@@ -1,122 +1,188 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
-const images = [
-  "/images/mobiles.png",
-  "/images/laptop_earbuds.png",
-  "/images/mens_wear.png",
-  "/images/kitchen_images.png",
+const DEFAULT_IMAGES = [
+  "/images/mobile.png",
+  "/images/gym.png",
+  "/images/kitchen.png",
 ];
 
-function Slider() {
+const AUTOPLAY_DELAY = 4000;
+const TRANSITION_MS = 700;
+
+function Slider({ images = DEFAULT_IMAGES, autoPlayDelay = AUTOPLAY_DELAY, rounded = "rounded-xl" }) {
   const [current, setCurrent] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [loaded, setLoaded] = useState({});
+  const timerRef = useRef(null);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
-  const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % images.length);
-  };
+  const prefersReducedMotion = useMemo(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,
+    []
+  );
 
-  const prevSlide = () => {
-    setCurrent((prev) =>
-      prev === 0 ? images.length - 1 : prev - 1
-    );
-  };
+  const goTo = useCallback(
+    (index) => {
+      if (isAnimating) return;
+      const next = ((index % images.length) + images.length) % images.length;
+      setIsAnimating(true);
+      setCurrent(next);
+      window.setTimeout(() => setIsAnimating(false), prefersReducedMotion ? 0 : TRANSITION_MS);
+    },
+    [images.length, isAnimating, prefersReducedMotion]
+  );
 
+  const nextSlide = useCallback(() => goTo(current + 1), [current, goTo]);
+  const prevSlide = useCallback(() => goTo(current - 1), [current, goTo]);
+
+  // Autoplay — pauses on hover/focus, restarts its full window on every change
   useEffect(() => {
-    const timer = setInterval(() => {
-      nextSlide();
-    }, 4000);
+    if (isHovering || prefersReducedMotion || images.length <= 1) return;
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % images.length);
+    }, autoPlayDelay);
+    return () => clearInterval(timerRef.current);
+  }, [isHovering, current, autoPlayDelay, images.length, prefersReducedMotion]);
 
-    return () => clearInterval(timer);
-  }, []);
+  const handleManualNav = (action) => {
+    clearInterval(timerRef.current);
+    action();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowLeft") handleManualNav(prevSlide);
+    if (e.key === "ArrowRight") handleManualNav(nextSlide);
+  };
+
+  const handleTouchStart = (e) => (touchStartX.current = e.touches[0].clientX);
+  const handleTouchMove = (e) => (touchEndX.current = e.touches[0].clientX);
+  const handleTouchEnd = () => {
+    const delta = touchStartX.current - touchEndX.current;
+    if (Math.abs(delta) > 50) {
+      handleManualNav(delta > 0 ? nextSlide : prevSlide);
+    }
+  };
+
+  const handleImageLoad = (index) => setLoaded((prev) => ({ ...prev, [index]: true }));
 
   return (
-    <div className="max-w-[1600px] xl:max-w-[1800px] mx-auto px-2 md:px-4 lg:px-5 mt-4">
-      <div className="relative overflow-hidden rounded-2xl shadow-xl bg-white">
+    <div
+      className={`relative overflow-hidden ${rounded} group outline-none`}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      onFocus={() => setIsHovering(true)}
+      onBlur={() => setIsHovering(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Promotional banners"
+    >
+      {/* Skeleton shimmer until the active image has actually loaded */}
+      {!loaded[current] && <div className="absolute inset-0 bg-slate-200 animate-pulse z-0" />}
 
-        {/* Banner */}
-        <img
-          key={current}
-          src={images[current]}
-          alt="banner"
-          className="
-            w-full
-            h-auto
-            max-h-[450px]
-            lg:max-h-[500px]
-            xl:max-h-[450px]
-            object-contain
-            transition-all
-            duration-500
-          "
-        />
-
-        {/* Light Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/[0.03] to-transparent pointer-events-none" />
-
-        {/* Left Arrow */}
-        <button
-          onClick={prevSlide}
-          className="
-            hidden lg:flex
-            items-center
-            justify-center
-            absolute
-            left-6
-            top-1/2
-            -translate-y-1/2
-            bg-white/80
-            hover:bg-white
-            shadow-2xl
-            rounded-full
-            p-3
-            transition-all
-            duration-300
-            hover:scale-110
-          "
-        >
-          <ChevronLeftIcon fontSize="large" />
-        </button>
-
-        {/* Right Arrow */}
-        <button
-          onClick={nextSlide}
-          className="
-            hidden lg:flex
-            items-center
-            justify-center
-            absolute
-            right-6
-            top-1/2
-            -translate-y-1/2
-            bg-white/80
-            hover:bg-white
-            shadow-2xl
-            rounded-full
-            p-3
-            transition-all
-            duration-300
-            hover:scale-110
-          "
-        >
-          <ChevronRightIcon fontSize="large" />
-        </button>
-
-        {/* Dots */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrent(index)}
-              className={`transition-all duration-300 rounded-full ${
-                current === index
-                  ? "w-10 h-2 bg-primary"
-                  : "w-2 h-2 bg-white/80"
-              }`}
-            />
-          ))}
-        </div>
+      {/* Sliding track */}
+      <div
+        className="flex cursor-pointer"
+        style={{
+          transform: `translateX(-${current * 100}%)`,
+          transition: prefersReducedMotion ? "none" : `transform ${TRANSITION_MS}ms ease-out`,
+        }}
+      >
+        {images.map((src, index) => (
+          <img
+            key={src}
+            src={src}
+            alt={`Promotional banner ${index + 1}`}
+            loading={index === 0 ? "eager" : "lazy"}
+            onLoad={() => handleImageLoad(index)}
+            className="
+              w-full flex-shrink-0 relative z-10
+              h-[180px] sm:h-[350px] md:h-[450px] lg:h-[450px] xl:h-[520px]
+              object-contain lg:object-cover bg-white
+            "
+          />
+        ))}
       </div>
+
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-transparent to-black/5 pointer-events-none z-10" />
+
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={() => handleManualNav(prevSlide)}
+            aria-label="Previous slide"
+            className="
+              hidden lg:flex items-center justify-center
+              absolute left-6 top-1/2 -translate-y-1/2
+              w-12 h-12 bg-white/90 hover:bg-white shadow-xl rounded-full
+              transition-all duration-300 hover:scale-110
+              opacity-0 group-hover:opacity-100 focus-visible:opacity-100 z-20
+            "
+          >
+            <ChevronLeftIcon />
+          </button>
+
+          <button
+            onClick={() => handleManualNav(nextSlide)}
+            aria-label="Next slide"
+            className="
+              hidden lg:flex items-center justify-center
+              absolute right-6 top-1/2 -translate-y-1/2
+              w-12 h-12 bg-white/90 hover:bg-white shadow-xl rounded-full
+              transition-all duration-300 hover:scale-110
+              opacity-0 group-hover:opacity-100 focus-visible:opacity-100 z-20
+            "
+          >
+            <ChevronRightIcon />
+          </button>
+
+          {/* Dots with autoplay progress fill */}
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => handleManualNav(() => goTo(index))}
+                aria-label={`Go to slide ${index + 1}`}
+                aria-current={current === index}
+                className={`rounded-full overflow-hidden transition-all duration-300 ${
+                  current === index ? "w-10 h-2 bg-white/40" : "w-2 h-2 bg-white/60 hover:bg-white/80"
+                }`}
+              >
+                {current === index && !isHovering && !prefersReducedMotion && (
+                  <span
+                    key={`progress-${current}`}
+                    className="block h-full bg-primary rounded-full"
+                    style={{ animation: `slider-progress ${autoPlayDelay}ms linear forwards` }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Slide counter */}
+          <div className="absolute top-4 right-4 lg:right-6 bg-black/40 text-white text-xs font-medium px-2.5 py-1 rounded-full z-20 tabular-nums">
+            {current + 1} / {images.length}
+          </div>
+        </>
+      )}
+
+      <style>{`
+        @keyframes slider-progress {
+          from { width: 0% }
+          to { width: 100% }
+        }
+      `}</style>
     </div>
   );
 }

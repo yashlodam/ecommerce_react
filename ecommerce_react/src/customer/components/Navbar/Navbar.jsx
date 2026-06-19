@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import MenuIcon from '@mui/icons-material/Menu';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -12,34 +12,43 @@ import StoreIcon from '@mui/icons-material/Store';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import CategorySheet from './CategorySheet';
+import { mainCategory } from '../../../data/category/mainCategory';
 function Navbar() {
 
     const theme = useTheme();
     const isLarge = useMediaQuery(theme.breakpoints.up("lg"));
 
+    const [selectedCategory,setSelectedCategory] = useState('');
+    const [showCategorySheet,setShowCategorySheet] = useState();
+
   return (
     <>
-        <Box>
+        <Box className="sticky top-0 left-0 right-0 bg-white" sx = {{zIndex:2}}>
             <div className='flex items-center justify-between px-5 lg:px-20 h-[70px] border-b'>
                 <div className='flex items-center gap-4 lg:gap-10'>
                     <div className='flex items-center gap-2'>
+                      { !isLarge && (
                         <IconButton>
                             <MenuIcon/>
-
                         </IconButton>
+                      )}
                         <h1 className='logo cursor-pointer text-lg md:text-2xl text-[#00927c]'>
                             ShopSphere
                         </h1>
                     </div>
                     
                         <ul className='flex gap-2 lg:gap-4 items-center font-medium text-gray-800'>
-                        {["Men","Women","Home & Furniture","Electronics"].map((item,index)=>{
+                        {mainCategory.map((item,index)=>{
                             return(
                         <li
                             key={index}
+                            onMouseLeave={()=>setShowCategorySheet(false)}
+                            onMouseEnter={()=>{setSelectedCategory(item.categoryId)
+                            setShowCategorySheet(true)}}
                              className="mainCategory hover:text-primary hover:border-b-2 h-[70px] px-4 border-primary flex items-center cursor-pointer"
                              >
-                             {item}
+                             {item.name}
                           </li>
                             )
                         })}
@@ -74,6 +83,16 @@ function Navbar() {
                     }
                 </div>
             </div>
+
+            {
+            showCategorySheet &&  <div 
+            onMouseLeave={()=>setShowCategorySheet(false)}
+            onMouseOver={()=>setShowCategorySheet(true)}   
+            className='categorySheet absolute top-[4.41rem] left-20 right-20 '  >
+                 
+                <CategorySheet selectedCategory={selectedCategory} setShowSheet={setShowCategorySheet}/>
+            </div>
+            }
         </Box>
     </>
   )
