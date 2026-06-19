@@ -46,7 +46,7 @@ function ProductCard({ product }) {
         style={{transform:`translateX(${(index-currentImages)*100}%)`}}
         />)}
         
-          <div className="indicator flex flex-col items-center space-y-2">
+          {isHovered && <div className="indicator flex flex-col items-center space-y-2">
             
             <div className="flex gap-3">
               <Button variant="contained" color="secondary">
@@ -58,6 +58,7 @@ function ProductCard({ product }) {
             </div>
         
       </div>
+}
     </div>
     <div className="details pt-3 space-y-1 group-hover-effect rounded-md">
       <div className="name">
@@ -67,10 +68,10 @@ function ProductCard({ product }) {
       </div>
       <div className="price flex items-center gap-3">
         <span className="font-semibold text-gray-800">
-          rs 400
+          ₹ 400
         </span>
         <span className=".thin-line-through text-gray-400">
-          rs 999
+          ₹ 999
         </span>
         <span className="text-primary font-semibold">
           60%
