@@ -10,17 +10,24 @@ import Divider from '@mui/material/Divider'
 import FilterSerction from './FilterSerction';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Select from '@mui/material/Select';
+import Pagination from '@mui/material/Pagination';
 
 
 function Product() {
 
   const theme = useTheme();
   const isLarge = useMediaQuery(theme.breakpoints.up("lg"));
+  
+  const [page,setPage] = useState(1);
 
   const [sort,setSort] = useState("");
 
   const handleSortChange = (event)=>{
     setSort(event.target.value);
+  }
+
+  const handlePageChange = (value)=>{
+    setPage(value);
   }
 
   return (
@@ -70,8 +77,15 @@ function Product() {
         <Divider/>
         <section className="products_section grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y5 px-5 justify-center">
         {[1,1,1,1,1,1].map((item) => <ProductCard/>)}
+
+        
           </section>
+          <div className='flex justify-center py-10 '>
+       <Pagination onChange={(e,value)=> handlePageChange(value)} count={10} variant="outlined" color='primary' />
       </div>
+      </div>
+
+      
        
       </div>
     </div>
