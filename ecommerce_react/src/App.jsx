@@ -8,6 +8,8 @@ import { BrowserRouter } from 'react-router-dom';
 import ProductDetails from './customer/pages/ProductDetails/ProductDetails';
 import Review from './customer/pages/Review/Review';
 import Cart from './customer/pages/Cart/Cart';
+import Checkout from './customer/pages/Checkout/Checkout';
+import Account from './customer/pages/Account/Account';
 
 function App() {
   return (
@@ -18,7 +20,9 @@ function App() {
           {/* <Home/> */}
           {/* <Product/> */}
           {/* <ProductDetails/> */}
-          <Cart/>
+          {/* <Cart/> */}
+          {/* <Checkout/> */}
+          <Account/>
         </div>
         
       </ThemeProvider>
