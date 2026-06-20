@@ -11,6 +11,9 @@ function CartItem() {
                 <h1 className='font-semibold text-lg'>Virani Clothing</h1>
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti optio molestias minima, adipisci necessitatibus eum commodi aspernatur tempora, omnis laboriosam eius impedit aut id aperiam ducimus. Qui quae ducimus harum.</p>
             </div>
+            <div>
+                <h1>This is price section </h1>
+            </div>
         </div>
     </div>
   )
