@@ -9,7 +9,8 @@ const steps = [
   "Bank Details",
   "Supplier Details",
   "Bank detaisl",
-  
+  "Shop details"
+
 ]
 
 function SellerAccountForm() {
