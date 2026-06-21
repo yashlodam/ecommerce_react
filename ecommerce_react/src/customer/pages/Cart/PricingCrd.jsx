@@ -49,11 +49,6 @@ function PricingCrd() {
         </p>
       </div>
 
-      {/* Checkout Button */}
-      <button className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">
-        Proceed to Checkout
-      </button>
-
     </div>
   );
 }

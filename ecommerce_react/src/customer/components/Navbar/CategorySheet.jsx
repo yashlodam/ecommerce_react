@@ -12,6 +12,7 @@ import { homeFurnitureLevelThree } from "../../../data/category/level three/home
 import { beautyLevelThree } from "../../../data/category/level three/beautyLevelThree";
 
 import Box from "@mui/material/Box";
+import { useNavigate } from "react-router-dom";
 
 const categoryTwo = {
   men: menLevelTwo,
@@ -31,6 +32,7 @@ const categoryThree = {
 
 function CategorySheet({ selectedCategory, setShowSheet }) {
 
+  const navigate = useNavigate();
 
   const childCategory = (category, parentCategoryId) => {
     if (!Array.isArray(category)) return [];
@@ -68,6 +70,7 @@ function CategorySheet({ selectedCategory, setShowSheet }) {
                 item.categoryId
               ).map((child) => (
                 <li
+                onClick={()=> navigate("/products/"+child.categoryId)}
                   key={child.categoryId}
                   className="font-semibold text-sm hover:text-primary cursor-pointer"
                 >

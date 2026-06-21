@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import CartItem from './CartItem'
 import PricingCrd from './PricingCrd'
+import { useNavigate } from 'react-router-dom';
 
 function Cart() {
 
@@ -23,6 +24,8 @@ function Cart() {
     const handleChange = (e)=>{
         setCouponCode(e.target.value)
     }
+
+    const navigate = useNavigate();
 
   return (
     <div className='pt-10 px-5 sm:px-10 md:px-60 min-h-screen'>
@@ -103,6 +106,10 @@ function Cart() {
 
     </div>
                 <PricingCrd/>
+                {/* Checkout Button */}
+      <button onClick={()=> navigate("/checkout")} className="w-full cursor-pointer bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">
+        Proceed to Checkout
+      </button>
             </div>
         </div>
     </div>
