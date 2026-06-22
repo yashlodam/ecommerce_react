@@ -1,20 +1,29 @@
 import React from 'react'
 import DrawerList from './DrawerList'
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import AddIcon from '@mui/icons-material/Add';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import LogoutIcon from '@mui/icons-material/Logout';
 
-function SellerDrawerList() {
-    const menu = [
+
+
+ const menu = [
             {
                 name:"Dashboard",
                 path:"/seller",
-                icon:<Dashboard className="text-primary"/>,
-                activeIcon:<Dashboard className="text-white"/>,
+                icon:<DashboardIcon className="text-primary"/>,
+                activeIcon:<DashboardIcon className="text-white"/>,
             },
-            {
-                name:"Seller",
-                path:"/seller/orders",
-                icon:<ShoppingBagIcon className="text-primary"/>,
-                activeIcon:<ShoppingBagIcon className="text-white"/>,
-            },
+            // {
+            //     name:"Seller",
+            //     path:"/seller/orders",
+            //     icon:<ShoppingBagIcon className="text-primary"/>,
+            //     activeIcon:<ShoppingBagIcon className="text-white"/>,
+            // },
             {
                 name:"Orders",
                 path:"/seller/orders",
@@ -63,11 +72,14 @@ function SellerDrawerList() {
                 activeIcon:<LogoutIcon className="text-white"/>,
             },
         ]
+
+function SellerDrawerList({toggleDrawer}) {
+  
   return (
     <div>
-        <DrawerList menu={menu} menu2={menu2} toggleDrawer={true}/>
+        <DrawerList menu={menu} menu2={menu2} toggleDrawer={toggleDrawer}/>
     </div>
   )
 }
 
-export default SellerDrawerList
+export default SellerDrawerList 

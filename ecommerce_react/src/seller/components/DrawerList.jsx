@@ -1,14 +1,11 @@
 import React from 'react'
-import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import AddIcon from '@mui/icons-material/Add';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import LogoutIcon from '@mui/icons-material/Logout';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import { ListItemText } from '@mui/material';
+import { useLocation } from "react-router-dom";
 
 function DrawerList({menu,menu2,toggleDrawer}) {
+
+    const location = useLocation();
 
     
   return (
@@ -20,14 +17,16 @@ function DrawerList({menu,menu2,toggleDrawer}) {
 
          {
             menu.map((item,index)=>{
-                <div key={index}>
-                    <p>
+                return(
+                <div className='pr-9 cursor-pointer' key={index}>
+                    <p className={`${item.path==location.pathname ? "bg-primary text-white":"text-primary"} flex items-center px-5 py-3 rounded-r-full`}>
                        <ListItemIcon>
-                        {item.icon}
+                        {item.path==location.pathname?item.activeIcon:item.icon}
                         </ListItemIcon> 
-                        ListItemIcon
+                      <ListItemText primary={item.name}/>
                     </p>
                 </div>
+                );
             })
          }
 
