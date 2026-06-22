@@ -1,5 +1,6 @@
 import React from 'react'
 import SellerDrawerList from '../../components/SellerDrawerList'
+import SellerRoute from '../../../Routes/SellerRoute'
 
 function SellerDashboard() {
 
@@ -15,7 +16,7 @@ function SellerDashboard() {
                 <SellerDrawerList toggleDrawer={toggleDrawer}/>
             </section>
             <section className='p-10 w-full lg:w-[80%] overflow-y-auto'>
-                seller routes
+                <SellerRoute/>
             </section>
         </div>
 

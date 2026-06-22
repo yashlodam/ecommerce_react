@@ -76,9 +76,9 @@ import LogoutIcon from '@mui/icons-material/Logout';
 function SellerDrawerList({toggleDrawer}) {
   
   return (
-    <div>
+   
         <DrawerList menu={menu} menu2={menu2} toggleDrawer={toggleDrawer}/>
-    </div>
+    
   )
 }
 
