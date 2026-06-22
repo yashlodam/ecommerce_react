@@ -39,17 +39,19 @@ const rows = [
   createData('Gingerbread', 356, 16.0, 49, 3.9),
 ];
 
-export default function Transaction() {
+export default function ProductTable() {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell>Date</StyledTableCell>
-            <StyledTableCell align="right">Customer Details</StyledTableCell>
-            <StyledTableCell align="right">Order</StyledTableCell>
-            <StyledTableCell align="right">Amount</StyledTableCell>
-             
+            <StyledTableCell>Images</StyledTableCell>
+            <StyledTableCell align="right">Title</StyledTableCell>
+            <StyledTableCell align="right">MRP</StyledTableCell>
+            <StyledTableCell align="right">Selling Price</StyledTableCell>
+             <StyledTableCell align="right">Color</StyledTableCell>
+              <StyledTableCell align="right">Update Stock</StyledTableCell>
+              <StyledTableCell align="right">Update</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -61,8 +63,9 @@ export default function Transaction() {
               <StyledTableCell align="right">{row.fat}</StyledTableCell>
               <StyledTableCell align="right">{row.carbs}</StyledTableCell>
               <StyledTableCell align="right">{row.protein}</StyledTableCell>
-              
-              
+              <StyledTableCell align="right">{row.fat}</StyledTableCell>
+              <StyledTableCell align="right">{row.carbs}</StyledTableCell>
+              <StyledTableCell align="right">{row.protein}</StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>
