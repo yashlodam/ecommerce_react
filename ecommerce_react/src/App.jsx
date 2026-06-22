@@ -11,6 +11,7 @@ import Cart from './customer/pages/Cart/Cart';
 import Checkout from './customer/pages/Checkout/Checkout';
 import Account from './customer/pages/Account/Account';
 import BecomeSeller from './customer/pages/Become_seller/BecomeSeller';
+import SellerDashboard from './seller/pages/SellerDashboard/SellerDashboard';
 
 
 function App() {
@@ -37,6 +38,9 @@ function App() {
 
                 <Route path='/account/*' element={<Account/>}/>
                 <Route path='/become-seller' element={<BecomeSeller/>}/>
+
+                 <Route path='/seller/*' element={<SellerDashboard/>}/>
+
                 
 
           </Routes>
