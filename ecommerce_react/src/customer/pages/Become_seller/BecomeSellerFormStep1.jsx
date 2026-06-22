@@ -1,5 +1,7 @@
 import TextField from '@mui/material/TextField'
 import React from 'react'
+import Box from '@mui/material/Box';
+
 
 function BecomeSellerFormStep1({formik}) {
   return (
@@ -14,6 +16,16 @@ function BecomeSellerFormStep1({formik}) {
             onChange={formik.handleChange}
             error={formik.touched.mobile && Boolean(formik.errors.mobile)}
             helperText={formik.touched.mobile && formik.errors.mobile}
+            />
+
+            <TextField
+            fullWidth
+            name='GSTIN'
+            label="GSTIN"
+            value={formik.value.GSTIN}
+            onChange={formik.handleChange}
+            error={formik.touched.GSTIN && Boolean(formik.errors.GSTIN)}
+            helperText={formik.touched.GSTIN && formik.errors.GSTIN}
             />
         </div>
     </Box>

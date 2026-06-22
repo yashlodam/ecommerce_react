@@ -3,7 +3,8 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 import React, { useState } from 'react'
-
+import BecomeSellerFormStep1 from './BecomeSellerFormStep1';
+import { useFormik } from "formik";
 const steps = [
   "Tax Details & Mobile",
   "Pickup Address",
@@ -14,6 +15,42 @@ const steps = [
 
 function SellerAccountForm() {
   const [activeStep,setActiveStep] = useState(0);
+  const formik = useFormik({
+  initialValues: {
+    mobile: "",
+    otp: "",
+    gstin: "",
+    pickupAddress: {
+      name: "",
+      mobile: "",
+      pincode: "",
+      address: "",
+      locality: "",
+      city: "",
+      state: "",
+    },
+    bankDetails: {
+      accountNumber: "",
+      ifscCode: "",
+      accountHoldername: "",
+    },
+    sellerName: "",
+    email: "",
+    businessDetails: {
+      businessName: "",
+      businessEmail: "",
+      businessMobile: "",
+      logo: "",
+      banner: "",
+      businessAddress: "",
+    },
+    password: "",
+  },
+
+  onSubmit: (values) => {
+    console.log(values, "formik submitted");
+  },
+});
 
   const handleStep= (value)=>()=>{
     
@@ -40,7 +77,7 @@ function SellerAccountForm() {
         }
       </Stepper>
       <section>
-
+        {activeStep==0 ? <BecomeSellerFormStep1 formik={formik}/> : null}
       </section>
       <div className='flex items-center justify-between'>
         <Button onClick={handleStep(-1)} variant='contained' disabled={activeStep==0}>
