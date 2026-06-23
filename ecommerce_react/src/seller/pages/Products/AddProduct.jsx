@@ -4,8 +4,9 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Select from "@mui/material/Select";
-
+import { mainCategory } from "../../../data/category/mainCategory";
 import {
+  Button,
   FormControl,
   FormHelperText,
   InputLabel,
@@ -292,11 +293,129 @@ const handleRemoveImage = (index) => {
   </FormControl>
 </Grid>
 
+ <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+  <FormControl
+    fullWidth
+    error={formik.touched.category && Boolean(formik.errors.category)}
+    required
+  >
+    <InputLabel id="category-label">Category</InputLabel>
 
-          
-          
-          
+    <Select
+      labelId="category-label"
+      id="category"
+      name="category"
+      value={formik.values.category}
+      onChange={formik.handleChange}
+      onBlur={formik.handleBlur}
+      label="Size"
+    >
+      <MenuItem value="">
+        <em>None</em>
+      </MenuItem>
 
+      {mainCategory.map((item) => (
+        <MenuItem key={item.categoryId} value={item.name}>
+          {item.name}
+        </MenuItem>
+      ))}
+    </Select>
+
+    {formik.touched.category && formik.errors.category && (
+      <FormHelperText>{formik.errors.category}</FormHelperText>
+    )}
+  </FormControl>
+</Grid>
+
+   <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+  <FormControl
+    fullWidth
+    error={formik.touched.category && Boolean(formik.errors.category)}
+    required
+  >
+    <InputLabel id="category2-label">Second Category</InputLabel>
+
+    <Select
+      labelId="category2-label"
+      id="category2"
+      name="category2"
+      value={formik.values.category2}
+      onChange={formik.handleChange}
+      onBlur={formik.handleBlur}
+      label="Size"
+    >
+      <MenuItem value="">
+        <em>None</em>
+      </MenuItem>
+
+      {mainCategory.map((item) => (
+        <MenuItem key={item.categoryId} value={item.name}>
+          {item.name}
+        </MenuItem>
+      ))}
+    </Select>
+
+    {formik.touched.category && formik.errors.category && (
+      <FormHelperText>{formik.errors.category}</FormHelperText>
+    )}
+  </FormControl>
+</Grid>
+
+
+
+<Grid size={{ xs: 12, md: 4, lg: 3 }}>
+  <FormControl
+    fullWidth
+    error={formik.touched.category3 && Boolean(formik.errors.category3)}
+    required
+  >
+    <InputLabel id="category-label">Third Category</InputLabel>
+
+    <Select
+      labelId="category3-label"
+      id="category3"
+      name="category3"
+      value={formik.values.category3}
+      onChange={formik.handleChange}
+      onBlur={formik.handleBlur}
+      label="Size"
+    >
+      <MenuItem value="">
+        <em>None</em>
+      </MenuItem>
+
+      {mainCategory.map((item) => (
+        <MenuItem key={item.categoryId} value={item.name}>
+          {item.name}
+        </MenuItem>
+      ))}
+    </Select>
+
+    {formik.touched.category3 && formik.errors.category3 && (
+      <FormHelperText>{formik.errors.category3}</FormHelperText>
+    )}
+  </FormControl>
+</Grid>
+
+    <Grid size={{xs:12}}>
+
+      <Button
+      sx={{p:"14px"}}
+      color="primary"
+      variant="contained"
+      fullWidth
+      type="submit"
+      >
+        {
+          false ? <CircularProgress size="small"/>:""
+        }
+        ADD PRODUCT
+
+      </Button>
+
+    </Grid>
+
+      
         </Grid>
       </form>
     </div>
