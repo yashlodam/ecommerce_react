@@ -5,6 +5,17 @@ import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Select from "@mui/material/Select";
 import { mainCategory } from "../../../data/category/mainCategory";
+import { menLevelTwo } from "../../../data/category/level two/menLevelTwo";
+import { womenLevelTwo } from "../../../data/category/level two/womensLevelTwo";
+import { electronicsLevelTwo } from "../../../data/category/level two/electronicsLevelTwo";
+import { homeFurnitureLevelTwo } from "../../../data/category/level two/homeFurnitureLevelTwo";
+import { beautyLevelTwo } from "../../../data/category/level two/beautyLevelTwo";
+
+import { menLevelThree } from "../../../data/category/level three/menLevelThree";
+import { womenLevelThree } from "../../../data/category/level three/womenLevelThree";
+import { electronicsLevelThree } from "../../../data/category/level three/electronicsLevelThree";
+import { homeFurnitureLevelThree } from "../../../data/category/level three/homeFurnitureLevelThree";
+import { beautyLevelThree } from "../../../data/category/level three/beautyLevelThree";
 import {
   Button,
   FormControl,
@@ -16,6 +27,23 @@ import {
 
 import { useFormik } from "formik";
 import { uploadToCloudinary } from "../../../Util/uploadToCloudinary";
+
+
+const categoryTwo = {
+  men: menLevelTwo,
+  women: womenLevelTwo,
+  electronics: electronicsLevelTwo,
+  home_furniture: homeFurnitureLevelTwo,
+  beauty: beautyLevelTwo,
+};
+
+const categoryThree = {
+  men: menLevelThree,
+  women: womenLevelThree,
+  electronics: electronicsLevelThree,
+  home_furniture: homeFurnitureLevelThree,
+  beauty: beautyLevelThree,
+};
 
 const colors = [
   { name: "Black", hex: "#000000" },
@@ -91,7 +119,6 @@ const handleRemoveImage = (index) => {
   },
 });
 
-  
 
   
 
@@ -175,6 +202,7 @@ const handleRemoveImage = (index) => {
           <Grid size={{xs:12}}>
             <TextField
             fullWidth
+            multiline
             rows={4}
             id='description'
             name='description'
@@ -182,7 +210,7 @@ const handleRemoveImage = (index) => {
             value={formik.values.description}
             onChange={formik.handleChange}
             error={formik.touched.description && Boolean(formik.errors.description)}
-            helperText={formik.touched.title && formik.errors.description}
+            helperText={formik.touched.description && formik.errors.description}
             required
             />
           </Grid>
@@ -315,7 +343,7 @@ const handleRemoveImage = (index) => {
       </MenuItem>
 
       {mainCategory.map((item) => (
-        <MenuItem key={item.categoryId} value={item.name}>
+        <MenuItem key={item.categoryId} value={item.categoryId}>
           {item.name}
         </MenuItem>
       ))}
@@ -330,7 +358,7 @@ const handleRemoveImage = (index) => {
    <Grid size={{ xs: 12, md: 4, lg: 3 }}>
   <FormControl
     fullWidth
-    error={formik.touched.category && Boolean(formik.errors.category)}
+    error={formik.touched.category2 && Boolean(formik.errors.category2)}
     required
   >
     <InputLabel id="category2-label">Second Category</InputLabel>
@@ -348,15 +376,15 @@ const handleRemoveImage = (index) => {
         <em>None</em>
       </MenuItem>
 
-      {mainCategory.map((item) => (
-        <MenuItem key={item.categoryId} value={item.name}>
-          {item.name}
-        </MenuItem>
-      ))}
+      {(categoryTwo[formik.values.category] || []).map((item) => (
+  <MenuItem key={item.categoryId} value={item.categoryId}>
+    {item.name}
+  </MenuItem>
+))}
     </Select>
 
-    {formik.touched.category && formik.errors.category && (
-      <FormHelperText>{formik.errors.category}</FormHelperText>
+    {formik.touched.category2 && formik.errors.category2 && (
+      <FormHelperText>{formik.errors.category2}</FormHelperText>
     )}
   </FormControl>
 </Grid>
@@ -369,7 +397,7 @@ const handleRemoveImage = (index) => {
     error={formik.touched.category3 && Boolean(formik.errors.category3)}
     required
   >
-    <InputLabel id="category-label">Third Category</InputLabel>
+    <InputLabel id="category3-label">Third Category</InputLabel>
 
     <Select
       labelId="category3-label"
@@ -384,11 +412,14 @@ const handleRemoveImage = (index) => {
         <em>None</em>
       </MenuItem>
 
-      {mainCategory.map((item) => (
-        <MenuItem key={item.categoryId} value={item.name}>
-          {item.name}
-        </MenuItem>
-      ))}
+      {childCategory(
+  categoryThree[formik.values.category] || [],
+  formik.values.category2
+).map((item) => (
+  <MenuItem key={item.categoryId} value={item.categoryId}>
+    {item.name}
+  </MenuItem>
+))}
     </Select>
 
     {formik.touched.category3 && formik.errors.category3 && (
