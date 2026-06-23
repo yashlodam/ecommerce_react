@@ -1,8 +1,13 @@
 export const uploadToCloudinary = async (pics) => {
   const cloud_name = "dkn3nesb8";
-  const upload_preset = "ml_default";
+ const upload_preset = "ecommerce_upload";
 
-  if (pics) {
+  if (!pics) {
+    console.error("No image selected");
+    return null;
+  }
+
+  try {
     const data = new FormData();
 
     data.append("file", pics);
@@ -18,8 +23,13 @@ export const uploadToCloudinary = async (pics) => {
 
     const fileData = await res.json();
 
-    return fileData.secure_url; // better than url
-  } else {
-    console.log("Error: pics not found");
+    if (!res.ok) {
+      throw new Error(fileData.error?.message || "Upload failed");
+    }
+
+    return fileData.secure_url;
+  } catch (error) {
+    console.error("Cloudinary Upload Error:", error);
+    return null;
   }
 };
