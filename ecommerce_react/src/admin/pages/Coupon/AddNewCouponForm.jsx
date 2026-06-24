@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 function AddNewCouponForm() {
 
@@ -37,6 +38,7 @@ function AddNewCouponForm() {
 
   return (
     <div>
+      <h1 className='text-2xl font-bold text-primary pb-5 text-center'>Create New Coupon</h1>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box component={"form"} onSubmit={formik.hanndleSubmit} sx={{mt:3}}>
         <Grid container spacing={2}>
@@ -53,6 +55,65 @@ function AddNewCouponForm() {
 
             
           </Grid>
+
+          <Grid size={{xs:12,sm:6}}>
+            <TextField
+            fullWidth
+            name='discountPercentage'
+            label='Discount Percentage'
+            value={formik.values.discountPercentage}
+            onChange={formik.handleChange}
+            error={formik.touched.discountPercentage && Boolean(formik.errors.discountPercentage)}
+            helperText={formik.touched.discountPercentage && formik.errors.discountPercentage}
+            />
+
+            
+          </Grid>
+           <Grid size={{xs:12,sm:6}}>
+            
+            <DatePicker
+            sx={{width:"100%"}}
+            label="Validity Start Date"
+            name='validityStartDate'
+            onChange={formik.handleChange}
+            value={formik.values.validityStartDate}
+            />
+            
+          </Grid>
+
+           <Grid size={{xs:12,sm:6}}>
+            
+            <DatePicker
+            sx={{width:"100%"}}
+            label="Validity End Date"
+            name='validityEndDate'
+            onChange={formik.handleChange}
+            value={formik.values.validityEndDate}
+            />
+            
+          </Grid>
+
+          <Grid size={{xs:12}}>
+            <TextField
+            fullWidth
+            name='minimumOrderValue'
+            label='Minimum Order Value'
+            value={formik.values.minimumOrderValue}
+            onChange={formik.handleChange}
+            error={formik.touched.minimumOrderValue && Boolean(formik.errors.minimumOrderValue)}
+            helperText={formik.touched.minimumOrderValue && formik.errors.minimumOrderValue}
+            />
+
+            
+          </Grid>
+
+          <Grid size={{xs:12}}>
+            <Button variant='contained' fullWidth sx={{py:".8rem"}}> 
+              Create Coupon
+            </Button>
+          </Grid>
+
+          
         </Grid>
 
       </Box>
