@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Navbar from './customer/components/Navbar/Navbar'
 import { ThemeProvider } from '@emotion/react'
 import customeTheme from "./Theme/customeTheme";
@@ -16,7 +16,13 @@ import Dashboard from './admin/pages/Dashboard/Dashboard';
 import AdminDashboard from './admin/pages/Dashboard/Dashboard';
 
 
+
 function App() {
+
+  // useEffect(()=>{
+  //   fetchProducts();
+  // },[])
+
   return (
     <BrowserRouter>
       <ThemeProvider theme={customeTheme}>
