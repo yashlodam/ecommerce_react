@@ -1,8 +1,12 @@
 import React from 'react'
+import HomeCategoryTable from './HomeCategoryTable'
 
 function DealCategoryTable() {
+   
   return (
-    <div>DealCategoryTable</div>
+    <div>
+        <HomeCategoryTable/>
+    </div>
   )
 }
 

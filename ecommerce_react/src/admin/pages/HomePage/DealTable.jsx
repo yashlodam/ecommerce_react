@@ -8,6 +8,8 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -49,8 +51,9 @@ export default function DealTable() {
           <TableRow>
             <StyledTableCell>No</StyledTableCell>
             <StyledTableCell>Image</StyledTableCell>
-            <StyledTableCell align="right">Category</StyledTableCell>
-            <StyledTableCell align="right">Update</StyledTableCell>
+            <StyledTableCell align="right">Discount</StyledTableCell>
+            <StyledTableCell align="right">Edit</StyledTableCell>
+             <StyledTableCell align="right">Delete</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -61,11 +64,17 @@ export default function DealTable() {
               </StyledTableCell>
               <StyledTableCell >{row.calories}</StyledTableCell>
               <StyledTableCell>{row.fat}</StyledTableCell>
-              <StyledTableCell align="right">{row.carbs}</StyledTableCell>
+
+              
               <StyledTableCell align="right">
                 <Button>
                     <EditIcon/>
                 </Button>
+              </StyledTableCell>
+              <StyledTableCell align="right">
+               <IconButton>
+                <DeleteIcon sx={{color:"red"}}/>
+               </IconButton>
               </StyledTableCell>
             </StyledTableRow>
           ))}
