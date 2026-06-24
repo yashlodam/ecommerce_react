@@ -9,13 +9,11 @@ import InputAdornment from "@mui/material/InputAdornment";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import { useFormik } from "formik";
-import * as Yup from "yup";
-import { sendLoginSignupOtp, verifyLoginSignupOtp } from "../../../State/AuthSlice";
+import { sendLoginSignupOtp,signin } from "../../../State/AuthSlice";
 import { useAppDispatch } from "../../../State/Store";
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
-// Styles moved outside to prevent re-creation
 const inputStyle = {
   "& .MuiOutlinedInput-root": {
     borderRadius: "16px",
@@ -38,20 +36,7 @@ const gradientButtonSx = {
   "&.Mui-disabled": { background: "#a7d8d2", color: "#fff" },
 };
 
-// Yup schema – OTP field is only validated when otpSent is true
-const validationSchema = Yup.object({
-  email: Yup.string()
-    .email("Enter a valid email")
-    .required("Email is required"),
-  otp: Yup.string()
-    .when("$otpSent", {
-      is: true,
-      then: (schema) =>
-        schema
-          .matches(/^\d{6}$/, "OTP must be exactly 6 digits")
-          .required("OTP is required"),
-    }),
-});
+const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 function SellerLoginForm() {
   const [otpSent, setOtpSent] = useState(false);
@@ -65,26 +50,45 @@ function SellerLoginForm() {
   const navigate = useNavigate();
   const timerRef = useRef(null);
 
+  const otpSentRef = useRef(otpSent);
+  useEffect(() => {
+    otpSentRef.current = otpSent;
+  }, [otpSent]);
+
+  const validate = (values) => {
+    const errors = {};
+    if (!values.email) {
+      errors.email = "Email is required";
+    } else if (!EMAIL_REGEX.test(values.email)) {
+      errors.email = "Enter a valid email";
+    }
+    if (otpSentRef.current) {
+      if (!values.otp) {
+        errors.otp = "OTP is required";
+      } else if (!/^\d{6}$/.test(values.otp)) {
+        errors.otp = "OTP must be exactly 6 digits";
+      }
+    }
+    return errors;
+  };
+
   const formik = useFormik({
     initialValues: { email: "", otp: "" },
-    validationSchema,
-    // Pass the otpSent flag so the schema can conditionally validate OTP
-    validationContext: { otpSent },
+    validate,
     onSubmit: async (values) => {
       setError("");
       setSuccess("");
       setVerifying(true);
       try {
         const result = await dispatch(
-          verifyLoginSignupOtp({
+          signin({
             email: values.email.trim(),
             otp: values.otp.trim(),
           })
         ).unwrap();
         setSuccess(result?.message || "Login successful. Redirecting...");
-        // Small delay so the user sees the success message
         setTimeout(() => {
-          navigate("/seller/dashboard");
+          navigate("/seller");
         }, 1500);
       } catch (err) {
         const message =
@@ -98,7 +102,6 @@ function SellerLoginForm() {
     },
   });
 
-  // Cooldown countdown for resend button
   useEffect(() => {
     if (cooldown <= 0) {
       clearInterval(timerRef.current);
@@ -111,10 +114,9 @@ function SellerLoginForm() {
   }, [cooldown]);
 
   const handleSendOtp = async () => {
-    // Validate only the email field
-    const emailError = await formik.validateField("email");
+    const errors = await formik.validateForm();
     formik.setFieldTouched("email", true, false);
-    if (emailError) return;
+    if (errors.email) return;
 
     setError("");
     setSuccess("");
@@ -146,12 +148,10 @@ function SellerLoginForm() {
     formik.setFieldTouched("otp", false, false);
   };
 
-  // Auto-submit when OTP reaches 6 digits
   const handleOtpChange = (e) => {
     const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 6);
     formik.setFieldValue("otp", digitsOnly);
     if (digitsOnly.length === 6 && !verifying) {
-      // Allow formik state to update before submitting
       setTimeout(() => formik.submitForm(), 0);
     }
   };
@@ -162,7 +162,7 @@ function SellerLoginForm() {
         width: "100%",
         maxWidth: { xs: "100%", sm: 480 },
         mx: "auto",
-        mt: { xs: 2, md: 5 },
+        mt: { xs: 3, md: 5 },
         p: { xs: 3, sm: 4, md: 5 },
         borderRadius: "28px",
         background: "#ffffff",
@@ -170,7 +170,6 @@ function SellerLoginForm() {
         boxShadow: `0 4px 12px rgba(0,0,0,.04), 0 12px 32px rgba(0,0,0,.08)`,
       }}
     >
-      {/* Header */}
       <div className="text-center mb-8">
         <div
           className="mx-auto mb-5 flex items-center justify-center rounded-full"
@@ -202,8 +201,8 @@ function SellerLoginForm() {
       )}
 
       <form onSubmit={formik.handleSubmit} noValidate>
-        <div className="space-y-5">
-          {/* Email Field */}
+        {/* 🔥 Changed from space-y-5 to space-y-4 for a tighter, cleaner gap */}
+        <div className="space-y-4">
           <TextField
             fullWidth
             name="email"
@@ -236,7 +235,6 @@ function SellerLoginForm() {
             </Button>
           ) : (
             <>
-              {/* Change Email Link */}
               <div className="text-right">
                 <Button
                   variant="text"
@@ -252,7 +250,6 @@ function SellerLoginForm() {
                 </Button>
               </div>
 
-              {/* OTP Field */}
               <TextField
                 fullWidth
                 name="otp"
@@ -278,14 +275,16 @@ function SellerLoginForm() {
                 sx={inputStyle}
               />
 
-              {/* Verify Button */}
               <Button
                 fullWidth
                 type="submit"
                 variant="contained"
                 size="large"
                 disabled={verifying}
-                sx={gradientButtonSx}
+                sx={{
+                  ...gradientButtonSx,
+                  mt: 3,
+                }}
               >
                 {verifying ? (
                   <CircularProgress size={22} sx={{ color: "#fff" }} />
@@ -294,7 +293,6 @@ function SellerLoginForm() {
                 )}
               </Button>
 
-              {/* Resend OTP */}
               <Button
                 fullWidth
                 variant="text"

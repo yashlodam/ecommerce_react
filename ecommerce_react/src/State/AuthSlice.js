@@ -24,3 +24,21 @@ export const sendLoginSignupOtp = createAsyncThunk(
     }
   }
 );
+
+export const signin = createAsyncThunk(
+  "auth/signin",
+  async ({ email, otp }, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/auth/login", {
+        email,
+        otp,
+      });
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Login failed"
+      );
+    }
+  }
+);
