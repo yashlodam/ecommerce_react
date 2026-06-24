@@ -1,8 +1,11 @@
 import React from 'react'
+import HomeCategoryTable from './HomeCategoryTable'
 
 function ShopByCategoryTable() {
   return (
-    <div>ShopByCategoryTable</div>
+    <div>
+      <HomeCategoryTable/>
+    </div>
   )
 }
 
