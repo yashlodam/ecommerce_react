@@ -14,14 +14,19 @@ import BecomeSeller from './customer/pages/Become_seller/BecomeSeller';
 import SellerDashboard from './seller/pages/SellerDashboard/SellerDashboard';
 import Dashboard from './admin/pages/Dashboard/Dashboard';
 import AdminDashboard from './admin/pages/Dashboard/Dashboard';
+import { useAppDispatch } from './State/Store';
+import { fetchSellerProfile } from './State/seller/sellerSlice';
 
 
 
 function App() {
 
-  // useEffect(()=>{
-  //   fetchProducts();
-  // },[])
+  const dispatch = useAppDispatch();
+  
+
+  useEffect(()=>{
+    dispatch(fetchSellerProfile(localStorage.getItem("jwt") || "") )
+  },[])
 
   return (
     <BrowserRouter>

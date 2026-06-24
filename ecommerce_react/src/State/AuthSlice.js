@@ -36,6 +36,9 @@ export const signin = createAsyncThunk(
 
       console.log(response.data)
 
+      const jwt = response.data.jwt;
+      localStorage.setItem("jwt",jwt);
+
       return response.data;
     } catch (error) {
       return rejectWithValue(
