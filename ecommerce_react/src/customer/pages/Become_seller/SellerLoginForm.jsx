@@ -82,7 +82,7 @@ function SellerLoginForm() {
       try {
         const result = await dispatch(
           signin({
-            email: values.email.trim(),
+            email: `seller_${values.email.trim()}`,
             otp: values.otp.trim(),
           })
         ).unwrap();
