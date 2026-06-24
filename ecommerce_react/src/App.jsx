@@ -28,12 +28,7 @@ function App() {
       <ThemeProvider theme={customeTheme}>
         <div>
           <Navbar/>
-          {/* <Home/> */}
-          {/* <Product/> */}
-          {/* <ProductDetails/> */}
-          {/* <Cart/> */}
-          {/* <Checkout/> */}
-          {/* <Account/> */}
+          
 
           <Routes>
 

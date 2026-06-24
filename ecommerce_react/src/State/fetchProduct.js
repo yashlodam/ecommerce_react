@@ -1,15 +1,15 @@
-// import axios from "axios";
+import axios from "axios";
 
-// const api = "http://localhost:5454/products"
+const api = "http://localhost:5454/products"
 
 
-// export const fetchProducts = async ()=>{
-//     try{
+export const fetchProducts = async ()=>{
+    try{
 
-//         const response = await axios.get(api)
-//         console.log("response",response.data);
+        const response = await axios.get(api)
+        console.log("response",response.data);
 
-//     }catch(error){
-//         console.log(error)
-//     }
-// }
+    }catch(error){
+        console.log(error)
+    }
+}

@@ -6,9 +6,12 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import InputAdornment from "@mui/material/InputAdornment";
 import { useFormik } from "formik";
+import { sendLoginSignupOtp } from "../../../State/AuthSlice";
+import { useAppDispatch } from "../../../State/Store";
 
 function SellerLoginForm() {
   const [otpSent, setOtpSent] = useState(false);
+  const dispatch = useAppDispatch()
 
   const formik = useFormik({
     initialValues: {
@@ -21,10 +24,9 @@ function SellerLoginForm() {
   });
 
   const handleSendOtp = () => {
-    console.log("Send OTP to:", formik.values.email);
-
-    // Call OTP API here
-
+    console.log(formik.values.email)
+    console.log(typeof formik.values.email)
+    dispatch(sendLoginSignupOtp(formik.values.email))
     setOtpSent(true);
   };
 
