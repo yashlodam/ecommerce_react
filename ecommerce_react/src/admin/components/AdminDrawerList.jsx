@@ -8,6 +8,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import AddIcon from '@mui/icons-material/Add';
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 const menu = [
             {
@@ -57,12 +58,12 @@ const menu = [
         ]
     
         const menu2 = [
-            // {
-            //     name:"Account",
-            //     path:"/admin/account",
-            //     icon:<AccountBoxIcon className="text-primary"/>,
-            //     activeIcon:<AccountBoxIcon className="text-white"/>,
-            // },
+            {
+                name:"Account",
+                path:"/admin/account",
+                icon:<AccountBoxIcon className="text-primary"/>,
+                activeIcon:<AccountBoxIcon className="text-white"/>,
+            },
             {
                 name:"Logout",
                 path:"/",
