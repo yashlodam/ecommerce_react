@@ -29,23 +29,32 @@ const initialState = {
 }
 
 const sellerSlice = createSlice({
-    name:"sellers",
+    name: "sellers",
     initialState,
-    reducers:{},
-    extraReducers:(builder)=>{
+    reducers: {
+        logout: (state) => {
+            state.profile = null;
+            state.selectedSeller = null;
+            state.report = null;
+            state.error = null;
+            state.loading = false;
+        }
+    },
+    extraReducers: (builder) => {
         builder
-        .addCase(fetchSellerProfile.pending,(state)=>{
-            state.loading=true;
+        .addCase(fetchSellerProfile.pending, (state) => {
+            state.loading = true;
         })
-        .addCase(fetchSellerProfile.fulfilled,(state,action)=>{
-            state.loading=false;
-            state.profile=action.payload
+        .addCase(fetchSellerProfile.fulfilled, (state, action) => {
+            state.loading = false;
+            state.profile = action.payload;
         })
-        .addCase(fetchSellerProfile.rejected,(state,action)=>{
-            state.loading=false;
-            state.error=action.payload;
-        })
+        .addCase(fetchSellerProfile.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        });
     }
-})
+});
 
+export const { logout } = sellerSlice.actions;
 export default sellerSlice.reducer;

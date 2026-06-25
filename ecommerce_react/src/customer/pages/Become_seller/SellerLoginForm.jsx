@@ -11,6 +11,7 @@ import Alert from "@mui/material/Alert";
 import { useFormik } from "formik";
 import { sendLoginSignupOtp,signin } from "../../../State/AuthSlice";
 import { useAppDispatch } from "../../../State/Store";
+import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
@@ -80,16 +81,23 @@ function SellerLoginForm() {
       setSuccess("");
       setVerifying(true);
       try {
-        const result = await dispatch(
-          signin({
-            email: `seller_${values.email.trim()}`,
-            otp: values.otp.trim(),
-          })
-        ).unwrap();
-        setSuccess(result?.message || "Login successful. Redirecting...");
-        // setTimeout(() => {
-        //   navigate("/seller");
-        // }, 1500);
+       const result = await dispatch(
+  signin({
+    email: `seller_${values.email.trim()}`,
+    otp: values.otp.trim(),
+  })
+).unwrap();
+
+setSuccess(result?.message || "Login successful.");
+
+const jwt = localStorage.getItem("jwt");
+console.log(jwt);
+
+if (jwt) {
+  await dispatch(fetchSellerProfile(jwt));
+}
+
+navigate("/seller");
       } catch (err) {
         const message =
           typeof err === "string"

@@ -2,6 +2,8 @@ import React from 'react'
 import ListItemIcon from '@mui/material/ListItemIcon';
 import { Divider, ListItemText } from '@mui/material';
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../State/Store";
+import { logout } from '../../State/seller/sellerSlice';
 
 function DrawerList({menu,menu2,toggleDrawer}) {
 
@@ -9,12 +11,13 @@ function DrawerList({menu,menu2,toggleDrawer}) {
 
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-  console.log("Logout clicked");
-  localStorage.removeItem("jwt");
-  navigate("/");
-};
+    const dispatch = useAppDispatch();
 
+    const handleLogout = () => {
+    localStorage.removeItem("jwt");
+    dispatch(logout());
+    navigate("/");
+};
     
   return (
     <div className='h-full'>

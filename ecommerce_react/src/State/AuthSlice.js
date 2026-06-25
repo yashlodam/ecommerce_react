@@ -34,7 +34,7 @@ export const signin = createAsyncThunk(
         otp,
       });
 
-      console.log(response.data)
+      console.log(email,otp);
 
       const jwt = response.data.jwt;
       localStorage.setItem("jwt",jwt);

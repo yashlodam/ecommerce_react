@@ -26,15 +26,7 @@ function App() {
   const navigate = useNavigate();
   
 
-  useEffect(()=>{
-    dispatch(fetchSellerProfile(localStorage.getItem("jwt") || "") )
-  },[])
-
-  useEffect(()=>{
-    if(seller.profile){
-      navigate("/seller")
-    }
-  },[seller.profile])
+  
 
   return (
     
