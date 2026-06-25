@@ -87,9 +87,9 @@ function SellerLoginForm() {
           })
         ).unwrap();
         setSuccess(result?.message || "Login successful. Redirecting...");
-        setTimeout(() => {
-          navigate("/seller");
-        }, 1500);
+        // setTimeout(() => {
+        //   navigate("/seller");
+        // }, 1500);
       } catch (err) {
         const message =
           typeof err === "string"

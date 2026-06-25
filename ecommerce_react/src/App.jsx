@@ -4,7 +4,7 @@ import { ThemeProvider } from '@emotion/react'
 import customeTheme from "./Theme/customeTheme";
 import Home from './customer/pages/Home/Home';
 import Product from './customer/pages/product/Product';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import ProductDetails from './customer/pages/ProductDetails/ProductDetails';
 import Review from './customer/pages/Review/Review';
 import Cart from './customer/pages/Cart/Cart';
@@ -14,7 +14,7 @@ import BecomeSeller from './customer/pages/Become_seller/BecomeSeller';
 import SellerDashboard from './seller/pages/SellerDashboard/SellerDashboard';
 import Dashboard from './admin/pages/Dashboard/Dashboard';
 import AdminDashboard from './admin/pages/Dashboard/Dashboard';
-import { useAppDispatch } from './State/Store';
+import { store, useAppDispatch, useAppSelector } from './State/Store';
 import { fetchSellerProfile } from './State/seller/sellerSlice';
 
 
@@ -22,14 +22,22 @@ import { fetchSellerProfile } from './State/seller/sellerSlice';
 function App() {
 
   const dispatch = useAppDispatch();
+  const {seller} = useAppSelector(store=> store)
+  const navigate = useNavigate();
   
 
   useEffect(()=>{
     dispatch(fetchSellerProfile(localStorage.getItem("jwt") || "") )
   },[])
 
+  useEffect(()=>{
+    if(seller.profile){
+      navigate("/seller")
+    }
+  },[seller.profile])
+
   return (
-    <BrowserRouter>
+    
       <ThemeProvider theme={customeTheme}>
         <div>
           <Navbar/>
@@ -58,7 +66,7 @@ function App() {
         </div>
         
       </ThemeProvider>
-      </BrowserRouter>
+      
 
       
     
