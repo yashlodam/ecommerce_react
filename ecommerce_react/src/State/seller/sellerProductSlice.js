@@ -8,7 +8,7 @@ export const fetchSellerProduct = createAsyncThunk("/sellerProduct/fetchSellerPr
     async(jwt)=>{
         try{
 
-            const response = await api.get("/sellers/product",{
+            const response = await api.get("/sellers/products",{
                 headers:{
                     Authorization:`Bearer ${jwt}`,
                 },
@@ -27,7 +27,7 @@ export const createProduct = createAsyncThunk("/sellerProduct/createProduct",
     async(jwt)=>{
         try{
 
-            const response = await api.post("/sellers/product",{
+            const response = await api.post("/sellers/products",{
                 headers:{
                     Authorization:`Bearer ${jwt}`,
                 },

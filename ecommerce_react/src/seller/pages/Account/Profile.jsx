@@ -5,9 +5,9 @@ import { useAppSelector } from "../../../State/Store";
 
 function Profile() {
   
-  const { profile, loading } = useAppSelector((store) => store.seller);
+  const {seller} = useAppSelector((store) => store);
 
-  console.log(profile)
+  console.log(seller)
 
   const SectionCard = ({ title, children }) => (
     <div className="bg-white rounded-lg shadow-sm border mb-6">

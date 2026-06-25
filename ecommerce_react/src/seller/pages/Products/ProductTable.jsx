@@ -1,16 +1,16 @@
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { CircularProgress } from "@mui/material";
-import { useEffect } from "react";
-
-import { useAppDispatch, useAppSelector } from "../../../State/Store";
-import { fetchSellerProduct } from "../../../State/seller/sellerProductSlice";
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import { store, useAppDispatch, useAppSelector } from '../../../State/Store';
+import { useEffect } from 'react';
+import { fetchSellerProduct } from '../../../State/seller/sellerProductSlice';
+import { Button, IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -23,106 +23,72 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
+  '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
   },
-  "&:last-child td, &:last-child th": {
+  // hide last border
+  '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
 
+function createData(name, calories, fat, carbs, protein) {
+  return { name, calories, fat, carbs, protein };
+}
+
+
+
 export default function ProductTable() {
+
   const dispatch = useAppDispatch();
+  const {sellerProduct} = useAppSelector(store=>store)
 
-  const { products, loading, error } = useAppSelector(
-    (store) => store.sellerProduct
-  );
-
-  useEffect(() => {
-    const jwt = localStorage.getItem("jwt");
-
-    if (jwt) {
-      dispatch(fetchSellerProduct(jwt));
-    }
-  }, [dispatch]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center mt-10">
-        <CircularProgress />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center text-red-500 mt-10">
-        {error}
-      </div>
-    );
-  }
+  useEffect(()=>{
+    dispatch(fetchSellerProduct(localStorage.getItem("jwt")))
+  },[])
 
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }}>
+      <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell>Image</StyledTableCell>
+            <StyledTableCell>Images</StyledTableCell>
             <StyledTableCell align="right">Title</StyledTableCell>
             <StyledTableCell align="right">MRP</StyledTableCell>
             <StyledTableCell align="right">Selling Price</StyledTableCell>
-            <StyledTableCell align="right">Color</StyledTableCell>
-            <StyledTableCell align="right">Stock</StyledTableCell>
-            <StyledTableCell align="right">Update</StyledTableCell>
+             <StyledTableCell align="right">Color</StyledTableCell>
+              <StyledTableCell align="right">Update Stock</StyledTableCell>
+              <StyledTableCell align="right">Update</StyledTableCell>
           </TableRow>
         </TableHead>
-
         <TableBody>
-          {products.length > 0 ? (
-            products.map((product) => (
-              <StyledTableRow key={product.id}>
-                <StyledTableCell>
-                  <img
-                    src={product.images?.[0]}
-                    alt={product.title}
-                    width={70}
-                    height={70}
-                    style={{ objectFit: "cover", borderRadius: "6px" }}
-                  />
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  {product.title}
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  ₹{product.mrpPrice}
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  ₹{product.sellingPrice}
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  {product.color}
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  {product.quantity}
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  Update
-                </StyledTableCell>
-              </StyledTableRow>
-            ))
-          ) : (
-            <StyledTableRow>
-              <StyledTableCell colSpan={7} align="center">
-                No Products Found
+          {sellerProduct.products.map((items) => (
+            <StyledTableRow key={items.id}>
+              <StyledTableCell component="th" scope="row">
+                <div className='flex gap-1 flex-wrap'>
+                  {items.images.map((image)=> <img className='w-20 rounded-md' alt='' src={image}/>)}
+                </div>
               </StyledTableCell>
+              <StyledTableCell align="right">{items.title}</StyledTableCell>
+              <StyledTableCell align="right">{items.mrpPrice}</StyledTableCell>
+              <StyledTableCell align="right">{items.sellingPrice}</StyledTableCell>
+              <StyledTableCell align="right">{items.color}</StyledTableCell>
+              <StyledTableCell align="right">
+                {
+                  <Button size='small'>
+                    in_stock
+                  </Button>
+                }
+              </StyledTableCell>
+              <StyledTableCell align="right">{
+                <IconButton color='primary' size='small'>
+                  <Button size='small'>
+                    <EditIcon/>
+                  </Button>
+                </IconButton>
+                  }</StyledTableCell>
             </StyledTableRow>
-          )}
+          ))}
         </TableBody>
       </Table>
     </TableContainer>
