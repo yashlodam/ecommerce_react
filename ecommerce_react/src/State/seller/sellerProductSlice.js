@@ -23,23 +23,29 @@ export const fetchSellerProduct = createAsyncThunk("/sellerProduct/fetchSellerPr
 )
 
 
-export const createProduct = createAsyncThunk("/sellerProduct/createProduct",
-    async(jwt)=>{
-        try{
-
-            const response = await api.post("/sellers/products",{
-                headers:{
-                    Authorization:`Bearer ${jwt}`,
-                },
-            })
-            console.log("seller product created successfully",response.data)
-            return response.data
-            
-        } catch(error){
-            console.log(error)
+export const createProduct = createAsyncThunk(
+  "sellerProduct/createProduct",
+  async ({ product, jwt }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(
+        "/sellers/products",
+        product,
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
         }
+      );
+
+      console.log("Seller product created successfully", response.data);
+
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue(error.response?.data || error.message);
     }
-)
+  }
+);
 
 const initialState = {
     products:[],

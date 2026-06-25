@@ -62,7 +62,7 @@ export default function ProductTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {sellerProduct.products.map((items) => (
+          {sellerProduct.products?.map((items) => (
             <StyledTableRow key={items.id}>
               <StyledTableCell component="th" scope="row">
                 <div className='flex gap-1 flex-wrap'>
