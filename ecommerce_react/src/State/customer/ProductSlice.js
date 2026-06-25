@@ -1,4 +1,4 @@
-import { createAsyncThunk, isRejectedWithValue } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, isRejectedWithValue } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const API_URL = "http://localhost:5454";
@@ -62,3 +62,32 @@ export const fetchAllProducts = createAsyncThunk(
 );
 
 
+const intialState = {
+    product:null,
+    products:[],
+    totalPages:1,
+    loading:false,
+    error:null,
+    searchProduct:[]
+}
+
+
+const productSlice = createSlice({
+    name:"products",
+    intialState,
+    reducers:{},
+    extraReducers:(builder)=>{
+        builder.addCase(fetchProductById.pending,(state)=>{
+            state.loading=true
+        });
+         builder.addCase(fetchProductById.fulfilled,(state,action)=>{
+            state.loading=false
+            state.product = action.payload
+        })
+         builder.addCase(fetchProductById.rejected,(state,action)=>{
+            state.loading=false;
+            state.error = action.error
+        })
+
+    }
+})
