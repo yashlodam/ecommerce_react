@@ -1,7 +1,7 @@
 import StarIcon from '@mui/icons-material/Star';
 import { teal } from '@mui/material/colors';
 import Divider from '@mui/material/Divider';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import ShieldIcon from '@mui/icons-material/Shield';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
@@ -14,26 +14,45 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import Review from '../Review/Review';
 import SimilarProduct from './SimilarProduct';
 import ReviewCard from '../Review/ReviewCard';
+import { useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { store, useAppSelector } from '../../../State/Store';
+import { fetchProductById } from '../../../State/customer/ProductSlice';
 
 function ProductDetails() {
 
   const [quantity,setQuantity] = useState(1)
+
+  const dispatch = useDispatch();
+  const {productId} = useParams()
+  const {product} = useAppSelector((store)=>store) 
+
+  const [activeImage,setActiveImage] = useState(0)
+
+  useEffect(()=>{
+    dispatch(fetchProductById(Number(productId)))
+  },[productId])
+
+  const handleActiveImage = (value)=>{
+    setActiveImage(value)
+  }
 
   return (
     <div className='px-5 lg:px-20 pt-10'>
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-12'>
         <section className='flex flex-col lg:flex-row gap-5'>
           <div className='w-full lg:w-[15%] flex flex-wrap lg:flex-col gap-3'>
-            {[1.1,1,1].map((item)=> <img className='lg:w-full w-[50px] cursor-pointer rounded-md' src='https://rukminim2.flixcart.com/image/964/964/xif0q/shirt/j/x/u/l-fk-may-fuul-shirt-linen-1-vraj-shopee-original-imahcyuehwzyap4c.jpeg?q=90'/>)}
+            {product.product?.images.map((item,index)=> <img 
+            onClick ={()=>handleActiveImage(index)} className='lg:w-full w-[50px] cursor-pointer rounded-md' src={item}/>)}
           </div>
           <div className='w-full lg:w-[85%]'>
-            <img className='w-full rounded-md' src="https://rukminim2.flixcart.com/image/964/964/xif0q/shirt/p/d/m/l-fk-may-fuul-shirt-linen-1-vraj-shopee-original-imahcyuebfdrjc2g.jpeg?q=90" alt="" />
+            <img className='w-full rounded-md' src={product.product?.images[activeImage]} alt="" />
           </div>
         </section>
 
         <section>
-          <h1 className='font-bold text-lg text-primary'>Ram Clothing</h1>
-          <p className='text-gray-500 font-semibold '>men black shirt</p>
+          <h1 className='font-bold text-lg text-primary'>{product.product?.seller?.businesssDetails.businessName}</h1>
+          <p className='text-gray-500 font-semibold '>{product.product?.title}</p>
           <div className='flex justify-between items-center py-2  w-[180px] px-3 mt-5'>
             <div className='flex gap-1 items-center'>
               <span>4</span>
@@ -47,13 +66,13 @@ function ProductDetails() {
           <div className='price flex items-center gap-3 mt-5 text-2xl'>
 
             <span className='font-sans text-gray-800'>
-              ₹ 400
+              ₹ {product.product?.sellingPrice}
             </span>
             <span className='line-through text-gray-400'>
-              ₹ 900
+              ₹ {product.product?.mrpPrice}
             </span>
             <span className='text-primary font-semibold'>
-              60%
+              {product.product?.discountPercent} %
             </span>
 
           </div>
@@ -110,7 +129,7 @@ function ProductDetails() {
           </div>
 
           <div className='mt-5'>
-            <p className='text-gray-500 font-semibold'>Upgrade your wardrobe with this premium linen casual shirt, designed for comfort and style. Crafted from high-quality breathable fabric, this shirt offers a lightweight feel and a modern fit, making it perfect for everyday wear, office meetings, casual outings, and special occasions. The durable stitching, soft texture, and elegant design ensure long-lasting performance while keeping you comfortable throughout the day.</p>
+            <p className='text-gray-500 font-semibold'>{product.product?.description}</p>
           </div>
 
           <div className='mt-7 space-y-5'>

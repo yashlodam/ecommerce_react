@@ -5,12 +5,15 @@ import Button from "@mui/material/Button";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import { teal } from "@mui/material/colors";
+import { useNavigate } from "react-router-dom";
 
 function ProductCard({ item }) {
   const images = item.images || [];
 
   const [currentImage, setCurrentImage] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isHovered || images.length <= 1) return;
@@ -23,8 +26,8 @@ function ProductCard({ item }) {
   }, [isHovered, images]);
 
   return (
-    <div
-      className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden w-full max-w-[280px] mx-auto"
+    <div onClick={()=> navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)}
+      className="group cursor-pointer bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden w-full max-w-[280px] mx-auto"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

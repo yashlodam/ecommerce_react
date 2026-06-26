@@ -70,7 +70,7 @@ function FilterSerction() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 h-full max-h-screen overflow-y-auto w-full">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 w-full">
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 sticky top-0 bg-white/95 backdrop-blur-sm z-10 border-b border-gray-100">
@@ -163,7 +163,7 @@ function FilterSerction() {
               {price.map((item, index) => (
                 <FormControlLabel
                   key={index}
-                  value={item.name}
+                  value={item.value}
                   control={<Radio size="small" sx={radioSx} />}
                   sx={formControlLabelSx}
                   label={item.name}
@@ -193,7 +193,7 @@ function FilterSerction() {
               {discount.map((item, index) => (
                 <FormControlLabel
                   key={index}
-                  value={item.name}
+                  value={item.value}
                   control={<Radio size="small" sx={radioSx} />}
                   sx={formControlLabelSx}
                   label={item.name}

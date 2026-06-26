@@ -51,14 +51,29 @@ function Product() {
     setPage(value);
   };
 
-  useEffect(() => {
-    const [minPrice, maxPrice] =
-      searchParams.get("price")?.split("-") || [];
+ useEffect(() => {
+  const [minPrice, maxPrice] =
+    searchParams.get("price")?.split("-") || [];
 
-    dispatch(
-      fetchAllProducts(category)
-    );
-  }, [category]);
+  const color = searchParams.get("color");
+  const minDiscount = searchParams.get("discount")
+    ? Number(searchParams.get("discount"))
+    : undefined;
+  
+  const newFilter = {
+    category,
+    colors: color || "",
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    minDiscount,
+    sort,
+    pageNumber: page - 1,
+  };
+
+  console.log("Sending Filter:", newFilter);
+
+  dispatch(fetchAllProducts(newFilter));
+}, [dispatch, category, searchParams, page, sort]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
@@ -76,7 +91,10 @@ function Product() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Desktop Filter */}
           <aside className="hidden lg:block w-[260px] shrink-0">
-            <div className="lg:sticky lg:top-6">
+            <div
+              className="lg:sticky lg:top-6 overflow-y-auto"
+              style={{ maxHeight: "calc(100vh - 3rem)" }}
+            >
               <FilterSerction />
             </div>
           </aside>
@@ -84,7 +102,7 @@ function Product() {
           {/* Products */}
           <div className="flex-1 min-w-0">
             {/* Toolbar */}
-            <div className="flex items-center justify-between gap-3 mb-5 bg-white rounded-xl border border-gray-200 px-3 sm:px-4 py-2.5">
+            <div className="flex items-center justify-between gap-2 sm:gap-3 mb-5 bg-white rounded-xl border border-gray-200 px-3 sm:px-4 py-2.5 flex-wrap">
               {!isLarge ? (
                 <>
                   <Button
@@ -110,9 +128,23 @@ function Product() {
                     anchor="left"
                     open={openFilter}
                     onClose={() => setOpenFilter(false)}
+                    PaperProps={{
+                      sx: {
+                        width: { xs: "85vw", sm: 320 },
+                        maxWidth: 340,
+                        borderTopRightRadius: 16,
+                        borderBottomRightRadius: 16,
+                      },
+                    }}
                   >
-                    <Box sx={{ width: { xs: 300, sm: 320 }, height: "100%" }}>
-                      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
+                    <Box
+                      sx={{
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <div className="flex items-center justify-between px-3 py-3 border-b border-gray-100 shrink-0">
                         <Typography sx={{ fontWeight: 700, fontSize: "15px", pl: 1 }}>
                           Filters
                         </Typography>
@@ -123,9 +155,24 @@ function Product() {
                           <CloseIcon fontSize="small" />
                         </IconButton>
                       </div>
-                      <Box sx={{ p: 1.5 }}>
+                      <Box sx={{ p: 1.5, overflowY: "auto", flex: 1 }}>
                         <FilterSerction />
                       </Box>
+                      <div className="px-3 py-3 border-t border-gray-100 shrink-0">
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          onClick={() => setOpenFilter(false)}
+                          sx={{
+                            textTransform: "none",
+                            fontWeight: 600,
+                            backgroundColor: theme.palette.primary.main,
+                            "&:hover": { backgroundColor: theme.palette.primary.dark },
+                          }}
+                        >
+                          Apply Filters
+                        </Button>
+                      </div>
                     </Box>
                   </Drawer>
                 </>
@@ -173,7 +220,7 @@ function Product() {
                 className="grid gap-4 sm:gap-6"
                 style={{
                   gridTemplateColumns:
-                    "repeat(auto-fit, minmax(220px, 1fr))",
+                    "repeat(auto-fit, minmax(160px, 1fr))",
                 }}
               >
                 {product.products.map((item, index) => (
@@ -196,7 +243,7 @@ function Product() {
               <div className="flex justify-center mt-10">
                 <Pagination
                   page={page}
-                  count={10}
+                  count={product.totalPages || 1}
                   color="primary"
                   variant="outlined"
                   shape="rounded"
