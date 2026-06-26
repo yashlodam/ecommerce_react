@@ -240,7 +240,7 @@ function Navbar() {
                   />
                 </IconButton>
               ) : (
-                <Button variant='contained' sx={primaryBtnSx}>
+                <Button onClick={()=> navigate("/login")} variant='contained' sx={primaryBtnSx}>
                   Login
                 </Button>
               )}

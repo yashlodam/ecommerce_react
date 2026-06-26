@@ -16,6 +16,8 @@ import Dashboard from './admin/pages/Dashboard/Dashboard';
 import AdminDashboard from './admin/pages/Dashboard/Dashboard';
 import { store, useAppDispatch, useAppSelector } from './State/Store';
 import { fetchSellerProfile } from './State/seller/sellerSlice';
+import LoginForm from './customer/pages/Auth/LoginForm';
+import Auth from './customer/pages/Auth/Auth';
 
 
 
@@ -50,6 +52,8 @@ function App() {
                  <Route path='/seller/*' element={<SellerDashboard/>}/>
 
            <Route path='/admin/*' element={<AdminDashboard/>}/> 
+
+           <Route path='/login' element={<Auth/>}/>
 
                 
 
