@@ -312,14 +312,8 @@ function LoginForm() {
 
               <Button
                 variant="text"
-                disabled={loginLoading} // Added loginLoading disable
-                onClick={() => {
-                  setOtpSent(false);
-                  setShowOtp(false);
-                  setErrorMessage(""); // Clear old errors
-                  setSuccessMessage(""); // Clear old success 
-                  formik.setFieldValue("otp", "");
-                }}
+                disabled={loginLoading} // Added loginLoading 
+                onClick={handleSendOtp}
                 sx={{
                   width: "fit-content",
                   mx: "auto",
@@ -333,7 +327,7 @@ function LoginForm() {
                   },
                 }}
               >
-                Change Email Address
+                Resend Otp
               </Button>
             </Box>
           )}

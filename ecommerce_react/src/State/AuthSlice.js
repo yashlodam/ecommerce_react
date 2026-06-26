@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../config/Api";
 
 export const sendLoginSignupOtp = createAsyncThunk(
@@ -60,3 +60,38 @@ export const logout = createAsyncThunk("/auth/logout",
     }
   }
 )
+
+
+export const signup = createAsyncThunk(
+  "/auth/signup",
+  async (signupRequest, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/auth/signup", signupRequest);
+
+      console.log("registered suceesfully",response.data)
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Login failed"
+      );
+    }
+  }
+);
+
+const initialState = {
+  jwt:null,
+  otpSend:false,
+  isLoggedIn:false,
+  user:null
+}
+
+
+const authSlice = createSlice({
+   name:"auth",
+   initialState,
+   reducers:{},
+   extraReducers:{
+    
+   }
+})
