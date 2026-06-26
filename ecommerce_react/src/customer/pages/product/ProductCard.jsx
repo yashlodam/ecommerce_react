@@ -1,87 +1,106 @@
 import React, { useEffect, useState } from "react";
-import { Star, Heart } from "lucide-react";
-import "./ProductCard.css"
+import "./ProductCard.css";
+
 import Button from "@mui/material/Button";
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import { teal } from "@mui/material/colors";
-import ModeCommentIcon from '@mui/icons-material/ModeComment';
 
-function ProductCard({ product }) {
+function ProductCard({ item }) {
+  const images = item.images || [];
+
+  const [currentImage, setCurrentImage] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (!isHovered || images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, [isHovered, images]);
   
-
-  const images = [
-    "https://rukminim2.flixcart.com/image/964/964/xif0q/t-shirt/1/u/i/-original-imahntpgnt2g6j9y.jpeg?q=90",
-    "https://rukminim2.flixcart.com/image/964/964/xif0q/t-shirt/1/u/i/-original-imahntpgnt2g6j9y.jpeg?q=90",
-    "https://rukminim2.flixcart.com/image/1920/1920/xif0q/t-shirt/h/w/d/-original-imahntpgae835zuu.jpeg?q=90"
-  ]
-  const [currentImages,setCurrentImage] = useState(0);
-  const [isHovered,setIsHovered] = useState(false);
-
-  useEffect(()=>{
-    let interval;
-    if(isHovered){
-      interval = setInterval(()=>{
-        setCurrentImage((prevImage)=> (prevImage+1)% images.length);
-      },1000);
-    }
-    else if(interval){
-      clearInterval(interval);
-      interval=null;
-    }
-
-    return ()=> clearInterval(interval);
-
-  },[isHovered]);
-
   return (
-    
-    <div className="group px-4 relative">
-      <div className="card"
-      onMouseEnter={()=> setIsHovered(true)}
-      onMouseLeave={()=> setIsHovered(false)}
-      >
+    <div
+      className="group bg-white rounded-xl shadow hover:shadow-xl transition-all duration-300 overflow-hidden w-full max-w-[280px] mx-auto"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Image */}
 
-        {images.map((item,index)=><img className="card-media object-top"
-        src={item} alt=""
-        style={{transform:`translateX(${(index-currentImages)*100}%)`}}
-        />)}
-        
-          {isHovered && <div className="indicator flex flex-col items-center space-y-2">
-            
-            <div className="flex gap-3">
-              <Button variant="contained" color="secondary">
-                <FavoriteIcon sx={{color:teal[500]}}/>
-              </Button>
-              <Button variant="contained" color="secondary">
-                <ModeCommentIcon sx={{color:teal[500]}}/>
-              </Button>
-            </div>
-        
-      </div>
-}
-    </div>
-    <div className="details pt-3 space-y-1 group-hover-effect rounded-md">
-      <div className="name">
-        <h1>Levis</h1>
-        <p>T-Shirt</p>
+      <div className="relative h-72 overflow-hidden">
+        {images.map((img, index) => (
+          <img
+            key={index}
+            src={img}
+            alt=""
+            className="absolute inset-0 w-full h-full object-contain transition-transform duration-500"
+            style={{
+              transform: `translateX(${(index - currentImage) * 100}%)`,
+            }}
+          />
+        ))}
 
-      </div>
-      <div className="price flex items-center gap-3">
-        <span className="font-semibold text-gray-800">
-          ₹ 400
-        </span>
-        <span className=".thin-line-through text-gray-400">
-          ₹ 999
-        </span>
-        <span className="text-primary font-semibold">
-          60%
-        </span>
+        {isHovered && (
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
+            <Button
+              variant="contained"
+              sx={{
+                minWidth: "45px",
+                borderRadius: "50%",
+                background: "#fff",
+              }}
+            >
+              <FavoriteIcon sx={{ color: teal[500] }} />
+            </Button>
+
+            <Button
+              variant="contained"
+              sx={{
+                minWidth: "45px",
+                borderRadius: "50%",
+                background: "#fff",
+              }}
+            >
+              <ModeCommentIcon sx={{ color: teal[500] }} />
+            </Button>
+          </div>
+        )}
       </div>
 
+      {/* Details */}
+
+      <div className="p-4">
+        <h2 className="font-semibold text-lg line-clamp-2">
+          {item?.title}
+        </h2>
+
+        <p className="text-sm text-gray-500 mt-1">
+          {item.category?.name}
+        </p>
+
+        <div className="flex items-center gap-2 mt-3">
+          <span className="text-lg font-bold">
+            ₹{item.sellingPrice}
+          </span>
+
+          <span className="line-through text-gray-400">
+            ₹{item.mrpPrice}
+          </span>
+
+          <span className="text-green-600 font-semibold">
+            {item.discountPercent}% OFF
+          </span>
+        </div>
+
+        <p className="text-sm text-gray-500 mt-2">
+          {item.color}
+        </p>
+      </div>
     </div>
-    </div>
-    
-  )
+  );
 }
 
 export default ProductCard;

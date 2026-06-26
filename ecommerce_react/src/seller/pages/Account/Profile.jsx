@@ -55,24 +55,24 @@ function Profile() {
       />
     </div>
 
-    <Row label="Seller Name" value={profile?.sellerName} />
-    <Row label="Seller Email" value={profile?.email} />
-    <Row label="Seller Mobile" value={profile?.mobile} />
+    <Row label="Seller Name" value={seller.profile?.sellerName} />
+    <Row label="Seller Email" value={seller.profile?.email} />
+    <Row label="Seller Mobile" value={seller.profile?.mobile} />
   </SectionCard>
 
   {/* Business Details */}
   <SectionCard title="Business Details">
     <Row
       label="Business Name/Brand Name"
-      value={profile?.businessDetails?.businessName}
+      value={seller.profile?.businessDetails?.businessName}
     />
     <Row
       label="GSTIN"
-      value={profile?.businessDetails?.businessRegistrationNumber}
+      value={seller.profile?.businessDetails?.businessRegistrationNumber}
     />
     <Row
       label="Account Status"
-      value={profile?.accountStatus}
+      value={seller.profile?.accountStatus}
     />
   </SectionCard>
 
@@ -80,15 +80,15 @@ function Profile() {
   <SectionCard title="Bank Details">
     <Row
       label="Account Holder Name"
-      value={profile?.bankDetails?.accountHolderName}
+      value={seller.profile?.bankDetails?.accountHolderName}
     />
     <Row
       label="Account Number"
-      value={profile?.bankDetails?.accountNumber}
+      value={seller.profile?.bankDetails?.accountNumber}
     />
     <Row
       label="IFSC CODE"
-      value={profile?.bankDetails?.ifscCode}
+      value={seller.profile?.bankDetails?.ifscCode}
     />
   </SectionCard>
 
@@ -96,19 +96,19 @@ function Profile() {
   <SectionCard title="Pickup Address">
     <Row
       label="Address"
-      value={profile?.pickupAddress?.address}
+      value={seller.profile?.pickupAddress?.address}
     />
     <Row
       label="City"
-      value={profile?.pickupAddress?.city}
+      value={seller.profile?.pickupAddress?.city}
     />
     <Row
       label="State"
-      value={profile?.pickupAddress?.state}
+      value={seller.profile?.pickupAddress?.state}
     />
     <Row
       label="Mobile"
-      value={profile?.pickupAddress?.mobile}
+      value={seller.profile?.pickupAddress?.mobile}
     />
   </SectionCard>
 </div>

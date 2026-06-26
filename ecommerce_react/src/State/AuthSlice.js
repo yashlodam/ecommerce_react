@@ -26,7 +26,7 @@ export const sendLoginSignupOtp = createAsyncThunk(
 );
 
 export const signin = createAsyncThunk(
-  "auth/signin",
+  "/auth/signin",
   async ({ email, otp }, { rejectWithValue }) => {
     try {
       const response = await api.post("/auth/login", {
@@ -47,3 +47,16 @@ export const signin = createAsyncThunk(
     }
   }
 );
+
+
+export const logout = createAsyncThunk("/auth/logout",
+  async(navigate,{rejectWithValue})=>{
+    try{
+      localStorage.clear()
+      console.log("logout sucess")
+      navigate("/")
+    } catch(e){
+      console.log(e)
+    }
+  }
+)
