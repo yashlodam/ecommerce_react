@@ -27,7 +27,11 @@ function ProductDetails() {
   const {productId} = useParams()
   const {product} = useAppSelector((store)=>store) 
 
+  
+
   const [activeImage,setActiveImage] = useState(0)
+  
+  
 
   useEffect(()=>{
     dispatch(fetchProductById(Number(productId)))
@@ -148,7 +152,7 @@ function ProductDetails() {
           Similar Product
         </h1>
         <div className='pt-5'>
-          <SimilarProduct/>
+          <SimilarProduct />
         </div>
         
       </div>
