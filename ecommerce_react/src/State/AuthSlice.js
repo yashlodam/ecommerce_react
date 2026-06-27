@@ -49,18 +49,6 @@ export const signin = createAsyncThunk(
 );
 
 
-export const logout = createAsyncThunk("/auth/logout",
-  async(navigate,{rejectWithValue})=>{
-    try{
-      localStorage.clear()
-      console.log("logout sucess")
-      navigate("/")
-    } catch(e){
-      console.log(e)
-    }
-  }
-)
-
 
 export const signup = createAsyncThunk(
   "/auth/signup",
@@ -100,6 +88,18 @@ export const fetchUserProfile = createAsyncThunk(
   }
 );
 
+export const logout = createAsyncThunk("/auth/logout",
+  async(navigate, {rejectWithValue})=>{
+    try{
+      localStorage.clear()
+      console.log("logout sucess")
+      navigate("/")
+    } catch(error){
+      console.log("error.......",error)
+    }
+  }
+)
+
 
 
 const initialState = {
@@ -126,6 +126,11 @@ const authSlice = createSlice({
            builder.addCase(fetchUserProfile.fulfilled,(state,action)=>{
             state.user = action.payload
             state.isLoggedIn=true
+           })
+           builder.addCase(logout.fulfilled,(state)=>{
+            state.jwt = null
+            state.isLoggedIn = false
+            state.user=null
            })
    }
 })
