@@ -1,7 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CartItem from './CartItem'
 import PricingCrd from './PricingCrd'
 import { useNavigate } from 'react-router-dom';
+
+import {store,useAppDispatch, useAppSelector } from "../../../State/Store";
+import {fetchUserCart } from '../../../State/customer/CartSlice';
+
 
 function Cart() {
 
@@ -27,11 +31,20 @@ function Cart() {
 
     const navigate = useNavigate();
 
+    const dispatch = useAppDispatch();
+    const {cart} = useAppSelector(store=>store)
+
+    
+
+    useEffect(()=>{
+      dispatch(fetchUserCart(localStorage.getItem("jwt") || ""))
+    },[])
+
   return (
     <div className='pt-10 px-5 sm:px-10 md:px-60 min-h-screen'>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-5'>
             <div className='cartItemSection lg:col-span-2 space-y-3'>
-                {[1,1,1,1,1,1].map((item)=> <CartItem/>)}
+                {cart.cart?.cartItems.map((item)=> <CartItem item = {item}/>)}
             </div>
            <div className='col-span-1 sticky top-5 h-fit text-sm space-y-3'>
                <div className="col-span-1 rounded-xl bg-white shadow-sm p-5 space-y-5">

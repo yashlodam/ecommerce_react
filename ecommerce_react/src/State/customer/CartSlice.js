@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-import api from "../../config/Api"
+
 import { sumCartItemMrpPrice } from "../../Util/sumCartItemMrpPrice";
 import {sumCartItemSellingPrice} from "../../Util/sumCartItemSellingPrice"
+import { applyCoupon } from "./CouponSlice";
+import { api } from "../../config/Api";
 
 const  API_URL = "/api/cart";
 
@@ -185,3 +187,7 @@ const cartSlice = createSlice({
         })
     }
 })
+
+
+export default cartSlice.reducer;
+export const {resetCartState} = cartSlice.actions;

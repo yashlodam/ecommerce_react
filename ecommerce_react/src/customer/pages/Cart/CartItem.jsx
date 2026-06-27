@@ -5,8 +5,12 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import CloseIcon from '@mui/icons-material/Close';
+import { useNavigate } from 'react-router-dom';
 
-function CartItem() {
+function CartItem({item}) {
+
+  const navigate = useNavigate();
+  
   const handleUpdateQuantity = () => {
     // update cart item quantity
   };
@@ -14,6 +18,7 @@ function CartItem() {
   const handleRemoveItem = () => {
     // remove item from cart
   };
+
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative">
@@ -36,23 +41,21 @@ function CartItem() {
 
       {/* Product Details */}
       <div className="p-5 flex gap-4">
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0" onClick={()=> navigate(`/product-details/${item.product.category?.categoryId}/${item.product.title}/${item.product.id}`)}>
           <img
             className="w-[90px] h-[110px] object-cover rounded-lg border"
-            src="https://rukminim2.flixcart.com/image/612/612/xif0q/shirt/n/x/c/xl-met-shirt1408-metronaut-original-imahgrb99ffhkdyg.jpeg?q=70"
+            src={item.product.images[0]}
             alt="Product"
           />
         </div>
 
         <div className="flex-1 space-y-2 pr-10">
           <h1 className="font-semibold text-lg text-gray-900">
-            Virani Clothing
+            {item.product.seller.businesssDetails.businessName}
           </h1>
 
           <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Corrupti optio molestias minima, adipisci necessitatibus eum
-            commodi aspernatur tempora, omnis laboriosam eius impedit aut id.
+           {item.product.title}
           </p>
 
           <p className="text-gray-500 text-xs">
@@ -65,7 +68,7 @@ function CartItem() {
           </p>
 
           <p className="text-sm text-gray-700">
-            <strong>Quantity:</strong> 5
+            <strong>Quantity:</strong> {item.quantity}
           </p>
         </div>
       </div>
@@ -109,8 +112,8 @@ function CartItem() {
 
         {/* Price Section */}
         <div className="text-right">
-          <p className="text-lg font-bold text-gray-900">₹799</p>
-          <p className="text-sm text-gray-500 line-through">₹1,299</p>
+          <p className="text-lg font-bold text-gray-900">₹{item.sellingPrice}</p>
+          <p className="text-sm text-gray-500 line-through">₹{item.mrpPrice}</p>
         </div>
       </div>
     </div>
