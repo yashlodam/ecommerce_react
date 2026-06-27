@@ -198,6 +198,10 @@ const cartSlice = createSlice({
 
     state.cart.totalMrpPrice = sumCartItemMrpPrice(state.cart.cartItems);
     state.cart.totalSellingPrice = sumCartItemSellingPrice(state.cart.cartItems);
+    state.cart.totalItem = state.cart.cartItems.reduce(
+  (total, item) => total + item.quantity,
+  0
+);
   }
 
   state.loading = false;

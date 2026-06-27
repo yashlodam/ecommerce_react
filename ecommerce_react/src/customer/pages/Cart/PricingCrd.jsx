@@ -1,8 +1,13 @@
 import React from 'react';
 import Divider from '@mui/material/Divider';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import { useAppSelector } from '../../../State/Store';
 
 function PricingCrd() {
+
+  const {cart} = useAppSelector(store=>store);
+  console.log(cart)
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-5 space-y-5 sticky top-5">
 
@@ -16,13 +21,13 @@ function PricingCrd() {
         <div className="space-y-3 text-sm">
 
           <div className="flex justify-between">
-            <span className="text-gray-600">Price (3 items)</span>
-            <span>₹3,499</span>
+            <span className="text-gray-600">Price ({cart.cart?.totalItem})</span>
+            <span>₹{cart.cart?.totalMrpPrice}</span>
           </div>
 
           <div className="flex justify-between">
             <span className="text-gray-600">Discount</span>
-            <span className="text-green-600">- ₹700</span>
+            <span className="text-green-600">- ₹{cart.cart?.totalMrpPrice - cart.cart?.totalSellingPrice}</span>
           </div>
 
           <div className="flex justify-between">
@@ -32,7 +37,7 @@ function PricingCrd() {
 
           <div className="flex justify-between">
             <span className="text-gray-600">Platform Fee</span>
-            <span>₹10</span>
+            <span>FREE</span>
           </div>
 
         </div>
@@ -41,11 +46,11 @@ function PricingCrd() {
 
         <div className="flex justify-between font-bold text-lg">
           <span>Total Amount</span>
-          <span>₹2,809</span>
+          <span>₹{cart.cart?.totalSellingPrice}</span>
         </div>
 
         <p className="text-green-600 text-sm font-medium mt-3">
-          You will save ₹700 on this order
+          You will save ₹{cart.cart?.totalMrpPrice-cart.cart?.totalSellingPrice} on this order
         </p>
       </div>
 

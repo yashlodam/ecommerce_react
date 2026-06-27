@@ -118,7 +118,7 @@ function Cart() {
       </div>
 
     </div>
-                <PricingCrd/>
+                <PricingCrd />
                 {/* Checkout Button */}
       <button onClick={()=> navigate("/checkout")} className="w-full cursor-pointer bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">
         Proceed to Checkout
