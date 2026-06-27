@@ -21,17 +21,19 @@ import Auth from './customer/pages/Auth/Auth';
 import { fetchUserProfile } from './State/AuthSlice';
 
 function App() {
-  const dispatch = useAppDispatch();
+  
   const { auth, seller } = useAppSelector((state) => state);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const jwt = localStorage.getItem("jwt");
+  const dispatch = useAppDispatch();
 
-  //   if (jwt) {
-  //     dispatch(fetchUserProfile(jwt));
-  //   }
-  // }, [dispatch]);
+useEffect(() => {
+  const jwt = localStorage.getItem("jwt");
+
+  if (jwt) {
+    dispatch(fetchUserProfile(jwt));
+  }
+}, [dispatch]);
 
   return (
     <ThemeProvider theme={customeTheme}>

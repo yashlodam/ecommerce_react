@@ -67,7 +67,7 @@ function Navbar() {
     const dispatch = useAppDispatch()
 
     const {isLoggedIn,user} = useAppSelector(store => store.auth)
-    
+    console.log(isLoggedIn)
     useEffect(() => {
   if (isLoggedIn) {
     dispatch(fetchUserProfile(localStorage.getItem("jwt")));

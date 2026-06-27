@@ -105,7 +105,7 @@ export const fetchUserProfile = createAsyncThunk(
 const initialState = {
   jwt:null,
   otpSend:false,
-  isLoggedIn:false,
+  isLoggedIn: !!localStorage.getItem("jwt"),
   user:null
 }
 
