@@ -6,14 +6,25 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../../State/Store';
+import { updateCartItem } from '../../../State/customer/CartSlice';
 
 function CartItem({item}) {
 
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   
-  const handleUpdateQuantity = () => {
-    // update cart item quantity
-  };
+  const handleUpdateQuantity = (value) => {
+  dispatch(
+    updateCartItem({
+      jwt: localStorage.getItem("jwt"),
+      cartItemId: item.id,
+      cartItem: {
+        quantity: value,
+      },
+    })
+  );
+};
 
   const handleRemoveItem = () => {
     // remove item from cart
@@ -40,8 +51,8 @@ function CartItem({item}) {
       </IconButton>
 
       {/* Product Details */}
-      <div className="p-5 flex gap-4">
-        <div className="flex-shrink-0" onClick={()=> navigate(`/product-details/${item.product.category?.categoryId}/${item.product.title}/${item.product.id}`)}>
+      <div className="p-5 flex gap-4 cursor-pointer" onClick={()=> navigate(`/product-details/${item.product.category?.categoryId}/${item.product.title}/${item.product.id}`)}>
+        <div className="flex-shrink-0" >
           <img
             className="w-[90px] h-[110px] object-cover rounded-lg border"
             src={item.product.images[0]}
@@ -79,8 +90,8 @@ function CartItem({item}) {
       <div className="px-5 py-4 flex justify-between items-center bg-gray-50">
         <div className="flex items-center gap-3">
           <Button
-            onClick={handleUpdateQuantity}
-            disabled={true}
+           onClick={() => handleUpdateQuantity(item.quantity - 1)}
+            disabled={item.quantity <= 1}
             variant="outlined"
             sx={{
               minWidth: '40px',
@@ -93,11 +104,11 @@ function CartItem({item}) {
           </Button>
 
           <span className="font-semibold text-lg min-w-[30px] text-center">
-            5
+            {item.quantity}
           </span>
 
           <Button
-            onClick={handleUpdateQuantity}
+           onClick={() => handleUpdateQuantity(item.quantity + 1)}
             variant="outlined"
             sx={{
               minWidth: '40px',
