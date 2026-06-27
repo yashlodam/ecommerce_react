@@ -79,6 +79,29 @@ export const signup = createAsyncThunk(
   }
 );
 
+export const fetchUserProfile = createAsyncThunk(
+  "auth/fetchUserProfile",
+  async (jwt, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/api/users/profile", {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      });
+
+      console.log("User Profile:", response.data);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch profile"
+      );
+    }
+  }
+);
+
+
+
 const initialState = {
   jwt:null,
   otpSend:false,
@@ -91,7 +114,14 @@ const authSlice = createSlice({
    name:"auth",
    initialState,
    reducers:{},
-   extraReducers:{
-    
+   extraReducers:(builder)=>{
+           builder.addCase(signin.fulfilled,(state,action)=>{
+            state.jwt = action.payload;
+            state.isLoggedIn = true
+           })
+           builder.addCase(signup.fulfilled,(state,action)=>{
+             state.jwt = action.payload
+             state.isLoggedIn = true
+           })
    }
 })
