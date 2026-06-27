@@ -5,6 +5,8 @@ import React, { useEffect, useState } from 'react'
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import ShieldIcon from '@mui/icons-material/Shield';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
@@ -18,19 +20,45 @@ import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { store, useAppSelector } from '../../../State/Store';
 import { fetchProductById } from '../../../State/customer/ProductSlice';
+import { addItemToCart } from '../../../State/customer/CartSlice';
 
 function ProductDetails() {
 
   const [quantity,setQuantity] = useState(1)
-
+  const [openAlert, setOpenAlert] = useState(false);
   const dispatch = useDispatch();
   const {productId} = useParams()
   const {product} = useAppSelector((store)=>store) 
 
-  
+  console.log(product)
 
   const [activeImage,setActiveImage] = useState(0)
-  
+
+  const addToCard = () => {
+  const data = {
+    productId: Number(productId),
+    quantity,
+    size: product.product?.Sizes,
+  };
+
+  dispatch(
+    addItemToCart({
+      jwt: localStorage.getItem("jwt"),
+      request: data,
+    })
+  )
+    .unwrap()
+    .then(() => {
+      setOpenAlert(true);
+
+      setTimeout(() => {
+        setOpenAlert(false);
+      }, 3000);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
   
 
   useEffect(()=>{
@@ -43,6 +71,21 @@ function ProductDetails() {
 
   return (
     <div className='px-5 lg:px-20 pt-10'>
+      <Snackbar
+  open={openAlert}
+  autoHideDuration={3000}
+  onClose={() => setOpenAlert(false)}
+  anchorOrigin={{ vertical: "top", horizontal: "right" }}
+>
+  <Alert
+    onClose={() => setOpenAlert(false)}
+    severity="success"
+    variant="filled"
+    sx={{ width: "100%" }}
+  >
+    Item added to cart successfully!
+  </Alert>
+</Snackbar>
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-12'>
         <section className='flex flex-col lg:flex-row gap-5'>
           <div className='w-full lg:w-[15%] flex flex-wrap lg:flex-col gap-3'>
@@ -120,6 +163,9 @@ function ProductDetails() {
           
           <div className='mt-12 flex items-center gap-5'>
             <Button fullWidth
+            onClick={()=> {
+              addToCard();
+            }}
             variant='contained'
              startIcon={<AddShoppingCartIcon/>} sx={{py:"1rem"}}>
               Add to Bag
