@@ -20,3 +20,21 @@ export const fetchUserCart = createAsyncThunk("/cart/fetchUserCart",
         }
     }
 )
+
+
+export const addItemToCart = createAsyncThunk("/cart/addItemToCart",
+    async(jwt,request,{rejectWithValue})=>{
+        try{
+            const response = await api.put(`${API_URL}/add`,request,{
+                headers:{
+                    Authorization:`Bearer ${jwt}`
+                }
+            })
+
+            console.log("Cart added",response.data)
+            return response.data
+        } catch(error){
+            console.log(error)
+        }
+    }
+)
