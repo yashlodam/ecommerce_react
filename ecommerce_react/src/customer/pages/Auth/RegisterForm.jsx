@@ -20,12 +20,12 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
 
 import { useAppDispatch } from "../../../State/Store";
-import { sendLoginSignupOtp } from "../../../State/AuthSlice";
+import { sendLoginSignupOtp, signup } from "../../../State/AuthSlice";
 
 
 function RegisterForm() {
   const dispatch = useAppDispatch();
-
+console.log("RegisterForm Rendered");
   const [otpSent, setOtpSent] = useState(false);
 const [loading, setLoading] = useState(false);
 const [signupLoading, setSignupLoading] = useState(false);
@@ -57,14 +57,16 @@ const [errorMessage, setErrorMessage] = useState("");
     }),
 
    onSubmit: async (values) => {
+    console.log(values)
   setSignupLoading(true);
   setErrorMessage("");
   setSuccessMessage("");
 
   try {
-    // await dispatch(signup(values)).unwrap();
+    await dispatch(signup(values)).unwrap();
 
     setSuccessMessage("Account created successfully.");
+    
 
   } catch (error) {
     setErrorMessage("Signup failed.");
@@ -231,6 +233,7 @@ const primaryButtonStyles = {
     variant="contained"
     sx={{...primaryButtonStyles,mt:3}}
     disabled={loading}
+    onClick={handleSendOtp}
     startIcon={
         loading
             ? <CircularProgress size={18} color="inherit"/>

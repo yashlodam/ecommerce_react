@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MenuIcon from '@mui/icons-material/Menu';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -22,6 +22,8 @@ import Drawer from "@mui/material/Drawer";
 import CloseIcon from "@mui/icons-material/Close";
 import InputBase from "@mui/material/InputBase";
 import Collapse from "@mui/material/Collapse";
+import { store, useAppDispatch, useAppSelector } from '../../../State/Store';
+import { fetchUserProfile } from '../../../State/AuthSlice';
 
 const ACCENT = "#00927c";
 const ACCENT_DARK = "#007563";
@@ -62,7 +64,15 @@ function Navbar() {
     const [openDrawer, setOpenDrawer] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
-    const isLoggedIn = false; // wire up to real auth state
+    const dispatch = useAppDispatch()
+
+    const {isLoggedIn,user} = useAppSelector(store => store.auth)
+    
+    useEffect(() => {
+  if (isLoggedIn) {
+    dispatch(fetchUserProfile(localStorage.getItem("jwt")));
+  }
+}, [dispatch, isLoggedIn]);
 
     const closeDrawer = () => setOpenDrawer(false);
 
@@ -233,12 +243,23 @@ function Navbar() {
           {isLarge && (
             <>
               {isLoggedIn ? (
-                <IconButton onClick={() => navigate("/account/orders")} aria-label="Account" sx={iconBtnSx}>
-                  <Avatar
-                    sx={{ width: 30, height: 30 }}
-                    src="https://yt3.ggpht.com/IQswhTaRAllO-9swJEwsLX3NO0OK_SrLrOFlTfLsjqrAwez9cSQ4cNOac0Ox9reNMsCOhg0hUA=s88-c-k-c0x00ffffff-no-rj"
-                  />
-                </IconButton>
+              <IconButton
+  onClick={() => navigate("/account/orders")}
+  aria-label="Account"
+  sx={iconBtnSx}
+>
+  <Avatar
+    sx={{
+      width: 30,
+      height: 30,
+      bgcolor: "primary.main",
+      fontWeight: "bold",
+      fontSize: 16,
+    }}
+  >
+    {user?.fullName?.charAt(0).toUpperCase() || "U"}
+  </Avatar>
+</IconButton>
               ) : (
                 <Button onClick={()=> navigate("/login")} variant='contained' sx={primaryBtnSx}>
                   Login

@@ -29,7 +29,7 @@ import { useNavigate } from "react-router-dom";
 function LoginForm() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
+  console.log("LoginForm Rendered");
   // FIXED: Added missing states for errorMessage and loginLoading
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false); // Used for sending OTP
@@ -86,6 +86,7 @@ function LoginForm() {
       formik.setFieldTouched("email", true);
       return;
     }
+    console.log("hi")
 
     setLoading(true);
     setErrorMessage("");
@@ -242,7 +243,10 @@ function LoginForm() {
             <Button
               fullWidth
               variant="contained"
-              onClick={handleSendOtp}
+              onClick={()=>{
+                console.log("button clicked")
+                handleSendOtp();
+              }}
               disabled={loading}
               startIcon={
                 loading ? (

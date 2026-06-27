@@ -80,7 +80,7 @@ export const signup = createAsyncThunk(
 );
 
 export const fetchUserProfile = createAsyncThunk(
-  "auth/fetchUserProfile",
+  "/auth/fetchUserProfile",
   async (jwt, { rejectWithValue }) => {
     try {
       const response = await api.get("/api/users/profile", {
@@ -123,5 +123,11 @@ const authSlice = createSlice({
              state.jwt = action.payload
              state.isLoggedIn = true
            })
+           builder.addCase(fetchUserProfile.fulfilled,(state,action)=>{
+            state.user = action.payload
+            state.isLoggedIn=true
+           })
    }
 })
+
+export default authSlice.reducer

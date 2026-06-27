@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import sellerSlice from "./seller/sellerSlice"
 import sellerProductSlice from './seller/sellerProductSlice'
 import productSlice from './customer/ProductSlice'
+import authSlice from './AuthSlice'
 const rootReducer = combineReducers({
 
   seller:sellerSlice,
   sellerProduct:sellerProductSlice,
-  product:productSlice
+  product:productSlice,
+  auth:authSlice
 })
 
 export const store = configureStore({
