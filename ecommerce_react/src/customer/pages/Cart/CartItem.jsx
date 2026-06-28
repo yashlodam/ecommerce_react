@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -7,12 +7,20 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../../State/Store';
-import { updateCartItem } from '../../../State/customer/CartSlice';
+import { deleteCartItem, updateCartItem } from '../../../State/customer/CartSlice';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 function CartItem({item}) {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  const [snackbar, setSnackbar] = useState({
+  open: false,
+  message: "",
+  severity: "success",
+});
   
   const handleUpdateQuantity = (value) => {
   dispatch(
@@ -26,13 +34,57 @@ function CartItem({item}) {
   );
 };
 
-  const handleRemoveItem = () => {
-    // remove item from cart
-  };
+ const handleCloseSnackbar = () => {
+  setSnackbar((prev) => ({
+    ...prev,
+    open: false,
+  }));
+};
 
+  const handleRemoveItem = async () => {
+  try {
+    await dispatch(
+      deleteCartItem({
+        jwt: localStorage.getItem("jwt"),
+        cartItemId: item.id,
+      })
+    ).unwrap();
+
+    setSnackbar({
+      open: true,
+      message: "Item removed from your cart.",
+      severity: "success",
+    });
+  } catch (error) {
+    setSnackbar({
+      open: true,
+      message: "Unable to remove the item. Please try again.",
+      severity: "error",
+    });
+  }
+};
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative">
+
+      <Snackbar
+  open={snackbar.open}
+  autoHideDuration={3000}
+  onClose={handleCloseSnackbar}
+  anchorOrigin={{
+    vertical: "bottom",
+    horizontal: "right",
+  }}
+>
+  <Alert
+    onClose={handleCloseSnackbar}
+    severity={snackbar.severity}
+    variant="filled"
+    sx={{ width: "100%" }}
+  >
+    {snackbar.message}
+  </Alert>
+</Snackbar>
 
       {/* Remove Item Button */}
       <IconButton
@@ -47,7 +99,7 @@ function CartItem({item}) {
           },
         }}
       >
-        <CloseIcon fontSize="small" />
+        <CloseIcon  fontSize="small" />
       </IconButton>
 
       {/* Product Details */}
