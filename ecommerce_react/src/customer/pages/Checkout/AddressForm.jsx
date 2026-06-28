@@ -37,11 +37,11 @@ const AddAddressForm = ({paymentGatway,handleClose}) => {
     },
     validationSchema,
     onSubmit: (values) => {
-      console.log("Address saved:", values);
+      
       dispatch(createOrder({
         address:values,
         jwt:localStorage.getItem("jwt") || "",
-        paymentGateway:paymentGateway
+        paymentGateway:paymentGatway
       }))
       handleClose();
     },
