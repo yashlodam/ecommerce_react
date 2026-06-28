@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import AddressForm from './AddressForm';
 import PricingCrd from '../Cart/PricingCrd';
 import Radio from '@mui/material/Radio';
+import ButtonBase from '@mui/material/ButtonBase';
 
 
 function Checkout() {
@@ -42,9 +43,9 @@ const[isChecked,setIsChecked] = useState(false)
             <div className='col-span-2 space-y-5'>
                 <div className='flex justify-between items-center'>
                     <h1 className='font-semibold'>Select Address</h1>
-                    <Button variant='outlined'>
-                        Add new Address
-                    </Button>
+                                    <Button onClick={handleOpen} className='py-4 px-5  border border-gray-200 rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer'>
+                    <AddIcon className='mr-2'/> Add new Address
+                </Button>
                 </div>
                 <div className='text-xs font-medium space-y-5'>
                     <p className='font-semibold text-[15px]'>Saved Addresses</p>
@@ -97,7 +98,9 @@ const[isChecked,setIsChecked] = useState(false)
 
     </div>
           
+          <Button >
 
+          </Button>
          
     </div>
 
