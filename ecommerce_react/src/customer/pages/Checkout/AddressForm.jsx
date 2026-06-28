@@ -3,6 +3,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { TextField, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useAppDispatch } from "../../../State/Store";
+import { createOrder } from "../../../State/customer/OrderSlice";
 
 const validationSchema = Yup.object({
   fullName: Yup.string().required("Full name is required"),
@@ -18,9 +20,11 @@ const validationSchema = Yup.object({
   state: Yup.string().required("State is required"),
 });
 
-const AddAddressForm = ({handleClose}) => {
+const AddAddressForm = ({paymentGatway,handleClose}) => {
   const [isOpen, setIsOpen] = useState(true);
 
+  const dispatch = useAppDispatch();
+ console.log("PaymentGateway is :",paymentGatway)
  const formik = useFormik({
     initialValues: {
       fullName: "",
@@ -34,6 +38,11 @@ const AddAddressForm = ({handleClose}) => {
     validationSchema,
     onSubmit: (values) => {
       console.log("Address saved:", values);
+      dispatch(createOrder({
+        address:values,
+        jwt:localStorage.getItem("jwt") || "",
+        paymentGateway:paymentGateway
+      }))
       handleClose();
     },
   });
@@ -193,7 +202,7 @@ const AddAddressForm = ({handleClose}) => {
           <button
             type="submit"
             disabled={formik.isSubmitting}
-            className="w-full sm:w-auto px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 active:bg-gray-900 transition disabled:opacity-50"
+            className="cursor-pointer w-full sm:w-auto px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 active:bg-gray-900 transition disabled:opacity-50"
           >
             Save Address
           </button>

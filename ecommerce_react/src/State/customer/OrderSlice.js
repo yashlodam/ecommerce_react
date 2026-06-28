@@ -62,8 +62,13 @@ export const createOrder = createAsyncThunk(
 
       return response.data;
     } catch (error) {
-      return rejectWithValue("Failed to create order");
-    }
+  console.log("Status:", error.response?.status);
+  console.log("Response:", error.response?.data);
+
+  return rejectWithValue(
+    error.response?.data || "Failed to create order"
+  );
+}
   }
 );
 

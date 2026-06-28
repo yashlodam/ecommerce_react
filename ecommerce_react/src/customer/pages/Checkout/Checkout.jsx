@@ -26,13 +26,13 @@ function Checkout() {
   p: 0,  // remove padding here since AddAddressForm has its own
 };
 
-const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [button,setButton] = useState(false);
-const[isChecked,setIsChecked] = useState(false)
+  const[isChecked,setIsChecked] = useState(false)
 
-  const [paymentGatway,setPaymentGatway] = useState("RAZORPAY");
+  const paymentGatway= "RAZORPAY";
 
   
 
@@ -44,7 +44,7 @@ const[isChecked,setIsChecked] = useState(false)
             <div className='col-span-2 space-y-5'>
                 <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
                     <h1 className='font-semibold'>Select Address</h1>
-                                    <Button onClick={handleOpen} className='w-full sm:w-auto py-4 px-5  border border-gray-200 rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer'>
+                    <Button onClick={handleOpen} className='w-full sm:w-auto py-4 px-5  border border-gray-200 rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer'>
                     <AddIcon className='mr-2'/> Add new Address
                 </Button>
                 </div>
@@ -65,7 +65,7 @@ const[isChecked,setIsChecked] = useState(false)
            aria-describedby="modal-modal-description"
               >
   <Box sx={style}>
-    <AddressForm handleClose={handleClose}/>
+    <AddressForm paymentGatway = {paymentGatway} handleClose={handleClose}/>
   </Box>
           </Modal>
            <div>
