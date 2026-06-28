@@ -1,47 +1,57 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { TextField, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/material/IconButton";
 
-function AddressForm({ handleClose }) {
-  const [address, setAddress] = useState({
-    fullName: "",
-    mobile: "",
-    pincode: "",
-    address: "",
-    locality: "",
-    city: "",
-    state: "",
+const validationSchema = Yup.object({
+  fullName: Yup.string().required("Full name is required"),
+  mobile: Yup.string()
+    .matches(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number")
+    .required("Mobile number is required"),
+  pincode: Yup.string()
+    .matches(/^\d{6}$/, "Enter a valid 6-digit pincode")
+    .required("Pincode is required"),
+  house: Yup.string().required("House/Flat/Building is required"),
+  locality: Yup.string().required("Locality/Street is required"),
+  city: Yup.string().required("City is required"),
+  state: Yup.string().required("State is required"),
+});
+
+const AddAddressForm = ({handleClose}) => {
+  const [isOpen, setIsOpen] = useState(true);
+
+ const formik = useFormik({
+    initialValues: {
+      fullName: "",
+      mobile: "",
+      pincode: "",
+      house: "",
+      locality: "",
+      city: "",
+      state: "",
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      console.log("Address saved:", values);
+      handleClose();
+    },
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
 
-    setAddress((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    console.log("Address Object:", address);
-
-    // Example:
-    // dispatch(createOrder({ address, jwt, paymentGateway }));
-
-    handleClose();
-  };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="bg-white rounded-xl p-2">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">
+     <div className="w-full max-h-[90vh] flex flex-col bg-white rounded-xl overflow-hidden">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="w-full sm:max-w-2xl max-h-[95vh] sm:max-h-[90vh] flex flex-col bg-white rounded-t-2xl sm:rounded-xl overflow-hidden"
+      >
+        {/* Header - sticky */}
+        <div className="flex justify-between items-center px-4 sm:px-6 py-4 border-b border-gray-100 shrink-0">
+          <h2 className="text-base sm:text-xl font-semibold text-gray-800">
             Add New Address
           </h2>
-
           <IconButton
             onClick={handleClose}
             size="small"
@@ -52,112 +62,145 @@ function AddressForm({ handleClose }) {
               },
             }}
           >
-            <CloseIcon />
+            <CloseIcon fontSize="small" />
           </IconButton>
         </div>
 
-        {/* Contact Details */}
-        <div className="space-y-5">
-          <h3 className="font-medium text-gray-700">Contact Details</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              required
-              type="text"
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4 sm:space-y-5">
+          {/* Contact */}
+          <h3 className="font-medium text-gray-700 text-sm sm:text-base">
+            Contact Details
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {/* Full Name */}
+            <TextField
+              fullWidth
+              size="small"
+              autoFocus
+              id="fullName"
               name="fullName"
-              value={address.fullName}
-              onChange={handleChange}
-              placeholder="Full Name"
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              label="Full Name"
+              value={formik.values.fullName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.fullName && Boolean(formik.errors.fullName)}
+              helperText={formik.touched.fullName && formik.errors.fullName}
             />
-
-            <input
-              required
-              type="tel"
+            {/* Mobile */}
+            <TextField
+              fullWidth
+              size="small"
+              id="mobile"
               name="mobile"
-              value={address.mobile}
-              onChange={handleChange}
-              placeholder="Mobile Number"
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              label="Mobile Number"
+              inputProps={{ inputMode: "numeric", maxLength: 10 }}
+              value={formik.values.mobile}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.mobile && Boolean(formik.errors.mobile)}
+              helperText={formik.touched.mobile && formik.errors.mobile}
             />
           </div>
 
           {/* Address */}
-          <h3 className="font-medium text-gray-700">Address</h3>
+          <h3 className="font-medium text-gray-700 text-sm sm:text-base pt-1">
+            Address
+          </h3>
 
-          <input
-            required
-            type="text"
+          {/* Pincode */}
+          <TextField
+            fullWidth
+            size="small"
+            id="pincode"
             name="pincode"
-            value={address.pincode}
-            onChange={handleChange}
-            placeholder="Pincode"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+            label="Pincode"
+            inputProps={{ inputMode: "numeric", maxLength: 6 }}
+            value={formik.values.pincode}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.pincode && Boolean(formik.errors.pincode)}
+            helperText={formik.touched.pincode && formik.errors.pincode}
           />
 
-          <input
-            required
-            type="text"
-            name="address"
-            value={address.address}
-            onChange={handleChange}
-            placeholder="House No., Building Name, Street"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+          {/* House */}
+          <TextField
+            fullWidth
+            size="small"
+            id="house"
+            name="house"
+            label="House No., Building, Street"
+            value={formik.values.house}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.house && Boolean(formik.errors.house)}
+            helperText={formik.touched.house && formik.errors.house}
           />
 
-          <input
-            required
-            type="text"
+          {/* Locality */}
+          <TextField
+            fullWidth
+            size="small"
+            id="locality"
             name="locality"
-            value={address.locality}
-            onChange={handleChange}
-            placeholder="Locality / Area / Town"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+            label="Locality / Town"
+            value={formik.values.locality}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.locality && Boolean(formik.errors.locality)}
+            helperText={formik.touched.locality && formik.errors.locality}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              required
-              type="text"
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {/* City */}
+            <TextField
+              fullWidth
+              size="small"
+              id="city"
               name="city"
-              value={address.city}
-              onChange={handleChange}
-              placeholder="City"
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              label="City"
+              value={formik.values.city}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.city && Boolean(formik.errors.city)}
+              helperText={formik.touched.city && formik.errors.city}
             />
-
-            <input
-              required
-              type="text"
+            {/* State */}
+            <TextField
+              fullWidth
+              size="small"
+              id="state"
               name="state"
-              value={address.state}
-              onChange={handleChange}
-              placeholder="State"
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              label="State"
+              value={formik.values.state}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.state && Boolean(formik.errors.state)}
+              helperText={formik.touched.state && formik.errors.state}
             />
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
-            >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition cursor-pointer"
-            >
-              Save Address
-            </button>
           </div>
         </div>
-      </div>
-    </form>
-  );
-}
 
-export default AddressForm;
+        {/* Buttons - sticky footer */}
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 px-4 sm:px-6 py-4 border-t border-gray-100 shrink-0 bg-white">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="w-full sm:w-auto px-5 py-3 border border-gray-300 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={formik.isSubmitting}
+            className="w-full sm:w-auto px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 active:bg-gray-900 transition disabled:opacity-50"
+          >
+            Save Address
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default AddAddressForm;
