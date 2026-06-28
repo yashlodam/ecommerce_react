@@ -78,7 +78,7 @@ const[isChecked,setIsChecked] = useState(false)
     {/* Razorpay */}
     <div className="flex items-center md:gap-3 border-2 border-teal-500 rounded-lg p-4 cursor-pointer bg-teal-50"
     onClick={()=> setIsChecked(!isChecked)}>
-      <Radio  checked={isChecked} />
+      <Radio  checked={true} />
       <img
         src="https://razorpay.com/assets/razorpay-logo.svg"
         alt="Razorpay"
