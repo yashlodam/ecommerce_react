@@ -107,7 +107,7 @@ function Account() {
               <Routes>
                 <Route path="/" element={<UserDetai />} />
                 <Route path="/orders" element={<Order />} />
-                <Route path="/order:orderId/:orderItemId" element={<UserDetai />} />
+                <Route path="/order/:orderId/:orderItemId" element={<OrderDetails />} />
                 <Route path="/addresses" element={<Address />} />
               </Routes>
             </div>

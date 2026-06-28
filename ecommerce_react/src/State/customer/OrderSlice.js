@@ -14,7 +14,7 @@ export const fetchUserOrderHistory = createAsyncThunk(
           Authorization: `Bearer ${jwt}`,
         },
       });
-
+      console.log(response.data)
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -103,6 +103,9 @@ export const paymentSuccess = createAsyncThunk(
           paymentLinkId,
         },
       });
+
+      console.log(response.data)
+      
 
       return response.data;
     } catch (error) {

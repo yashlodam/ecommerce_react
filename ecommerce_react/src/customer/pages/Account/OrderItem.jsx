@@ -1,9 +1,13 @@
 import React from "react";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import { useNavigate } from "react-router-dom";
 
-function OrderItem() {
+function OrderItem({item,order}) {
+  console.log(item)
+  console.log(order)
+  const navigate = useNavigate();
   return (
-    <div className="border rounded-xl overflow-hidden bg-white hover:shadow-md transition-all duration-300">
+    <div onClick={()=> navigate(`/account/order/${order.id}/${item.id}`)} className="border rounded-xl overflow-hidden bg-white hover:shadow-md transition-all duration-300">
       
       {/* Order Status */}
       <div className="flex items-center gap-3 px-5 py-4 border-b bg-gray-50">
@@ -13,11 +17,16 @@ function OrderItem() {
 
         <div>
           <h3 className="font-bold text-green-600 uppercase tracking-wide">
-            Shipped
+            {order.orderStatus}
           </h3>
-          <p className="text-sm text-gray-500">
-            Arriving by Fri, Oct 04
-          </p>
+         <p className="text-sm text-gray-500">
+  Arriving by{" "}
+  {new Date(order.deliverDate).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })}
+</p>
         </div>
       </div>
 
@@ -27,33 +36,31 @@ function OrderItem() {
           
           {/* Image */}
           <img
-            src="https://images.unsplash.com/photo-1542291026-7eec264c27ff"
-            alt="product"
+            src={item.product.images[0]}
             className="w-20 h-20 object-cover rounded-lg border"
           />
 
           {/* Details */}
           <div className="flex-1">
             <h2 className="font-semibold text-gray-900 text-lg">
-              Nike Air Max Running Shoes
+              {item.product.seller.businesssDetails.businessName}
             </h2>
 
             <p className="text-gray-600 text-sm mt-1 line-clamp-2">
-              Premium running shoes with breathable mesh design,
-              lightweight cushioning and all-day comfort.
+              {item.product.description}
             </p>
 
             <div className="flex flex-wrap gap-4 mt-3 text-sm">
               <p>
-                <span className="font-semibold">Size:</span> 8
+                <span className="font-semibold">Size:</span> {item.product.Sizes}
               </p>
 
               <p>
-                <span className="font-semibold">Color:</span> Black
+                <span className="font-semibold">Color:</span> {item.product.color}
               </p>
 
               <p>
-                <span className="font-semibold">Qty:</span> 1
+                <span className="font-semibold">Qty:</span> {item.quantity}
               </p>
             </div>
           </div>
