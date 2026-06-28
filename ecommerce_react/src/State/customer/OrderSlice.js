@@ -142,7 +142,8 @@ const initialState = {
     orderCanceled: false,
     loading : true,
     error: null,
-    currentOrder:null
+    currentOrder:null,
+    paymentOrder: null
 
 }
 
@@ -177,7 +178,25 @@ const orderSlice = createSlice({
             state.loading = false
         })
         .addCase(fetchOrderById.rejected,(state,action)=>{
-            
+            state.loading = false;
+            state.error = action.payload;
         })
+
+
+        //create a new order
+        .addCase(createOrder.pending,(state)=>{
+            state.loading = true;
+            state.error = null;
+        })
+        .addCase(createOrder.fulfilled,(state,action)=>{
+            state.paymentOrder = action.payload;
+            state.loading = false;
+        })
+        .addCase(createOrder.rejected,(state,action)=>{
+            state.loading = false;
+            state.error = action.payload
+        })
+
+        // fetch order item by id
     }
 })
