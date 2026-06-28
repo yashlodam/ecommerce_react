@@ -13,7 +13,7 @@ function Cart() {
 
   const [couponApplied, setCouponApplied] = useState(false);
 
-  const cartItems = cart.cart?.cartItems || [];
+  
   const handleApplyCoupon = () => {
     if (!couponCode.trim()) return;
 
@@ -35,6 +35,7 @@ function Cart() {
   const dispatch = useAppDispatch();
   const { cart } = useAppSelector(store => store)
 
+  const cartItems = cart.cart?.cartItems || [];
 
 
   useEffect(() => {
