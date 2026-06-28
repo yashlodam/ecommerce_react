@@ -19,6 +19,7 @@ import { fetchSellerProfile } from './State/seller/sellerSlice';
 import LoginForm from './customer/pages/Auth/LoginForm';
 import Auth from './customer/pages/Auth/Auth';
 import { fetchUserProfile } from './State/AuthSlice';
+import PaymentSucess from './customer/PaymentSucess';
 
 function App() {
   
@@ -50,6 +51,7 @@ useEffect(() => {
           />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment-success/:orderId" element={<PaymentSucess />} />
           <Route path="/account/*" element={<Account />} />
           <Route path="/become-seller" element={<BecomeSeller />} />
           <Route path="/seller/*" element={<SellerDashboard />} />
