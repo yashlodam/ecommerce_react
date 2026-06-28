@@ -1,13 +1,34 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import { useAppDispatch } from "../State/Store";
+import { paymentSuccess } from "../State/customer/OrderSlice";
 
 function PaymentSuccess() {
   const navigate = useNavigate();
 
+  const dispatch = useAppDispatch();
+  const location = useLocation();
+  const {orderId} = useParams();
+  const getQueryParam = (key)=>{
+    const query = new URLSearchParams(location.search)
+    return query.get(key)
+  }
+
+
+
+  useEffect(()=>{
+    const paymentId = getQueryParam("razorpay_payment_id")
+    const paymentLinkId = getQueryParam("razorpay_payment_link_id")
+    dispatch(paymentSuccess({
+        jwt:localStorage.getItem("jwt") || "",
+        paymentId,
+        paymentLinkId
+    }))
+  },[orderId])
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-teal-50 flex justify-center items-center px-4">
 
