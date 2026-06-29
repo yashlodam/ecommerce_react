@@ -35,6 +35,8 @@ export const fetchOrderById = createAsyncThunk(
         },
       });
 
+      console.log(response.data)
+
       return response.data;
     } catch (error) {
       return rejectWithValue("Failed to fetch order");
@@ -83,6 +85,7 @@ export const fetchOrderItemById = createAsyncThunk(
         },
       });
 
+      console.log(response.data)
       return response.data;
     } catch (error) {
       return rejectWithValue("Failed to fetch order item");

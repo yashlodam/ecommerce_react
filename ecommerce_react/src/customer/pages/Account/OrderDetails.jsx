@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { store, useAppDispatch, useAppSelector } from "../../../State/Store";
+import { fetchOrderById, fetchOrderItemById } from "../../../State/customer/OrderSlice";
 
 function OrderDetails() {
   const navigate = useNavigate();
@@ -15,9 +17,18 @@ function OrderDetails() {
   const paymentMethod = "Cash On Delivery";
   const paymentStatus = "PENDING"; // PAID | PENDING | REFUNDED
 
-  const orderId = "ORD-20250621001";
+  // const orderId = "ORD-20250621001";
   const orderDate = "21 June 2026";
   const deliveryDate = "24 June 2026";
+
+  const dispatch = useAppDispatch();
+  const {orderId,orderItemId} = useParams();
+  const {order} = useAppSelector(store=>store);
+  console.log(order)
+  useEffect(()=>{
+    dispatch(fetchOrderById({orderId:Number(orderId),jwt:localStorage.getItem("jwt") || ""}))
+    dispatch(fetchOrderItemById({orderItemId:Number(orderItemId),jwt:localStorage.getItem("jwt") || ""}))
+  },[])
 
   const activeStepMap = {
     PLACED: 0,
@@ -43,28 +54,26 @@ function OrderDetails() {
         <div className="flex flex-col md:flex-row gap-6 items-center">
           <img
             className="w-32 h-32 object-cover rounded-xl border"
-            src="https://images.unsplash.com/photo-1542291026-7eec264c27ff"
+            src={order.orderItem?.product.images[0]}
             alt="Product"
           />
 
           <div className="flex-1">
             <h1 className="font-bold text-2xl text-gray-900">
-              Virani Clothing
+              {order.orderItem?.product.seller.businesssDetails.businessName}
             </h1>
 
             <p className="text-gray-600 mt-2">
-              Cellecor Ray 1.43" AMOLED Display | 700 NITS | AOD |
-              BT Calling | AI Voice | Split Screen Smartwatch
-              (Black Strap, Free Size)
+              {order.orderItem?.product.title}
             </p>
 
             <div className="flex flex-wrap gap-4 mt-3 text-sm">
               <p>
-                <strong>Size:</strong> M
+                <strong>Size:</strong> {order.orderItem?.size}
               </p>
 
               <p>
-                <strong>Quantity:</strong> 1
+                <strong>Quantity:</strong> {}
               </p>
             </div>
 
@@ -255,12 +264,11 @@ function OrderDetails() {
 
         <div className="space-y-2 text-gray-600">
           <p className="font-semibold text-gray-900">
-            Yash Lodam
+            {order.currentOrder?.shippingAddress.name}
           </p>
 
           <p>
-            Flat No. 101, MG Road,
-            Nashik, Maharashtra - 422001
+            {order.currentOrder?.shippingAddress.address,order.currentOrder?.shippingAddress.city,order.currentOrder?.shippingAddress.state,-,order.currentOrder?.shippingAddress.pinCode}
           </p>
 
           <p>
@@ -280,7 +288,7 @@ function OrderDetails() {
             <span className="text-gray-600">
               MRP
             </span>
-            <span>₹2,999</span>
+            <span>₹{order.orderItem?.mrpPrice}</span>
           </div>
 
           <div className="flex justify-between">
@@ -288,7 +296,7 @@ function OrderDetails() {
               Discount
             </span>
             <span className="text-green-600">
-              -₹500
+              -₹{order.orderItem?.mrpPrice-order.orderItem?.sellingPrice}
             </span>
           </div>
 
@@ -305,7 +313,7 @@ function OrderDetails() {
 
           <div className="flex justify-between text-xl font-bold">
             <span>Total Amount</span>
-            <span>₹2,499</span>
+            <span>₹{order.orderItem?.sellingPrice}</span>
           </div>
         </div>
       </section>
