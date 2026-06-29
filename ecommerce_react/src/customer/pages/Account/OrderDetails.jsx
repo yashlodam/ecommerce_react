@@ -268,11 +268,11 @@ function OrderDetails() {
           </p>
 
           <p>
-            {order.currentOrder?.shippingAddress.address,order.currentOrder?.shippingAddress.city,order.currentOrder?.shippingAddress.state,-,order.currentOrder?.shippingAddress.pinCode}
-          </p>
+  {`${order.currentOrder?.shippingAddress?.address}, ${order.currentOrder?.shippingAddress?.city}, ${order.currentOrder?.shippingAddress?.state} - ${order.currentOrder?.shippingAddress?.pinCode}`}
+</p>
 
           <p>
-            Phone: +91 9876543210
+            Phone: {`+91 ${order.currentOrder?.shippingAddress.mobile}`}
           </p>
         </div>
       </section>
