@@ -6,7 +6,7 @@ import { useAppSelector } from '../../../State/Store';
 function PricingCrd() {
 
   const {cart} = useAppSelector(store=>store);
-  console.log(cart)
+  console.log("pricing cart ",cart)
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-5 space-y-5 sticky top-5">
