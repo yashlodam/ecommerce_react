@@ -73,7 +73,7 @@ function OrderDetails() {
               </p>
 
               <p>
-                <strong>Quantity:</strong> {}
+                <strong>Quantity:</strong> {order.currentOrder?.totalItems}
               </p>
             </div>
 
@@ -87,7 +87,7 @@ function OrderDetails() {
                     : "bg-blue-100 text-blue-600"
                 }`}
               >
-                {orderStatus}
+                {order.currentOrder?.orderStatus}
               </span>
             </div>
           </div>
@@ -196,8 +196,12 @@ function OrderDetails() {
               Order Date
             </p>
             <p className="font-medium">
-              {orderDate}
-            </p>
+  {new Date(order.currentOrder.orderDate).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })}
+</p>
           </div>
 
           <div>
@@ -223,7 +227,7 @@ function OrderDetails() {
                   : "bg-yellow-100 text-yellow-700"
               }`}
             >
-              {paymentStatus}
+              {order.currentOrder?.paymenntStatus}
             </span>
           </div>
 
@@ -232,8 +236,12 @@ function OrderDetails() {
               Expected Delivery
             </p>
             <p className="font-medium">
-              {deliveryDate}
-            </p>
+  {new Date(order.currentOrder.deliverDate).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })}
+</p>
           </div>
 
           <div>
@@ -250,7 +258,7 @@ function OrderDetails() {
                   : "bg-blue-100 text-blue-600"
               }`}
             >
-              {orderStatus}
+              {order.currentOrder?.orderStatus}
             </span>
           </div>
         </div>
