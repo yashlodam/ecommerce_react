@@ -6,6 +6,7 @@ import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import { useAppDispatch } from "../State/Store";
 import { paymentSuccess } from "../State/customer/OrderSlice";
+import { fetchUserCart } from "../State/customer/CartSlice";
 
 function PaymentSuccess() {
   const navigate = useNavigate();
@@ -20,15 +21,30 @@ function PaymentSuccess() {
 
 
 
-  useEffect(()=>{
-    const paymentId = getQueryParam("razorpay_payment_id")
-    const paymentLinkId = getQueryParam("razorpay_payment_link_id")
-    dispatch(paymentSuccess({
-        jwt:localStorage.getItem("jwt") || "",
-        paymentId,
-        paymentLinkId
-    }))
-  },[orderId])
+ useEffect(() => {
+  const paymentId = getQueryParam("razorpay_payment_id");
+  const paymentLinkId = getQueryParam("razorpay_payment_link_id");
+
+  const completePayment = async () => {
+    try {
+      await dispatch(
+        paymentSuccess({
+          jwt: localStorage.getItem("jwt") || "",
+          paymentId,
+          paymentLinkId,
+        })
+      ).unwrap();
+
+      // Wait until paymentSuccess completes, then fetch the updated cart
+      await dispatch(fetchUserCart(localStorage.getItem("jwt"))).unwrap();
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  completePayment();
+}, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-teal-50 flex justify-center items-center px-4">
 

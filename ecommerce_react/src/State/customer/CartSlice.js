@@ -28,7 +28,7 @@ export const fetchUserCart = createAsyncThunk("/cart/fetchUserCart",
 
 export const addItemToCart = createAsyncThunk(
   "cart/addItem",
-  async ({ jwt, request }, { rejectWithValue }) => {
+  async ({ jwt, request }, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.put(
         "/api/cart/add",
@@ -40,8 +40,10 @@ export const addItemToCart = createAsyncThunk(
         }
       );
 
-      return response.data;
+      // Fetch updated cart
+      dispatch(fetchUserCart(jwt));
 
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to add item"
@@ -151,11 +153,9 @@ const cartSlice = createSlice({
       state.error = null;
     })
     builder.addCase(addItemToCart.fulfilled, (state, action) => {
-      if (state.cart) {
-        state.cart.cartItems.push(action.payload);
-      }
-      state.loading = false;
-    })
+  
+  state.loading = false;
+});
 
     builder.addCase(addItemToCart.rejected, (state, action) => {
       state.loading = false;
@@ -168,18 +168,25 @@ const cartSlice = createSlice({
       state.error = null;
     })
     builder.addCase(deleteCartItem.fulfilled, (state, action) => {
-      if (state.cart) {
-        state.cart.cartItems = state.cart.cartItems.filter(
-          (item) => item.id != action.meta.arg.cartItemId
-        );
+  if (state.cart) {
+    state.cart.cartItems = state.cart.cartItems.filter(
+      (item) => item.id !== action.payload
+    );
 
-        const mrpPrice = sumCartItemMrpPrice(state.cart?.cartItems || [])
-        const sellingPrice = sumCartItemSellingPrice(state.cart?.cartItems || [])
-        state.cart.totalSellingPrice = sellingPrice;
-        state.cart.totalMrpPrice = mrpPrice;
-      }
-      state.loading = false
-    })
+    state.cart.totalMrpPrice = sumCartItemMrpPrice(state.cart.cartItems);
+
+    state.cart.totalSellingPrice = sumCartItemSellingPrice(
+      state.cart.cartItems
+    );
+
+    state.cart.totalItem = state.cart.cartItems.reduce(
+      (total, item) => total + item.quantity,
+      0
+    );
+  }
+
+  state.loading = false;
+});
     builder.addCase(updateCartItem.pending, (state) => {
       state.loading = true;
       state.error = null;

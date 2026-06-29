@@ -48,19 +48,24 @@ function Checkout() {
   dispatch(fetchUserCart(jwt)); // or whatever your thunk is called
 }, [dispatch]);
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
   if (!selectedAddress) {
     alert("Please select an address");
     return;
   }
 
-  dispatch(
-    createOrder({
-      address: selectedAddress,
-      jwt: localStorage.getItem("jwt"),
-      paymentGateway: paymentGatway,
-    })
-  );
+  try {
+    await dispatch(
+      createOrder({
+        address: selectedAddress,
+        jwt: localStorage.getItem("jwt"),
+        paymentGateway: paymentGatway,
+      })
+    ).unwrap();
+
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 

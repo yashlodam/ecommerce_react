@@ -24,6 +24,7 @@ import InputBase from "@mui/material/InputBase";
 import Collapse from "@mui/material/Collapse";
 import { store, useAppDispatch, useAppSelector } from '../../../State/Store';
 import { fetchUserProfile } from '../../../State/AuthSlice';
+import { fetchUserCart } from '../../../State/customer/CartSlice';
 
 const ACCENT = "#00927c";
 const ACCENT_DARK = "#007563";
@@ -72,10 +73,13 @@ function Navbar() {
   const { isLoggedIn, user } = useAppSelector(store => store.auth)
   console.log(isLoggedIn)
   useEffect(() => {
-    if (isLoggedIn) {
-      dispatch(fetchUserProfile(localStorage.getItem("jwt")));
-    }
-  }, [dispatch, isLoggedIn]);
+  if (isLoggedIn) {
+    const jwt = localStorage.getItem("jwt");
+
+    dispatch(fetchUserProfile(jwt));
+    dispatch(fetchUserCart(jwt));
+  }
+}, [dispatch, isLoggedIn]);
 
   const closeDrawer = () => setOpenDrawer(false);
 
