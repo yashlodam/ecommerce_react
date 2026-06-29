@@ -100,7 +100,6 @@ function Checkout() {
     </div>
           
           <Button >
-
           </Button>
          
     </div>

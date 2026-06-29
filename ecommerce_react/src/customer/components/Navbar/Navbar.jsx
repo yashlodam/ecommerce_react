@@ -260,7 +260,7 @@ function Navbar() {
                         fontSize: 16,
                       }}
                     >
-                      {user?.fullName?.charAt(0).toUpperCase() || "U"}
+                      {user?.fullName?.charAt(0).toUpperCase()}
                     </Avatar>
                   </IconButton>
                 ) : (
