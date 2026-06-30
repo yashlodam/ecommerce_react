@@ -35,6 +35,7 @@ useEffect(() => {
   if (jwt) {
     dispatch(fetchUserProfile(jwt));
   }
+  
 }, [dispatch]);
 
   return (
