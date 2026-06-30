@@ -36,7 +36,9 @@ function LoginForm() {
   const [loginLoading, setLoginLoading] = useState(false); // Used for submitting OTP
   const [showOtp, setShowOtp] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
+
+
 
   const formik = useFormik({
     initialValues: {
@@ -51,8 +53,8 @@ function LoginForm() {
 
       otp: otpSent
         ? Yup.string()
-            .length(6, "OTP must be 6 digits")
-            .required("OTP is required")
+          .length(6, "OTP must be 6 digits")
+          .required("OTP is required")
         : Yup.string(),
     }),
 
@@ -62,15 +64,22 @@ function LoginForm() {
       setSuccessMessage("");
 
       try {
-        await dispatch(
+        const response = await dispatch(
           signin({
             email: values.email.trim(),
             otp: values.otp.trim(),
           })
         ).unwrap();
-
+        console.log("login response",response)
         setSuccessMessage("Login successful.");
-        navigate("/");
+
+        if (response.role === "ROLE_ADMIN") {
+          navigate("/admin");
+        } else if (response.role === "ROLE_SELLER") {
+          navigate("/seller");
+        } else {
+          navigate("/");
+        }
       } catch (error) {
         setErrorMessage(
           typeof error === "string" ? error : "Invalid OTP. Please try again."
@@ -243,7 +252,7 @@ function LoginForm() {
             <Button
               fullWidth
               variant="contained"
-              onClick={()=>{
+              onClick={() => {
                 console.log("button clicked")
                 handleSendOtp();
               }}
