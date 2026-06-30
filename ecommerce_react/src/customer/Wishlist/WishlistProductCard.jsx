@@ -6,21 +6,33 @@ import { useAppDispatch } from "../../State/Store";
 import { addProductToWishlist } from "../../State/customer/WishlistSlice";
 import { useNavigate } from "react-router-dom";
 
-function WishlistProductCard({ item }) {
+function WishlistProductCard({ item,
+  setOpenSuccess,
+  setSuccessMessage, }) {
      
     const dispatch = useAppDispatch()
     const navigate = useNavigate();
-    const handleWishlist = ()=>{
-        item.id && dispatch(addProductToWishlist({productId:item.id,
-            jwt:localStorage.getItem("jwt")
-        }))
-    }
-
     
+    const handleWishlist = async (e) => {
+  e.stopPropagation();
 
+  try {
+    await dispatch(
+      addProductToWishlist({
+        productId: item.id,
+        jwt: localStorage.getItem("jwt"),
+      })
+    ).unwrap();
+
+    setSuccessMessage("Item removed from your wishlist.");
+    setOpenSuccess(true);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
-    <div onClick={()=> navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)}  className="group w-full max-w-xs mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative">
+    <div onClick={()=> navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)}  className="group w-full max-w-xs mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative cursor-pointer">
 
       {/* Remove Button */}
       <div onClick={handleWishlist} className="absolute top-3 right-3 z-10">

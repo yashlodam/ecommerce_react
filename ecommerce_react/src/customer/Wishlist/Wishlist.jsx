@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
-import { Button, CircularProgress } from "@mui/material";
+import { Alert, Button, CircularProgress, Snackbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import WishlistProductCard from "./WishlistProductCard";
 import { useAppDispatch, useAppSelector } from "../../State/Store";
@@ -19,11 +19,12 @@ function Wishlist() {
   }, [dispatch]);
 
   const products = wishlist.wishlist?.products || [];
-
+  const [openSuccess, setOpenSuccess] = useState(false);
+const [successMessage, setSuccessMessage] = useState("");
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-
+    
         {/* Header */}
 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -59,6 +60,25 @@ function Wishlist() {
     </div>
   </div>
 </div>
+
+ <Snackbar
+  open={openSuccess}
+  autoHideDuration={3000}
+  onClose={() => setOpenSuccess(false)}
+  anchorOrigin={{ vertical: "top", horizontal: "right" }}
+  sx={{
+    mt: 6,
+    ml: 3,
+  }}
+>
+  <Alert
+    severity="success"
+    variant="filled"
+    sx={{ width: "100%" }}
+  >
+    {successMessage}
+  </Alert>
+</Snackbar>
 
         {/* Loading */}
         {wishlist.loading && (
@@ -113,6 +133,8 @@ function Wishlist() {
           </div>
         )}
 
+       
+
         {/* Wishlist Products */}
         {!wishlist.loading && products.length > 0 && (
           <div className="mt-10">
@@ -130,9 +152,12 @@ function Wishlist() {
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
               {products.map((item) => (
                 <WishlistProductCard
-                  key={item.id}
-                  item={item}
-                />
+  key={item.id}
+  item={item}
+  setOpenSuccess={setOpenSuccess}
+  setSuccessMessage={setSuccessMessage}
+/>
+                
               ))}
             </div>
 

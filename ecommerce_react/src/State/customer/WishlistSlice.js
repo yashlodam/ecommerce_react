@@ -10,9 +10,9 @@ const initialState = {
 
 
 export const getWishlistByUserId = createAsyncThunk("wishlist/getWishlistByUserId",
-    async(userId ,{rejectWithValue})=>{
+    async(jwt,{rejectWithValue})=>{
         try{
-            const response = await api.get(`/api/wishlist/${userId}`,{
+            const response = await api.get(`/api/wishlist`,{
                 headers:{
                     Authorization:`Bearer ${localStorage.getItem("jwt")}`
                 },
