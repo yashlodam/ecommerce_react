@@ -63,6 +63,38 @@ const wishlistSlice = createSlice({
         }
     },
     extraReducers : (builder)=>{
-        builder.addCase(getWishlistByUserId.pending,(sta))
+        builder
+        .addCase(getWishlistByUserId.pending,(state)=>{
+            state.loading = true;
+            state.error = null;
+        })
+        .addCase(getWishlistByUserId.fulfilled,(state,action)=>{
+            state.wishlist = action.payload;
+            state.loading = false;
+        })
+        .addCase(getWishlistByUserId.rejected,(state,action)=>{
+            state.loading = false;
+            state.error = action.payload
+        })
+
+        .addCase(addProductToWishlist.pending,(state)=>{
+            state.loading = true;
+            state.error = null;
+        })
+        .addCase(addProductToWishlist.fulfilled,(state,action)=>{
+            state.wishlist = action.payload;
+            state.loading =  false;
+        })
+
+        .addCase(addProductToWishlist.rejected,(state,action)=>{
+            state.loading = false;
+            state.error = action.payload
+        })
+
     }
 })
+
+
+export const {resetWishlistState} = wishlistSlice.actions;
+
+export default wishlistSlice.reducer;
