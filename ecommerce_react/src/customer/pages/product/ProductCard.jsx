@@ -6,6 +6,8 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import { teal } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../../State/Store";
+import { addProductToWishlist } from "../../../State/customer/WishlistSlice";
 
 function ProductCard({ item }) {
   const images = item.images || [];
@@ -14,6 +16,9 @@ function ProductCard({ item }) {
   const [isHovered, setIsHovered] = useState(false);
 
   const navigate = useNavigate();
+
+  const dispatch = useAppDispatch();
+
 
   useEffect(() => {
     if (!isHovered || images.length <= 1) return;
@@ -24,6 +29,19 @@ function ProductCard({ item }) {
 
     return () => clearInterval(interval);
   }, [isHovered, images]);
+
+  const handleWishlist = (e) => {
+  e.stopPropagation();
+
+  if (item.id) {
+    dispatch(
+      addProductToWishlist({
+        productId: item.id,
+        jwt: localStorage.getItem("jwt"),
+      })
+    );
+  }
+};
 
   return (
     <div onClick={()=> navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)}
@@ -82,7 +100,7 @@ function ProductCard({ item }) {
             isHovered ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         >
-          <Button
+          <Button onClick={handleWishlist}
             variant="contained"
             sx={{
               minWidth: "42px",

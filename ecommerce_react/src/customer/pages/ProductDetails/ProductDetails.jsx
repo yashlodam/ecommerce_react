@@ -69,6 +69,18 @@ function ProductDetails() {
     setActiveImage(value)
   }
 
+  const handleWishlist = () => {
+    
+    if (item.id) {
+      dispatch(
+        addProductToWishlist({
+          productId:Number(productId),
+          jwt: localStorage.getItem("jwt"),
+        })
+      );
+    }
+  };
+
   return (
     <div className='px-5 lg:px-20 pt-10'>
       <Snackbar
@@ -172,6 +184,7 @@ function ProductDetails() {
             </Button>
 
             <Button fullWidth
+            onClick={handleWishlist}
             variant='outlined'
              startIcon={<FavoriteIcon/>} sx={{py:"1rem"}}>
               whishlist

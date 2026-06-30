@@ -30,26 +30,30 @@ export const getWishlistByUserId = createAsyncThunk("wishlist/getWishlistByUserI
     }
 )
 
-export const addProductToWishlist = createAsyncThunk("wishlist/addProductToWishlist",
-    async({productId,jwt},{rejectWithValue})=>{
-        try{
-            const response = await api.post(`/api/wishlist/add-product/${productId}`,{
-                headers:{
-                    Authorization: `Bearer ${jwt}`
-                }
-            })
-
-            console.log("add product",response.data)
-
-            return response.data;
+export const addProductToWishlist = createAsyncThunk(
+  "wishlist/addProductToWishlist",
+  async ({ productId, jwt }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(
+        `/api/wishlist/add-product/${productId}`,
+        {}, // empty request body
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
         }
-        catch(error){
-            return rejectWithValue(
-                error.response?.data.message || "Failed to add product to wishlist"
-            )
-        }
+      );
+
+      console.log("add product", response.data);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to add product to wishlist"
+      );
     }
-)
+  }
+);
 
 
 const wishlistSlice = createSlice({
