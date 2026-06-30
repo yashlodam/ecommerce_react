@@ -20,7 +20,7 @@ const validationSchema = Yup.object({
   state: Yup.string().required("State is required"),
 });
 
-const AddAddressForm = ({handleClose}) => {
+const AddAddressForm = ({handleClose, onSuccess}) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const dispatch = useAppDispatch();
@@ -36,25 +36,38 @@ const AddAddressForm = ({handleClose}) => {
       state: "",
     },
     validationSchema,
-    onSubmit: (values) => {
-  const address = {
-    name: values.fullName,
-    mobile: values.mobile,
-    address: values.house,
-    locality: values.locality,
-    city: values.city,
-    state: values.state,
-    pinCode: values.pincode,
-  };
+    onSubmit: async (values, { setSubmitting, resetForm }) => {
+  try {
+    const address = {
+      name: values.fullName,
+      mobile: values.mobile,
+      address: values.house,
+      locality: values.locality,
+      city: values.city,
+      state: values.state,
+      pinCode: values.pincode,
+    };
 
-  dispatch(
-    addUserAddress({
-      address,
-      jwt:localStorage.getItem("jwt")
-    })
-  );
+    await dispatch(
+      addUserAddress({
+        address,
+        jwt: localStorage.getItem("jwt"),
+      })
+    ).unwrap();
 
-  handleClose();
+    resetForm();
+
+    if (onSuccess) {
+      onSuccess();
+    }
+
+    handleClose();
+
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setSubmitting(false);
+  }
 }
   });
 

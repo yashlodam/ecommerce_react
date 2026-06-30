@@ -12,6 +12,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 
 import { fetchUserProfile } from "../../../State/AuthSlice";
+import AddAddressForm from "../Checkout/AddressForm";
 
 function Address() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ function Address() {
 const [openDialog, setOpenDialog] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
 const [openError, setOpenError] = useState(false);
+const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(()=>{
     dispatch(fetchUserProfile(localStorage.getItem("jwt")))
@@ -51,7 +53,7 @@ const [openError, setOpenError] = useState(false);
     bgcolor: "#0f766e",
   }}
 >
-  
+  Add New Address
 </Button>
       </div>
       <Snackbar
@@ -61,7 +63,7 @@ const [openError, setOpenError] = useState(false);
   anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
 >
   <Alert severity="success" variant="filled">
-    Address deleted successfully.
+    {successMessage}
   </Alert>
 </Snackbar>
 
@@ -83,33 +85,28 @@ const [openError, setOpenError] = useState(false);
   address={address}
   setOpenSuccess={setOpenSuccess}
   setOpenError={setOpenError}
+  setSuccessMessage={setSuccessMessage}
 />
         ))}
       </div>
 
-      <Dialog
+<Dialog
   open={openDialog}
   onClose={() => setOpenDialog(false)}
   fullWidth
-  maxWidth="sm"
+  maxWidth="md"
 >
-  <DialogTitle>Add New Address</DialogTitle>
-
-  <DialogContent>
-    {/* Your address form goes here */}
+  <DialogContent dividers>
+    <AddAddressForm
+      handleClose={() => setOpenDialog(false)}
+      onSuccess={() => {
+        setSuccessMessage("Address added successfully.");
+        setOpenSuccess(true);
+        dispatch(fetchUserProfile(localStorage.getItem("jwt")));
+      }}
+    />
   </DialogContent>
-
-  <DialogActions>
-    <Button onClick={() => setOpenDialog(false)}>
-      Cancel
-    </Button>
-
-    <Button variant="contained">
-      Save Address
-    </Button>
-  </DialogActions>
 </Dialog>
-
     </div>
   );
 }

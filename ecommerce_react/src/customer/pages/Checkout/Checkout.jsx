@@ -106,16 +106,20 @@ function Checkout() {
               <AddIcon className='mr-2' /> Add new Address
             </Button>
           </div>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Box sx={style}>
-              <AddressForm handleClose={handleClose} />
-            </Box>
-          </Modal>
+        <Modal
+  open={open}
+  onClose={handleClose}
+>
+  <Box sx={style}>
+    <AddressForm
+      handleClose={handleClose}
+      onSuccess={() => {
+        dispatch(fetchUserProfile(localStorage.getItem("jwt")));
+        handleClose();
+      }}
+    />
+  </Box>
+</Modal>
           <div>
             <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <h2 className="text-center text-xl sm:text-2xl font-semibold text-teal-600 mb-6">

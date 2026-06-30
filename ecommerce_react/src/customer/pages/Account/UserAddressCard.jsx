@@ -8,28 +8,31 @@ import { fetchUserProfile } from "../../../State/AuthSlice";
 
 function UserAddressCard({ address,
   setOpenSuccess,
-  setOpenError, }) {
+  setOpenError,setSuccessMessage }) {
 
   const dispatch = useAppDispatch();
 
 
 
-  const removeAddress = async()=>{
-    try {
-  await dispatch(
-    deleteUserAddress({
-      addressId: address.id,
-      jwt: localStorage.getItem("jwt"),
-    })
-  ).unwrap();
+const removeAddress = async () => {
+  try {
+    await dispatch(
+      deleteUserAddress({
+        addressId: address.id,
+        jwt: localStorage.getItem("jwt"),
+      })
+    ).unwrap();
 
-  dispatch(fetchUserProfile(localStorage.getItem("jwt")));
+    // Refresh user profile
+    await dispatch(fetchUserProfile(localStorage.getItem("jwt")));
 
-  setOpenSuccess(true);
-} catch (error) {
-  setOpenError(true);
-}
+    setSuccessMessage("Address deleted successfully.");
+    setOpenSuccess(true);
+  } catch (error) {
+    console.error("Delete Error:", error);
+    setOpenError(true);
   }
+};
   return (
     <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
       <div className="flex justify-between items-start gap-4">
