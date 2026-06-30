@@ -1,19 +1,34 @@
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import { store, useAppDispatch, useAppSelector } from "../../../State/Store"
-import { useEffect } from 'react';
-import { fetchSellerOrders } from '../../../State/seller/sellerOrderSlice';
+import React, { useEffect, useState } from "react";
+import { styled } from "@mui/material/styles";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import {
+  Button,
+  Fade,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../State/Store";
+
+import {
+  fetchSellerOrders,
+  updateOrderStatus,
+} from "../../../State/seller/sellerOrderSlice";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
+    backgroundColor: "#111827",
+    color: "#fff",
+    fontWeight: 600,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -21,78 +36,223 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
+  "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
-  '&:last-child td, &:last-child th': {
+
+  "&:last-child td, &:last-child th": {
     border: 0,
   },
 }));
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-// const rows = [
-//   createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-//   createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-//   createData('Eclair', 262, 16.0, 24, 6.0),
-//   createData('Cupcake', 305, 3.7, 67, 4.3),
-//   createData('Gingerbread', 356, 16.0, 49, 3.9),
-// ];
-
 export default function OrderTable() {
-
   const dispatch = useAppDispatch();
-  const {sellerOrder} = useAppSelector(store=>store)
 
-  useEffect(()=>{
-    dispatch(fetchSellerOrders(localStorage.getItem("jwt") || ""))
-  },[])
+  const { sellerOrder } = useAppSelector((store) => store);
+
+  useEffect(() => {
+    dispatch(fetchSellerOrders(localStorage.getItem("jwt") || ""));
+  }, [dispatch]);
+
+  const [anchorEl, setAnchorEl] = useState({});
+
+  const handleClick = (event, orderId) => {
+    setAnchorEl((prev) => ({
+      ...prev,
+      [orderId]: event.currentTarget,
+    }));
+  };
+
+  const handleClose = (orderId) => {
+    setAnchorEl((prev) => ({
+      ...prev,
+      [orderId]: null,
+    }));
+  };
+
+  const handleStatusChange = (orderId, status) => {
+    dispatch(
+      updateOrderStatus({
+        jwt: localStorage.getItem("jwt"),
+        orderId,
+        orderStatus: status,
+      })
+    );
+
+    handleClose(orderId);
+  };
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }} aria-label="customized table">
+    <TableContainer component={Paper} elevation={3}>
+      <Table sx={{ minWidth: 900 }}>
         <TableHead>
           <TableRow>
-            <StyledTableCell>Order Id</StyledTableCell>
+            <StyledTableCell>Order ID</StyledTableCell>
             <StyledTableCell>Products</StyledTableCell>
-            <StyledTableCell align="right">Shipping Address</StyledTableCell>
-            <StyledTableCell align="right">Order Status</StyledTableCell>
-            <StyledTableCell align="right">Update</StyledTableCell>
+            <StyledTableCell>Shipping Address</StyledTableCell>
+            <StyledTableCell align="center">
+              Order Status
+            </StyledTableCell>
+            <StyledTableCell align="center">
+              Update Status
+            </StyledTableCell>
           </TableRow>
         </TableHead>
+
         <TableBody>
           {sellerOrder.orders?.map((item) => (
             <StyledTableRow key={item.id}>
-              <StyledTableCell component="th" scope="row">
-                {item.id}
+              <StyledTableCell>
+                #{item.id}
               </StyledTableCell>
-              <StyledTableCell >
-                <div className='flex gap-1 flex-wrap'>
-                  {
-                    item.orderItems.map((orderItem)=> <div className='flex gap-5 '>
-                      <img className='w-20 rounded-md' src={orderItem.product.images[0]} alt="" />
-                      <div className='flex flex-col justify-between py-2'>
-                        <h1>Title: {orderItem.product.title}</h1>
-                        <h1>Selling Price: {orderItem.product.sellingPrice}</h1>
-                        <h1>Color: {orderItem.product.color}</h1>
+
+              <StyledTableCell>
+                <div className="space-y-4">
+                  {item.orderItems.map((orderItem) => (
+                    <div
+                      key={orderItem.id}
+                      className="flex gap-4 items-center"
+                    >
+                      <img
+                        src={orderItem.product.images[0]}
+                        alt={orderItem.product.title}
+                        className="w-20 h-20 object-cover rounded-lg border"
+                      />
+
+                      <div>
+                        <h3 className="font-semibold">
+                          {orderItem.product.title}
+                        </h3>
+
+                        <p className="text-sm text-gray-600">
+                          ₹{orderItem.product.sellingPrice}
+                        </p>
+
+                        <p className="text-sm text-gray-500">
+                          Color: {orderItem.product.color}
+                        </p>
                       </div>
-                    </div>)
+                    </div>
+                  ))}
+                </div>
+              </StyledTableCell>
+
+              <StyledTableCell>
+                <div className="space-y-1">
+                  <h3 className="font-semibold">
+                    {item.shippingAddress.name}
+                  </h3>
+
+                  <p>
+                    {item.shippingAddress.address}
+                  </p>
+
+                  <p>
+                    {item.shippingAddress.city},{" "}
+                    {item.shippingAddress.state} -{" "}
+                    {item.shippingAddress.pinCode}
+                  </p>
+
+                  <p>
+                    <strong>Mobile:</strong>{" "}
+                    {item.shippingAddress.mobile}
+                  </p>
+                </div>
+              </StyledTableCell>
+
+              <StyledTableCell align="center">
+                <span className="px-4 py-2 rounded-full bg-green-100 text-green-700 font-semibold text-sm">
+                  {item.orderStatus}
+                </span>
+              </StyledTableCell>
+
+              <StyledTableCell align="center">
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={(e) =>
+                    handleClick(e, item.id)
                   }
-                </div>
+                >
+                  Status
+                </Button>
+
+                <Menu
+                  anchorEl={anchorEl[item.id]}
+                  open={Boolean(anchorEl[item.id])}
+                  onClose={() => handleClose(item.id)}
+                  TransitionComponent={Fade}
+                >
+                  <MenuItem
+                    onClick={() =>
+                      handleStatusChange(
+                        item.id,
+                        "PENDING"
+                      )
+                    }
+                  >
+                    Pending
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={() =>
+                      handleStatusChange(
+                        item.id,
+                        "PLACED"
+                      )
+                    }
+                  >
+                    Placed
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={() =>
+                      handleStatusChange(
+                        item.id,
+                        "CONFIRMED"
+                      )
+                    }
+                  >
+                    Confirmed
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={() =>
+                      handleStatusChange(
+                        item.id,
+                        "SHIPPED"
+                      )
+                    }
+                  >
+                    Shipped
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={() =>
+                      handleStatusChange(
+                        item.id,
+                        "DELIVERED"
+                      )
+                    }
+                  >
+                    Delivered
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={() =>
+                      handleStatusChange(
+                        item.id,
+                        "CANCELLED"
+                      )
+                    }
+                    sx={{
+                      color: "red",
+                    }}
+                  >
+                    Cancelled
+                  </MenuItem>
+                </Menu>
               </StyledTableCell>
-              <StyledTableCell align="right">
-                <div className='flex flex-col gap-y-2'>
-                  <h1>{item.shippingAddress.name}</h1>
-                  <h1>{item.shippingAddress.address},{item.shippingAddress.pinCode}</h1>
-                  <h1>{item.shippingAddress.state} - {item.shippingAddress.pinCode}</h1>
-                  <h1><strong>Mobile:</strong>{item.shippingAddress.mobile}</h1>
-                </div>
-              </StyledTableCell>
-              {/* <StyledTableCell align="right">{row.carbs}</StyledTableCell>
-              <StyledTableCell align="right">{row.protein}</StyledTableCell> */}
             </StyledTableRow>
           ))}
         </TableBody>
