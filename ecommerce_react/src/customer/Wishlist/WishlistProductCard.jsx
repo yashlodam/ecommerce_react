@@ -4,20 +4,23 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import { IconButton, Tooltip } from "@mui/material";
 import { useAppDispatch } from "../../State/Store";
 import { addProductToWishlist } from "../../State/customer/WishlistSlice";
+import { useNavigate } from "react-router-dom";
 
 function WishlistProductCard({ item }) {
      
     const dispatch = useAppDispatch()
-
+    const navigate = useNavigate();
     const handleWishlist = ()=>{
         item.id && dispatch(addProductToWishlist({productId:item.id,
             jwt:localStorage.getItem("jwt")
         }))
     }
 
+    
+
 
   return (
-    <div className="group w-full max-w-xs mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative">
+    <div onClick={()=> navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)}  className="group w-full max-w-xs mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative">
 
       {/* Remove Button */}
       <div onClick={handleWishlist} className="absolute top-3 right-3 z-10">
@@ -78,9 +81,7 @@ function WishlistProductCard({ item }) {
           )}
         </div>
 
-        <button className="mt-5 w-full bg-black text-white py-3 rounded-xl hover:bg-gray-800 transition font-medium">
-          Move to Cart
-        </button>
+        
       </div>
     </div>
   );
