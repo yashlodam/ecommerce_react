@@ -101,6 +101,32 @@ export const logout = createAsyncThunk("/auth/logout",
 )
 
 
+export const updateUserProfile = createAsyncThunk(
+  "auth/updateUserProfile",
+  async ({ userData, jwt }, { rejectWithValue }) => {
+    try {
+      const response = await api.patch(
+        "/api/users/profile/update",
+        userData,
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+
+      console.log("Profile updated successfully", response.data);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to update profile"
+      );
+    }
+  }
+);
+
+
 
 const initialState = {
   jwt:null,
@@ -132,6 +158,20 @@ const authSlice = createSlice({
             state.isLoggedIn = false
             state.user=null
            })
+
+           builder
+  .addCase(updateUserProfile.pending, (state) => {
+    state.loading = true;
+    state.error = null;
+  })
+  .addCase(updateUserProfile.fulfilled, (state, action) => {
+    state.loading = false;
+    state.user = action.payload;
+  })
+  .addCase(updateUserProfile.rejected, (state, action) => {
+    state.loading = false;
+    state.error = action.payload;
+  });
    }
 })
 
