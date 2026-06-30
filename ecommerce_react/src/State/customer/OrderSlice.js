@@ -145,6 +145,59 @@ export const cancelOrder = createAsyncThunk(
   }
 );
 
+
+export const addUserAddress = createAsyncThunk(
+  "user/addUserAddress",
+  async ({ address, jwt }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(
+        "api/users/add-address",
+        address,
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+
+      console.log("Address added successfully", response.data);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to add address"
+      );
+    }
+  }
+);
+
+
+
+export const deleteUserAddress = createAsyncThunk(
+  "user/deleteUserAddress",
+  async ({ addressId, jwt }, { rejectWithValue }) => {
+    try {
+      const response = await api.delete(
+        `api/users/address/${addressId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+
+      console.log("Address deleted successfully", response.data);
+
+      return { addressId, user: response.data };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to delete address"
+      );
+    }
+  }
+);
+
+
 // ================= Initial State =================
 const initialState = {
   orders: [],

@@ -2,8 +2,34 @@ import React from "react";
 import { Button } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useAppDispatch } from "../../../State/Store";
+import { deleteUserAddress } from "../../../State/customer/OrderSlice";
+import { fetchUserProfile } from "../../../State/AuthSlice";
 
-function UserAddressCard({ address }) {
+function UserAddressCard({ address,
+  setOpenSuccess,
+  setOpenError, }) {
+
+  const dispatch = useAppDispatch();
+
+
+
+  const removeAddress = async()=>{
+    try {
+  await dispatch(
+    deleteUserAddress({
+      addressId: address.id,
+      jwt: localStorage.getItem("jwt"),
+    })
+  ).unwrap();
+
+  dispatch(fetchUserProfile(localStorage.getItem("jwt")));
+
+  setOpenSuccess(true);
+} catch (error) {
+  setOpenError(true);
+}
+  }
   return (
     <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
       <div className="flex justify-between items-start gap-4">
@@ -48,6 +74,7 @@ function UserAddressCard({ address }) {
           </Button>
 
           <Button
+          onClick={removeAddress}
             size="small"
             color="error"
             startIcon={<DeleteIcon />}

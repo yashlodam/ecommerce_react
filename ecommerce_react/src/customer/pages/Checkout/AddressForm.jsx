@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import { TextField, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAppDispatch } from "../../../State/Store";
-import { createOrder } from "../../../State/customer/OrderSlice";
+import { addUserAddress, createOrder } from "../../../State/customer/OrderSlice";
 
 const validationSchema = Yup.object({
   fullName: Yup.string().required("Full name is required"),
@@ -20,11 +20,11 @@ const validationSchema = Yup.object({
   state: Yup.string().required("State is required"),
 });
 
-const AddAddressForm = ({paymentGatway,handleClose}) => {
+const AddAddressForm = ({handleClose}) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const dispatch = useAppDispatch();
- console.log("PaymentGateway is :",paymentGatway)
+ 
  const formik = useFormik({
     initialValues: {
       fullName: "",
@@ -48,18 +48,15 @@ const AddAddressForm = ({paymentGatway,handleClose}) => {
   };
 
   dispatch(
-    createOrder({
+    addUserAddress({
       address,
-      jwt: localStorage.getItem("jwt"),
-      paymentGateway: paymentGatway,
+      jwt:localStorage.getItem("jwt")
     })
   );
 
   handleClose();
 }
   });
-
-
 
 
   return (

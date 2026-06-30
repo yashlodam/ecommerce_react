@@ -113,7 +113,7 @@ function Checkout() {
             aria-describedby="modal-modal-description"
           >
             <Box sx={style}>
-              <AddressForm paymentGatway={paymentGatway} handleClose={handleClose} />
+              <AddressForm handleClose={handleClose} />
             </Box>
           </Modal>
           <div>
