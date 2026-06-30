@@ -20,6 +20,7 @@ import LoginForm from './customer/pages/Auth/LoginForm';
 import Auth from './customer/pages/Auth/Auth';
 import { fetchUserProfile } from './State/AuthSlice';
 import PaymentSucess from './customer/PaymentSucess';
+import Wishlist from './customer/Wishlist/Wishlist';
 
 function App() {
   
@@ -50,6 +51,8 @@ useEffect(() => {
             element={<ProductDetails />}
           />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/payment-success/:orderId" element={<PaymentSucess />} />
           <Route path="/account/*" element={<Account />} />

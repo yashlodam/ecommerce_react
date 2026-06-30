@@ -273,7 +273,7 @@ function Navbar() {
                   </Button>
                 )}
 
-                <IconButton aria-label="Wishlist" sx={iconBtnSx}>
+                <IconButton onClick={()=> navigate("/wishlist")} aria-label="Wishlist" sx={iconBtnSx}>
                   <FavoriteBorderIcon sx={{ fontSize: 26 }} />
                 </IconButton>
 
