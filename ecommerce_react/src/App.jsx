@@ -21,6 +21,8 @@ import Auth from './customer/pages/Auth/Auth';
 import { fetchUserProfile } from './State/AuthSlice';
 import PaymentSucess from './customer/PaymentSucess';
 import Wishlist from './customer/Wishlist/Wishlist';
+import { homeCategories } from './data/HomeCategories';
+import { createHomeCategories } from './State/customer/CustomerSlice';
 
 function App() {
   
@@ -35,7 +37,7 @@ useEffect(() => {
   if (jwt) {
     dispatch(fetchUserProfile(jwt));
   }
-  
+  dispatch(createHomeCategories(homeCategories));
 }, [dispatch]);
 
   return (
