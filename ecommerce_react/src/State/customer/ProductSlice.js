@@ -77,11 +77,43 @@ export const fetchAllProducts = createAsyncThunk(
   }
 );
 
+export const fetchHomeProducts = createAsyncThunk(
+  "products/fetchHomeProducts",
+  async ({ category }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_URL}/products`, {
+        params: {
+          category,
+          pageNumber: 0,
+        },
+      });
+
+      return {
+        category,
+        products: response.data.content,
+      };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || error.message
+      );
+    }
+  }
+);
+
 // ================= Initial State =================
 const initialState = {
   product: null,
   products: [],
   totalPages: 1,
+
+  homeProducts: {
+    men: [],
+    women: [],
+    electronics: [],
+    home_furniture: [],
+    beauty: [],
+  },
+
   loading: false,
   error: null,
   searchProducts: [],
@@ -123,6 +155,22 @@ const productSlice = createSlice({
         state.error = action.payload;
       });
 
+
+      builder
+  .addCase(fetchHomeProducts.pending, (state) => {
+    state.loading = true;
+  })
+  .addCase(fetchHomeProducts.fulfilled, (state, action) => {
+    state.loading = false;
+
+    const { category, products } = action.payload;
+
+    state.homeProducts[category] = products;
+  })
+  .addCase(fetchHomeProducts.rejected, (state, action) => {
+    state.loading = false;
+    state.error = action.payload;
+  });
     // Search Products
     builder
       .addCase(searchProduct.pending, (state) => {

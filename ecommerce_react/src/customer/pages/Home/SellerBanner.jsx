@@ -2,18 +2,16 @@ import React from "react";
 
 function SellerBanner() {
   return (
-    <section className="px-4 lg:px-8 py-10">
-      <div className="group relative overflow-hidden rounded-[32px] bg-white shadow-md hover:shadow-xl transition-all duration-500">
-
-        <img
-          src="/images/sellerProducts.png"
-          alt="Sell Your Products with ShopSphere"
-          className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-        />
-
-        {/* Optional subtle overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-transparent to-transparent pointer-events-none"></div>
-
+    <section className="px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1400px] overflow-hidden rounded-[32px] border border-slate-200/80 bg-white shadow-[0_30px_90px_-35px_rgba(15,23,42,0.35)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_34px_90px_-30px_rgba(15,23,42,0.4)]">
+        <div className="relative">
+          <img
+            src="/images/sellerProducts.png"
+            alt="Sell your products with ShopSphere"
+            className="h-auto w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/20 via-transparent to-slate-950/10" />
+        </div>
       </div>
     </section>
   );

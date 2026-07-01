@@ -23,6 +23,7 @@ import PaymentSucess from './customer/PaymentSucess';
 import Wishlist from './customer/Wishlist/Wishlist';
 import { homeCategories } from './data/HomeCategories';
 import { createHomeCategories } from './State/customer/CustomerSlice';
+import ScrollToTop from './ScrollToTop';
 
 function App() {
   
@@ -44,7 +45,7 @@ useEffect(() => {
     <ThemeProvider theme={customeTheme}>
       <div>
         <Navbar />
-
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products/:category" element={<Product />} />

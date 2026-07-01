@@ -34,64 +34,61 @@ function FeaturedCollections() {
   ];
 
   return (
-    <section className="px-4 lg:px-8 py-10 max-w-[1400px] mx-auto">
-      <div className="flex items-end justify-between mb-6 sm:mb-8 md:mb-10">
+    <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mb-6 flex flex-col gap-3 sm:mb-8 md:mb-10 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
-            Featured Collections
+          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-600">Curated picks</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+            Featured collections
           </h2>
-          <p className="text-gray-500 mt-1.5 text-sm sm:text-base md:text-base">
-            Curated collections for every lifestyle
+          <p className="mt-2 text-sm text-slate-600 sm:text-base">
+            Curated collections for every lifestyle, designed to feel elevated from the first glance.
           </p>
         </div>
 
-        <button className="hidden sm:flex items-center gap-1 text-sm md:text-base font-semibold text-[#2874f0] hover:underline whitespace-nowrap">
-          View All <ArrowRight size={16} />
+        <button className="inline-flex items-center gap-2 self-start rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
+          View all
+          <ArrowRight size={16} />
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-4 sm:gap-5 md:gap-6">
         {collections.map((item, index) => (
           <div
             key={index}
-            className={`group relative overflow-hidden rounded-2xl cursor-pointer aspect-[4/3] sm:aspect-[16/10] md:aspect-[16/10] lg:aspect-[4/3] ${item.span}`}
+            className={`group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-[24px] border border-slate-200/70 bg-white shadow-[0_24px_70px_-30px_rgba(15,23,42,0.35)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_80px_-24px_rgba(15,23,42,0.4)] sm:aspect-[16/10] md:aspect-[16/10] lg:aspect-[4/3] ${item.span}`}
           >
             <img
               src={item.image}
               alt={item.title}
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             />
 
-            {/* Gradient for text legibility, slightly stronger on hover */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 group-hover:from-black/85" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/20 to-transparent transition-opacity duration-300 group-hover:from-slate-950/90" />
 
-            <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-6 md:p-7 lg:p-7 text-white">
-              <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl font-bold leading-tight">
+            <div className="absolute inset-0 flex flex-col justify-end p-5 text-white sm:p-6 md:p-7 lg:p-7">
+              <h3 className="text-lg font-semibold leading-tight sm:text-xl md:text-2xl">
                 {item.title}
               </h3>
-              <p className="text-xs sm:text-sm md:text-sm text-white/80 mt-1 mb-4">
+              <p className="mt-1 mb-4 text-xs text-white/80 sm:text-sm">
                 {item.subtitle}
               </p>
 
-              <button className="self-start flex items-center gap-1.5 bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-semibold transition-transform duration-300 group-hover:gap-2.5 group-hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
-                Explore Now
-                <ArrowRight
-                  size={16}
-                  className="transition-transform duration-300 group-hover:translate-x-0.5"
-                />
+              <button className="self-start inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition-all duration-300 group-hover:gap-3 group-hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                Explore now
+                <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-0.5" />
               </button>
             </div>
 
-            {/* Focus ring for keyboard users on the whole card */}
-            <span className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 group-hover:ring-white/20 transition-colors duration-300" />
+            <span className="absolute inset-0 rounded-[24px] ring-1 ring-inset ring-white/10 transition-colors duration-300 group-hover:ring-white/20" />
           </div>
         ))}
       </div>
 
-      {/* Mobile-only view all link, shown below grid since header link is hidden on small screens */}
-      <button className="sm:hidden flex items-center gap-1 text-sm font-semibold text-[#2874f0] mt-6">
-        View All Collections <ArrowRight size={16} />
+      <button className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-700 sm:hidden">
+        View all collections
+        <ArrowRight size={16} />
       </button>
     </section>
   );

@@ -11,6 +11,7 @@ import FeaturedCollections from "./FeaturedCollections";
 import WhyChooseShopSphere from "./WhyChooseShopSphere";
 import CustomerReviews from "./CustomerReviews";
 import Footer from "./Footer";
+import HomeProducts from "./HomeProduct";
 
 function Home() {
   return (
@@ -23,9 +24,10 @@ function Home() {
           <Slider />
         </section>
         <ElectricCategory/>
-        <Grid/>
+        <HomeProducts/>
         <Deal/>
         <ShopByCategory/>
+        <Grid/>
         <BrandInSpotlight/>
         <TopRatedProducts/>
         <SellerBanner/>
