@@ -1,34 +1,48 @@
 export const homeCategories = [
   // Electronics
   {
-    categoryId: "gaming_laptops",
+    categoryId: "laptops",
     section: "ELECTRIC_CATEGORIES",
-    name: "Gaming Laptop",
-    image: "...",
+    name: "Laptop",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQbnn7bUe-pthNhCm296-VpXADc8tz1dBC1-EEI_ePtg&s",
   },
   {
     categoryId: "smartphones",
     section: "ELECTRIC_CATEGORIES",
     name: "Smartphones",
-    image: "...",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSQgZYXrrm3L5XX6naNP67gAEbpsuA9LeNN0Z0v4jzcg&s=10",
   },
   {
     categoryId: "headphones",
     section: "ELECTRIC_CATEGORIES",
     name: "Headphones",
-    image: "...",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWlP_1orqXc_aVIUx0K7Ku8y3R1OFwQUobV7RjC2xq-g&s",
   },
   {
     categoryId: "smart_watches",
     section: "ELECTRIC_CATEGORIES",
     name: "Smart Watches",
-    image: "...",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfW8zR4k6Vi_xdwbSlrCIy_akIOGcQtmCdQLERHLpLSg&s=10",
   },
+  {
+  categoryId: "speakers",
+  section: "ELECTRIC_CATEGORIES",
+  name: "Speakers",
+  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjVu9jLGObIU_HGlvk8jX21mVlogM-N0B9hNTV-j7QEw&s=10",
+},
+
+  {
+  categoryId: "cameras",
+  section: "ELECTRIC_CATEGORIES",
+  name: "Cameras",
+  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFOM-aH4mGk1kb9dj2s9YT_GBAcEhCRVRvRxnZty3rzg&s=10",
+},
+
   {
     categoryId: "televisions",
     section: "ELECTRIC_CATEGORIES",
     name: "Smart TVs",
-    image: "...",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhnIaFLKUE2uljOFsu1J_LHpiO1-jt49C47uf1K3NOXQ&s=10",
   },
 
   {

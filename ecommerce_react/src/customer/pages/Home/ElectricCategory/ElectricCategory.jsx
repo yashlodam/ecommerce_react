@@ -1,5 +1,6 @@
 import React from "react";
 import ElectricCategoryCard from "./ElectricCategoryCard";
+import { store, useAppDispatch, useAppSelector } from "../../../../State/Store";
 
 function ElectricCategory() {
   const categories = [
@@ -40,18 +41,20 @@ function ElectricCategory() {
     },
   ];
 
+  const {customer} = useAppSelector(store=>store);
+  console.log("Customer Data in ElectricCategory:", customer);
+
   return (
     <div className="mt-6 bg-white rounded-2xl ring-1 ring-slate-200/70 shadow-sm p-4 lg:p-6">
       <h2 className="text-xl font-bold mb-6">Electronics</h2>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
-        {categories.map((category, index) => (
-          <ElectricCategoryCard
-            key={index}
-            image={category.image}
-            title={category.title}
-          />
-        ))}
+        {customer.homeCategories?.electricCategories?.map((item, index) => (
+  <ElectricCategoryCard
+    key={index}
+    item={item}
+  />
+))}
       </div>
     </div>
   );
