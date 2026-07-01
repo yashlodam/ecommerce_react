@@ -50,7 +50,7 @@ useEffect(() => {
           <Route path="/products/:category" element={<Product />} />
           <Route path="/reviews/:productId" element={<Review />} />
           <Route
-            path="/product-details/:categoryId/:name/:productId"
+            path="/product-details/:categoryId/:productId"
             element={<ProductDetails />}
           />
           <Route path="/cart" element={<Cart />} />

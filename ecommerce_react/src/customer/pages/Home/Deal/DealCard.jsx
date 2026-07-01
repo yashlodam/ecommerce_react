@@ -1,79 +1,57 @@
 import React from "react";
 import { Star, Zap } from "lucide-react";
 
-function DealCard({
-  image,
-  title,
-  brand,
-  price,
-  originalPrice,
-  discount,
-  rating,
-  ratingCount,
-  assured = true,
-  freeDelivery = true,
-}) {
+function DealCard({item}) {
+
+  console.log("DealCard item:", item);
   return (
     <div className="group relative w-full max-w-[360px] bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden">
       {/* Image area */}
       <div className="relative bg-white p-5 pb-3">
-        {discount ? (
+        {item.discount ? (
           <span className="absolute top-0 left-3 z-10 bg-[#388e3c] text-white text-[11px] font-bold px-2 py-[3px] rounded">
-            {discount}% OFF
+            {item.discount}% OFF
           </span>
         ) : null}
 
         <img
-          src={image}
-          alt={title}
+          src={item.category.image}
+          alt={item.title}
           className="w-full h-40 object-contain group-hover:scale-105 transition-transform duration-300"
         />
       </div>
 
       {/* Content */}
       <div className="px-4 pb-4 pt-1">
-        {brand ? (
+        {item.brand ? (
           <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide truncate">
-            {brand}
+            {item.brand}
           </p>
         ) : null}
 
         <h3 className="text-[13px] text-gray-800 leading-snug mt-0.5 line-clamp-2 min-h-[34px]">
-          {title}
+          {item.category.name}
         </h3>
 
-        {rating ? (
-          <div className="flex items-center gap-1.5 mt-1.5">
-            <span className="flex items-center gap-0.5 bg-[#388e3c] text-white text-[11px] font-semibold px-1.5 py-[1px] rounded">
-              {rating.toFixed(1)}
-              <Star className="w-2.5 h-2.5 fill-white stroke-none" />
-            </span>
-            {ratingCount ? (
-              <span className="text-[11px] text-gray-500">
-                ({ratingCount.toLocaleString()})
-              </span>
-            ) : null}
-            
-          </div>
-        ) : null}
+        
 
         <div className="flex items-baseline gap-1.5 mt-1.5">
           <span className="text-[16px] font-bold text-gray-900">
-            ₹{Number(price).toLocaleString("en-IN")}
+            ₹{Number(item..price).toLocaleString("en-IN")}
           </span>
-          {originalPrice ? (
+          {item.originalPrice ? (
             <span className="text-[12px] text-gray-400 line-through">
-              ₹{Number(originalPrice).toLocaleString("en-IN")}
+              ₹{Number(item.originalPrice).toLocaleString("en-IN")}
             </span>
           ) : null}
-          {discount ? (
+          {item.discount ? (
             <span className="text-[12px] font-medium text-[#388e3c]">
-              {discount}% off
+              {item.discount}% off
             </span>
           ) : null}
         </div>
 
-        {freeDelivery ? (
+        {item.freeDelivery ? (
           <p className="text-[11px] text-gray-500 mt-1">Free delivery</p>
         ) : null}
       </div>

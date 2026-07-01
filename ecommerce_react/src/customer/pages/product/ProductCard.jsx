@@ -44,7 +44,7 @@ function ProductCard({ item }) {
 };
 
   return (
-    <div onClick={()=> navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)}
+    <div onClick={()=> navigate(`/product-details/${item.category?.categoryId}/${item.id}`)}
       className="group cursor-pointer bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden w-full max-w-[280px] mx-auto"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

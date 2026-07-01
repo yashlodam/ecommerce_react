@@ -100,13 +100,83 @@ const colors = [
   { name: "Transparent", hex: "transparent" },
 ];
 
-const sizes = [
-  { name: "S" },
-  { name: "M" },
-  { name: "L" },
-  { name: "XL" },
-  { name: "XXL" },
-];
+const variants = {
+  men: [
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL",
+  ],
+
+  women: [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+  ],
+
+  electronics: [
+  "32 GB",
+  "64 GB",
+  "128 GB",
+  "256 GB",
+  "512 GB",
+  "1 TB",
+
+  "2 GB RAM",
+  "4 GB RAM",
+  "6 GB RAM",
+  "8 GB RAM",
+  "12 GB RAM",
+  "16 GB RAM",
+  "32 GB RAM",
+
+  "11 inch",
+  "13 inch",
+  "14 inch",
+  "15.6 inch",
+  "16 inch",
+  "24 inch",
+  "27 inch",
+  "32 inch",
+  "43 inch",
+  "50 inch",
+  "55 inch",
+  "65 inch",
+
+  "Bluetooth",
+  "Wireless",
+  "Wired",
+
+  "Single SIM",
+  "Dual SIM",
+
+  "USB Type-C",
+  "Lightning",
+  "Micro USB",
+],
+
+  home_furniture: [
+    "Single",
+    "Double",
+    "Queen",
+    "King",
+    "Small",
+    "Medium",
+    "Large",
+  ],
+
+  beauty: [
+    "30 ml",
+    "50 ml",
+    "100 ml",
+    "200 ml",
+    "250 ml",
+    "500 ml",
+  ],
+};
 
 function AddProduct() {
 
@@ -143,6 +213,7 @@ const handleImageChange = async (e) => {
 };
 
 
+
 const handleRemoveImage = (index) => {
   const updatedImages = [...formik.values.images];
   updatedImages.splice(index, 1);
@@ -173,6 +244,7 @@ onSubmit: async (values) => {
     })
   );
 
+
   if (createProduct.fulfilled.match(result)) {
     setSnackbarMessage("Product added successfully.");
     setSnackbarSeverity("success");
@@ -187,7 +259,7 @@ onSubmit: async (values) => {
 },
 });
 
-
+const variantOptions = variants[formik.values.category] || [];
   
 
   const childCategory = (category,parentCategoryId)=>{
@@ -282,112 +354,7 @@ onSubmit: async (values) => {
             required
             />
           </Grid>
-          <Grid size={{xs:12,md:4 ,lg:3}}>
-            <TextField
-            fullWidth
-            id='mrp_price'
-            name='mrpPrice'
-            label="MRP Price"
-            type='number'
-            value={formik.values.mrpPrice}
-            onChange={formik.handleChange}
-            error={formik.touched.mrpPrice && Boolean(formik.errors.mrpPrice)}
-            helperText={formik.touched.mrpPrice && formik.errors.mrpPrice}
-            required
-            />
-          </Grid>
-
-          <Grid size={{xs:12,md:4 ,lg:3}}>
-            <TextField
-            fullWidth
-            id='sellingPrice'
-            name='sellingPrice'
-            label="Selling Price"
-            type='number'
-            value={formik.values.sellingPrice}
-            onChange={formik.handleChange}
-            error={formik.touched.sellingPrice && Boolean(formik.errors.sellingPrice)}
-            helperText={formik.touched.sellingPrice && formik.errors.sellingPrice}
-            required
-            />
-          </Grid>
-
-
-         <Grid size={{ xs: 12, md: 4, lg: 3 }}>
-  <FormControl
-    fullWidth
-    error={formik.touched.color && Boolean(formik.errors.color)}
-    required
-  >
-    <InputLabel id="color-label">Color</InputLabel>
-
-    <Select
-      labelId="color-label"
-      id="color"
-      name="color"
-      value={formik.values.color}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      label="Color"
-    >
-      <MenuItem value="">
-        <em>None</em>
-      </MenuItem>
-
-      {colors.map((color, index) => (
-        <MenuItem key={index} value={color.name}>
-          <div className="flex gap-3 items-center">
-            <span
-              style={{ backgroundColor: color.hex }}
-              className={`h-5 w-5 rounded-full ${
-                color.name === "White" ? "border" : ""
-              }`}
-            />
-            <p>{color.name}</p>
-          </div>
-        </MenuItem>
-      ))}
-    </Select>
-
-    {formik.touched.color && formik.errors.color && (
-      <FormHelperText>{formik.errors.color}</FormHelperText>
-    )}
-  </FormControl>
-</Grid>
-
-      <Grid size={{ xs: 12, md: 4, lg: 3 }}>
-  <FormControl
-    fullWidth
-    error={formik.touched.sizes && Boolean(formik.errors.sizes)}
-    required
-  >
-    <InputLabel id="sizes-label">Size</InputLabel>
-
-    <Select
-      labelId="sizes-label"
-      id="sizes"
-      name="sizes"
-      value={formik.values.sizes}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      label="Size"
-    >
-      <MenuItem value="">
-        <em>None</em>
-      </MenuItem>
-
-      {sizes.map((size, index) => (
-        <MenuItem key={index} value={size.name}>
-          {size.name}
-        </MenuItem>
-      ))}
-    </Select>
-
-    {formik.touched.sizes && formik.errors.sizes && (
-      <FormHelperText>{formik.errors.sizes}</FormHelperText>
-    )}
-  </FormControl>
-</Grid>
+          
 
  <Grid size={{ xs: 12, md: 4, lg: 3 }}>
   <FormControl
@@ -497,6 +464,114 @@ onSubmit: async (values) => {
 
     {formik.touched.category3 && formik.errors.category3 && (
       <FormHelperText>{formik.errors.category3}</FormHelperText>
+    )}
+  </FormControl>
+</Grid>
+
+
+<Grid size={{xs:12,md:4 ,lg:3}}>
+            <TextField
+            fullWidth
+            id='mrp_price'
+            name='mrpPrice'
+            label="MRP Price"
+            type='number'
+            value={formik.values.mrpPrice}
+            onChange={formik.handleChange}
+            error={formik.touched.mrpPrice && Boolean(formik.errors.mrpPrice)}
+            helperText={formik.touched.mrpPrice && formik.errors.mrpPrice}
+            required
+            />
+          </Grid>
+
+          <Grid size={{xs:12,md:4 ,lg:3}}>
+            <TextField
+            fullWidth
+            id='sellingPrice'
+            name='sellingPrice'
+            label="Selling Price"
+            type='number'
+            value={formik.values.sellingPrice}
+            onChange={formik.handleChange}
+            error={formik.touched.sellingPrice && Boolean(formik.errors.sellingPrice)}
+            helperText={formik.touched.sellingPrice && formik.errors.sellingPrice}
+            required
+            />
+          </Grid>
+
+
+         <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+  <FormControl
+    fullWidth
+    error={formik.touched.color && Boolean(formik.errors.color)}
+    required
+  >
+    <InputLabel id="color-label">Color</InputLabel>
+
+    <Select
+      labelId="color-label"
+      id="color"
+      name="color"
+      value={formik.values.color}
+      onChange={formik.handleChange}
+      onBlur={formik.handleBlur}
+      label="Color"
+    >
+      <MenuItem value="">
+        <em>None</em>
+      </MenuItem>
+
+      {colors.map((color, index) => (
+        <MenuItem key={index} value={color.name}>
+          <div className="flex gap-3 items-center">
+            <span
+              style={{ backgroundColor: color.hex }}
+              className={`h-5 w-5 rounded-full ${
+                color.name === "White" ? "border" : ""
+              }`}
+            />
+            <p>{color.name}</p>
+          </div>
+        </MenuItem>
+      ))}
+    </Select>
+
+    {formik.touched.color && formik.errors.color && (
+      <FormHelperText>{formik.errors.color}</FormHelperText>
+    )}
+  </FormControl>
+</Grid>
+
+      <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+  <FormControl
+    fullWidth
+    error={formik.touched.sizes && Boolean(formik.errors.sizes)}
+    required
+  >
+    <InputLabel id="sizes-label">Size</InputLabel>
+
+    <Select
+      labelId="sizes-label"
+      id="sizes"
+      name="sizes"
+      value={formik.values.sizes}
+      onChange={formik.handleChange}
+      onBlur={formik.handleBlur}
+      label="Size"
+    >
+      <MenuItem value="">
+        <em>None</em>
+      </MenuItem>
+
+      {variantOptions.map((item, index) => (
+  <MenuItem key={index} value={item}>
+    {item}
+  </MenuItem>
+))}
+    </Select>
+
+    {formik.touched.sizes && formik.errors.sizes && (
+      <FormHelperText>{formik.errors.sizes}</FormHelperText>
     )}
   </FormControl>
 </Grid>
