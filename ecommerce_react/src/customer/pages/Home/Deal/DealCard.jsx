@@ -1,103 +1,78 @@
 import React from "react";
-import { Star, Zap } from "lucide-react";
+import LocalOfferRoundedIcon from "@mui/icons-material/LocalOfferRounded";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import FlashOnRoundedIcon from "@mui/icons-material/FlashOnRounded";
+import { useNavigate } from "react-router-dom";
 
-function DealCard({item}) {
+function DealCard({ item }) {
+  const navigate = useNavigate();
 
-  console.log("DealCard item:", item);
+  const handleClick = () => {
+    navigate(`/products/${item.category.categoryId}`);
+  };
+
   return (
-    <div className="group relative w-full max-w-[360px] bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden">
-      {/* Image area */}
-      <div className="relative bg-white p-5 pb-3">
-        {item.discount ? (
-          <span className="absolute top-0 left-3 z-10 bg-[#388e3c] text-white text-[11px] font-bold px-2 py-[3px] rounded">
-            {item.discount}% OFF
-          </span>
-        ) : null}
+    <div
+      onClick={handleClick}
+      className="group relative w-full cursor-pointer overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_16px_50px_-24px_rgba(15,23,42,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_-24px_rgba(15,23,42,0.45)]"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/5 via-transparent to-blue-500/10 opacity-0 transition duration-300 group-hover:opacity-100" />
+
+      <div className="relative flex h-56 items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(37,99,235,0.16),_transparent_60%),linear-gradient(135deg,_#f8fbff_0%,_#eef4ff_100%)] p-5 sm:h-60 md:h-64">
+        <div className="absolute left-3 top-3 rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-md">
+          {item.discount}% OFF
+        </div>
+
+        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold text-white shadow-md">
+          <FlashOnRoundedIcon sx={{ fontSize: 14 }} />
+          Deal
+        </div>
 
         <img
           src={item.category.image}
-          alt={item.title}
-          className="w-full h-40 object-contain group-hover:scale-105 transition-transform duration-300"
+          alt={item.category.name}
+          className="relative z-10 h-40 w-40 object-contain transition-all duration-500 group-hover:scale-110 group-hover:-rotate-1 sm:h-44 sm:w-44"
         />
       </div>
 
-      {/* Content */}
-      <div className="px-4 pb-4 pt-1">
-        {item.brand ? (
-          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide truncate">
-            {item.brand}
-          </p>
-        ) : null}
-
-        <h3 className="text-[13px] text-gray-800 leading-snug mt-0.5 line-clamp-2 min-h-[34px]">
-          {item.category.name}
-        </h3>
-
-        
-
-        <div className="flex items-baseline gap-1.5 mt-1.5">
-          <span className="text-[16px] font-bold text-gray-900">
-            ₹{Number(item..price).toLocaleString("en-IN")}
-          </span>
-          {item.originalPrice ? (
-            <span className="text-[12px] text-gray-400 line-through">
-              ₹{Number(item.originalPrice).toLocaleString("en-IN")}
-            </span>
-          ) : null}
-          {item.discount ? (
-            <span className="text-[12px] font-medium text-[#388e3c]">
-              {item.discount}% off
-            </span>
-          ) : null}
+      <div className="p-5">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-blue-700">
+          <LocalOfferRoundedIcon sx={{ fontSize: 16 }} />
+          Featured collection
         </div>
 
-        {item.freeDelivery ? (
-          <p className="text-[11px] text-gray-500 mt-1">Free delivery</p>
-        ) : null}
+        <h2 className="mt-3 min-h-[56px] text-lg font-semibold text-slate-900 line-clamp-2">
+          {item.category.name}
+        </h2>
+
+        <p className="mt-2 text-sm text-slate-500">
+          Curated savings crafted for premium value and style.
+        </p>
+
+        <div className="mt-5 flex items-end justify-between gap-3">
+          <div>
+            <p className="text-lg font-bold text-emerald-600">
+              Save {item.discount}%
+            </p>
+            <p className="text-xs text-slate-500">Limited time offer</p>
+          </div>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClick();
+            }}
+            className="flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:gap-3 hover:bg-slate-800"
+          >
+            Shop
+            <ArrowForwardRoundedIcon sx={{ fontSize: 18 }} />
+          </button>
+        </div>
       </div>
 
-      {/* Flash deal ribbon (optional, shows on hover for emphasis) */}
-      <div className="absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-r from-[#2874f0] to-[#388e3c] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+      <div className="h-1 origin-left scale-x-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 transition-transform duration-500 group-hover:scale-x-100" />
     </div>
   );
 }
 
 export default DealCard;
-
-// Demo wrapper so this renders meaningfully on its own
-export function DealCardDemo() {
-  return (
-    <div className="bg-[#f1f3f6] p-8 flex flex-wrap gap-4 justify-center">
-      <DealCard
-        image="https://rukminim2.flixcart.com/image/416/416/xif0q/headphone/o/4/x/-original-imahfvf6gzhhh3yh.jpeg"
-        brand="boAt"
-        title="Rockerz 450 Bluetooth Wireless On Ear Headphones"
-        price={1099}
-        originalPrice={3490}
-        discount={68}
-        rating={4.2}
-        ratingCount={284531}
-      />
-      <DealCard
-        image="https://rukminim2.flixcart.com/image/416/416/xif0q/shoe/a/u/v/9-running-shoes-9-original-imagez6yydghyaft.jpeg"
-        brand="Campus"
-        title="Running Shoes For Men"
-        price={899}
-        originalPrice={2499}
-        discount={64}
-        rating={3.9}
-        ratingCount={15234}
-      />
-      <DealCard
-        image="https://rukminim2.flixcart.com/image/416/416/xif0q/smartwatch/o/m/3/-original-imagqzx7zg7gjg7g.jpeg"
-        brand="Noise"
-        title="ColorFit Pulse 2 Max 1.91 Bluetooth Calling Smartwatch"
-        price={1299}
-        originalPrice={4999}
-        discount={74}
-        rating={4.0}
-        ratingCount={98765}
-      />
-    </div>
-  );
-}

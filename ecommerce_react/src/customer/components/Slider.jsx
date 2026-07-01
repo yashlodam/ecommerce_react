@@ -108,7 +108,7 @@ function Slider({
 
   return (
     <div
-      className={`relative overflow-hidden ${rounded} group`}
+      className={`group relative overflow-hidden border border-slate-200/80 bg-white shadow-[0_20px_60px_-30px_rgba(15,23,42,0.35)] ${rounded}`}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onTouchStart={handleTouchStart}
@@ -116,7 +116,7 @@ function Slider({
       onTouchEnd={handleTouchEnd}
     >
       {!loaded[current] && (
-        <div className="absolute inset-0 bg-slate-200 animate-pulse" />
+        <div className="absolute inset-0 animate-pulse bg-slate-100" />
       )}
 
       <div
@@ -144,6 +144,7 @@ function Slider({
               object-contain
               lg:object-cover
               bg-white
+              transition-transform duration-500 group-hover:scale-[1.01]
             "
           />
         ))}
@@ -162,12 +163,16 @@ function Slider({
               w-12
               h-12
               rounded-full
-              bg-white
-              shadow-lg
+              bg-white/90
+              border border-slate-200
+              shadow-[0_10px_30px_rgba(15,23,42,0.12)]
               items-center
               justify-center
               opacity-0
+              backdrop-blur-sm
+              transition-all duration-300
               group-hover:opacity-100
+              hover:bg-white
             "
           >
             <ChevronLeftIcon />
@@ -184,26 +189,30 @@ function Slider({
               w-12
               h-12
               rounded-full
-              bg-white
-              shadow-lg
+              bg-white/90
+              border border-slate-200
+              shadow-[0_10px_30px_rgba(15,23,42,0.12)]
               items-center
               justify-center
               opacity-0
+              backdrop-blur-sm
+              transition-all duration-300
               group-hover:opacity-100
+              hover:bg-white
             "
           >
             <ChevronRightIcon />
           </button>
 
-          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 rounded-full bg-slate-950/10 px-2.5 py-2 backdrop-blur-sm">
             {banners.map((_, index) => (
               <button
                 key={index}
                 onClick={() => handleManualNav(() => goTo(index))}
                 className={`rounded-full transition-all ${
                   current === index
-                    ? "w-8 h-2 bg-blue-600"
-                    : "w-2 h-2 bg-white"
+                    ? "h-2.5 w-8 bg-slate-900"
+                    : "h-2.5 w-2.5 bg-white/80"
                 }`}
               />
             ))}
