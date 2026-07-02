@@ -166,15 +166,15 @@ function Footer() {
 
               <li className="flex items-center gap-3">
                 <Phone size={17} className="text-[#2874f0] shrink-0" />
-                <a href="tel:+919876543210" className="hover:text-[#2874f0] transition-colors">
-                  +91 98765 43210
+                <a href="tel:+919665774924" className="hover:text-[#2874f0] transition-colors">
+                  +91 96657 74924
                 </a>
               </li>
 
               <li className="flex items-center gap-3">
                 <Mail size={17} className="text-[#2874f0] shrink-0" />
                 <a href="mailto:support@shopsphere.com" className="hover:text-[#2874f0] transition-colors">
-                  support@shopsphere.com
+                  yashlodam03@gmail.com
                 </a>
               </li>
             </ul>
