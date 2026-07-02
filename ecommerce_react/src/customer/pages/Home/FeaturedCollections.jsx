@@ -10,7 +10,7 @@ function FeaturedCollections() {
       image:
         "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=80",
       span: "sm:col-span-2 md:col-span-3 lg:col-span-2",
-      category:"womens"
+      category:"women"
     },
     {
       title: "Electronics",
