@@ -28,7 +28,6 @@ function Home() {
         <Deal/>
         <ShopByCategory/>
         <Grid/>
-        <BrandInSpotlight/>
         <TopRatedProducts/>
         <SellerBanner/>
         <FeaturedCollections/>

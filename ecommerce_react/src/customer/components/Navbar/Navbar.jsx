@@ -98,6 +98,7 @@ function Navbar() {
     if (!trimmed) return;
 
     setShowSearch(false);
+    setMobileSearchOpen(false);
     navigate(`/search?q=${encodeURIComponent(trimmed)}`);
   };
 
@@ -233,7 +234,7 @@ function Navbar() {
 
           {isLarge && (
             <div ref={searchRef} className="relative mx-4 hidden flex-1 md:flex max-w-xl">
-              <div className="relative flex w-full items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 shadow-sm transition-all duration-200 focus-within:border-teal-500 focus-within:bg-white">
+              <div className="relative flex w-full items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 shadow-sm transition-all duration-200 focus-within:border-teal-500 focus-within:bg-white">
                 <SearchIcon
                   onClick={() => handleSearch(query)}
                   sx={{ cursor: "pointer", color: "#64748b" }}
@@ -254,13 +255,32 @@ function Navbar() {
                     }
                   }}
                   placeholder="Search products, brands and more"
-                  className="ml-2 flex-1"
+                  className="ml-1 flex-1"
                   sx={{ fontSize: 14, color: "#0f172a" }}
                 />
+                <Button
+                  variant="contained"
+                  onClick={() => handleSearch(query)}
+                  disabled={!query.trim()}
+                  sx={{
+                    minWidth: 88,
+                    borderRadius: "999px",
+                    textTransform: "none",
+                    fontWeight: 700,
+                    px: 1.8,
+                    py: 0.8,
+                    bgcolor: ACCENT,
+                    boxShadow: "none",
+                    "&:hover": { bgcolor: ACCENT_DARK, boxShadow: "none" },
+                    "&:disabled": { bgcolor: "#cbd5e1", color: "#64748b" },
+                  }}
+                >
+                  Search
+                </Button>
               </div>
 
               {showSearch && (
-                <div className="absolute left-0 right-0 top-[calc(100%+0.65rem)] z-[60] max-h-96 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl">
+                <div className="absolute left-0 right-0 top-[calc(100%+0.65rem)] z-60 max-h-96 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl">
                   {isSearching ? (
                     <div className="flex items-center justify-center gap-2 px-4 py-5 text-sm text-slate-500">
                       <CircularProgress size={16} sx={{ color: ACCENT }} />
@@ -343,23 +363,87 @@ function Navbar() {
         {!isLarge && (
           <Collapse in={mobileSearchOpen}>
             <div className="border-t border-slate-200 bg-white px-3 py-2">
-              <div className="flex w-full items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 shadow-sm focus-within:border-teal-500 focus-within:bg-white">
-                <SearchIcon fontSize="small" className="text-slate-400" />
-                <InputBase
-                  autoFocus
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
-                      handleSearch(query);
-                      setMobileSearchOpen(false);
-                    }
-                  }}
-                  placeholder="Search products, brands and more"
-                  className="ml-2 flex-1 text-sm"
-                  sx={{ fontSize: 14 }}
-                />
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 shadow-sm focus-within:border-teal-500 focus-within:bg-white">
+                <div className="flex w-full items-center gap-2 rounded-full px-2 py-1.5">
+                  <SearchIcon
+                    onClick={() => handleSearch(query)}
+                    fontSize="small"
+                    className="cursor-pointer text-slate-400"
+                  />
+                  <InputBase
+                    autoFocus
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    onFocus={() => {
+                      if (searchResults.length > 0) {
+                        setShowSearch(true);
+                      }
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        handleSearch(query);
+                      }
+                    }}
+                    placeholder="Search products, brands and more"
+                    className="ml-1 flex-1 text-sm"
+                    sx={{ fontSize: 14 }}
+                  />
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => handleSearch(query)}
+                    disabled={!query.trim()}
+                    sx={{
+                      minWidth: 76,
+                      borderRadius: "999px",
+                      textTransform: "none",
+                      fontWeight: 700,
+                      px: 1.4,
+                      py: 0.6,
+                      bgcolor: ACCENT,
+                      boxShadow: "none",
+                      "&:hover": { bgcolor: ACCENT_DARK, boxShadow: "none" },
+                      "&:disabled": { bgcolor: "#cbd5e1", color: "#64748b" },
+                    }}
+                  >
+                    Search
+                  </Button>
+                </div>
+
+                {showSearch && (
+                  <div className="mt-2 max-h-72 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-lg">
+                    {isSearching ? (
+                      <div className="flex items-center justify-center gap-2 px-4 py-4 text-sm text-slate-500">
+                        <CircularProgress size={16} sx={{ color: ACCENT }} />
+                        <span>Searching...</span>
+                      </div>
+                    ) : searchResults.length === 0 ? (
+                      <div className="px-4 py-4 text-center text-sm text-slate-500">
+                        No products found for this search.
+                      </div>
+                    ) : (
+                      searchResults.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => {
+                            navigate(`/product-details/${item.category?.categoryId ?? item.categoryId}/${item.id}`);
+                            setQuery("");
+                            setShowSearch(false);
+                            setMobileSearchOpen(false);
+                          }}
+                          className="flex cursor-pointer items-center gap-3 px-3 py-3 transition-colors hover:bg-slate-50"
+                        >
+                          <img src={item.images?.[0]} alt={item.title} className="h-12 w-12 rounded-lg object-contain" />
+                          <div className="min-w-0 flex-1">
+                            <h4 className="truncate text-sm font-semibold text-slate-800">{item.title}</h4>
+                            <p className="mt-1 text-sm font-semibold text-teal-600">₹{item.sellingPrice}</p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </Collapse>

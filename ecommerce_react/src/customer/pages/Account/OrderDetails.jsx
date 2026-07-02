@@ -196,7 +196,7 @@ function OrderDetails() {
               Order Date
             </p>
             <p className="font-medium">
-  {new Date(order.currentOrder.orderDate).toLocaleDateString("en-IN", {
+  {new Date(order.currentOrder?.orderDate).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -236,7 +236,7 @@ function OrderDetails() {
               Expected Delivery
             </p>
             <p className="font-medium">
-  {new Date(order.currentOrder.deliverDate).toLocaleDateString("en-IN", {
+  {new Date(order?.currentOrder.deliverDate).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "long",
     year: "numeric",
