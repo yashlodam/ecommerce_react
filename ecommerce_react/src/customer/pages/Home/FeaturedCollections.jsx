@@ -1,14 +1,16 @@
 import React from "react";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 function FeaturedCollections() {
   const collections = [
     {
-      title: "Fashion Collection",
+      title: "Womens Fashion Collection",
       subtitle: "Styles for every season",
       image:
         "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=80",
       span: "sm:col-span-2 md:col-span-3 lg:col-span-2",
+      category:"womens"
     },
     {
       title: "Electronics",
@@ -16,6 +18,7 @@ function FeaturedCollections() {
       image:
         "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=1200&q=80",
       span: "md:col-span-3 lg:col-span-2",
+      category:"electronics"
     },
     {
       title: "Home Decor",
@@ -23,6 +26,7 @@ function FeaturedCollections() {
       image:
         "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=80",
       span: "md:col-span-3 lg:col-span-2",
+      category:"home_decor"
     },
     {
       title: "Gaming Zone",
@@ -30,8 +34,16 @@ function FeaturedCollections() {
       image:
         "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1200&q=80",
       span: "sm:col-span-2 md:col-span-3 lg:col-span-2",
+      category:"gaming"
     },
   ];
+
+  const navigate = useNavigate();
+
+  const handleClick = (category) => {
+    console.log("Navigating to category:", category);
+    navigate(`/products/${category}`);
+  }
 
   return (
     <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
@@ -75,7 +87,7 @@ function FeaturedCollections() {
                 {item.subtitle}
               </p>
 
-              <button className="self-start inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition-all duration-300 group-hover:gap-3 group-hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+              <button onClick={()=> handleClick(item.category)}  className="self-start inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition-all duration-300 group-hover:gap-3 group-hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
                 Explore now
                 <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-0.5" />
               </button>
