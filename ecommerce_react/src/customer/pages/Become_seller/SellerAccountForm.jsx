@@ -12,6 +12,8 @@ import { validationSchemas } from './validationSchemas';
 
 import { useAppDispatch } from '../../../State/Store'
 import { createSellers } from '../../../State/seller/sellerSlice';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 
 const steps = [
@@ -23,7 +25,7 @@ const steps = [
 ]
 
 
-function SellerAccountForm() {
+function SellerAccountForm({ onRegisterSuccess }) {
   const [activeStep, setActiveStep] = useState(0);
   const dispatch = useAppDispatch();
 
@@ -60,13 +62,12 @@ function SellerAccountForm() {
     },
     validationSchema: validationSchemas[activeStep],
     onSubmit: async (values) => {
-      console.log("Values:", values);
-      console.log("Errors:", await formik.validateForm());
-
-      dispatch(createSellers(values));
+      
     }
   });
-
+  const handleCloseSnackbar = () => {
+  setOpenSnackbar(false);
+};
 
 
   const handleStep = (value) => async () => {
@@ -117,12 +118,25 @@ function SellerAccountForm() {
     }
 
     // Last step -> Call API
-    if (activeStep === steps.length - 1) {
-      console.log("Submitting...", formik.values);
+    // Last step -> Call API
+if (activeStep === steps.length - 1) {
+ try {
+  const resultAction = await dispatch(createSellers(formik.values));
 
-      dispatch(createSellers(formik.values));
-      return;
-    }
+  if (createSellers.fulfilled.match(resultAction)) {
+    onRegisterSuccess();
+  } else {
+    alert(
+      resultAction.payload?.message ||
+      "Unable to create seller account."
+    );
+  }
+} catch (error) {
+  alert("Something went wrong.");
+}
+
+return;
+}
 
     // Move to next step
     setActiveStep((prev) => prev + 1);

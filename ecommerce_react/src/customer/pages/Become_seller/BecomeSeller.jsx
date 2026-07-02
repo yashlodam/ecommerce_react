@@ -9,7 +9,7 @@ function BecomeSeller() {
   const [isLogin, setIsLogin] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
 const [snackbarMessage, setSnackbarMessage] = useState("");
-const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+const [snackbarSeverity, setSnackbarSeverity] = useState("");
 
   const handleShowPage = () => {
     setIsLogin(!isLogin);
@@ -24,7 +24,19 @@ const [snackbarSeverity, setSnackbarSeverity] = useState("success");
           <section className="lg:col-span-1">
             <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-5 md:p-8">
               {!isLogin ? (
-                <SellerAccountForm />
+                <SellerAccountForm
+  onRegisterSuccess={() => {
+    setSnackbarSeverity("success");
+    setSnackbarMessage(
+      "Seller account created successfully. Please sign in to continue."
+    );
+    setOpenSnackbar(true);
+
+    setTimeout(() => {
+      setIsLogin(true);
+    }, 2000);
+  }}
+/>
               ) : (
                 <SellerLoginForm />
               )}
