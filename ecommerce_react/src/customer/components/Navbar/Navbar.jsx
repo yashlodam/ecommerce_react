@@ -93,6 +93,12 @@ function Navbar() {
   const [showSearch, setShowSearch] = useState(false);
 
   const searchRef = useRef(null);
+  const handleSearch = () => {
+  if (!query.trim()) return;
+
+  setShowSearch(false);
+  navigate(`/search?q=${query}`);
+};
 
 
   useEffect(() => {
@@ -108,25 +114,29 @@ function Navbar() {
     return () => clearTimeout(timer);
   }, [query, dispatch]);
 
-
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(e.target)
-      ) {
-        setShowSearch(false);
-      }
-    };
+  const handleClickOutside = (e) => {
+    if (
+      searchRef.current &&
+      !searchRef.current.contains(e.target)
+    ) {
+      setShowSearch(false);
+    }
+  };
 
-    document.addEventListener("mousedown", handleClickOutside);
+  document.addEventListener(
+    "mousedown",
+    handleClickOutside
+  );
 
-    return () =>
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
-  }, []);
+  return () => {
+    document.removeEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+  };
+}, []);
+  
 
   return (
     <>
@@ -237,19 +247,26 @@ function Navbar() {
               className="relative mx-4 hidden flex-1 md:flex max-w-xl"
             >
               <div className="flex w-full items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 shadow-sm transition focus-within:border-primary focus-within:bg-white">
-                <SearchIcon fontSize="small" className="text-slate-400" />
+                <SearchIcon onClick={handleSearch}
+                  sx={{
+                    cursor: "pointer",
+                    color: "gray",
+                  }} fontSize="small" className="text-slate-400" />
                 <InputBase
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onFocus={() => {
-                    if (product.searchProducts.length > 0) {
-                      setShowSearch(true);
-                    }
-                  }}
-                  placeholder="Search products, brands and more"
-                  className="ml-2 flex-1 text-sm"
-                  sx={{ fontSize: 14 }}
-                />
+  value={query}
+  onChange={(e) => setQuery(e.target.value)}
+  onFocus={() => {
+    if (product.searchProducts.length > 0) {
+      setShowSearch(true);
+    }
+  }}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  }}
+  placeholder="Search products, brands and more"
+/>
               </div>
             </div>
           )}

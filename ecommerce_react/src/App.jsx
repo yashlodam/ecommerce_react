@@ -24,6 +24,7 @@ import Wishlist from './customer/Wishlist/Wishlist';
 import { homeCategories } from './data/HomeCategories';
 import { createHomeCategories } from './State/customer/CustomerSlice';
 import ScrollToTop from './ScrollToTop';
+import SearchPage from './customer/pages/SearchPage';
 
 function App() {
   
@@ -64,6 +65,7 @@ useEffect(() => {
           <Route path="/seller/*" element={<SellerDashboard />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="/login" element={<Auth />} />
+          <Route path="/search" element={<SearchPage />} />
         </Routes>
       </div>
     </ThemeProvider>
