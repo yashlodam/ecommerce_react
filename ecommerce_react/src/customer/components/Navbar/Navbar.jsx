@@ -13,6 +13,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import CircularProgress from "@mui/material/CircularProgress";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import CategorySheet from "./CategorySheet";
@@ -68,13 +69,19 @@ function Navbar() {
 
   const { cart } = useAppSelector((state) => state);
   const { isLoggedIn, user } = useAppSelector((state) => state.auth);
+  const { product } = useAppSelector((store) => store);
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showCategorySheet, setShowCategorySheet] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
 
   const dispatch = useAppDispatch();
+  const searchRef = useRef(null);
+  const searchResults = product?.searchProducts ?? [];
+  const isSearching = product?.loading && query.trim().length > 1;
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -86,57 +93,40 @@ function Navbar() {
 
   const closeDrawer = () => setOpenDrawer(false);
 
+  const handleSearch = (value = query) => {
+    const trimmed = value?.trim();
+    if (!trimmed) return;
 
-  const { product } = useAppSelector((store) => store);
-
-  const [query, setQuery] = useState("");
-  const [showSearch, setShowSearch] = useState(false);
-
-  const searchRef = useRef(null);
-  const handleSearch = () => {
-  if (!query.trim()) return;
-
-  setShowSearch(false);
-  navigate(`/search?q=${query}`);
-};
-
+    setShowSearch(false);
+    navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+  };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (query.trim().length > 1) {
-        dispatch(searchProduct(query));
-        setShowSearch(true);
-      } else {
-        setShowSearch(false);
-      }
-    }, 400);
+    const trimmed = query.trim();
 
-    return () => clearTimeout(timer);
+    if (trimmed.length > 1) {
+      const timer = setTimeout(() => {
+        dispatch(searchProduct(trimmed));
+        setShowSearch(true);
+      }, 350);
+
+      return () => clearTimeout(timer);
+    }
+
+    setShowSearch(false);
+    return undefined;
   }, [query, dispatch]);
 
   useEffect(() => {
-  const handleClickOutside = (e) => {
-    if (
-      searchRef.current &&
-      !searchRef.current.contains(e.target)
-    ) {
-      setShowSearch(false);
-    }
-  };
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearch(false);
+      }
+    };
 
-  document.addEventListener(
-    "mousedown",
-    handleClickOutside
-  );
-
-  return () => {
-    document.removeEventListener(
-      "mousedown",
-      handleClickOutside
-    );
-  };
-}, []);
-  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -166,8 +156,8 @@ function Navbar() {
               <p className="truncate text-xs text-white/80">{isLoggedIn ? "View your account" : "Sign in to continue"}</p>
             </div>
             <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={(event) => {
+                event.stopPropagation();
                 closeDrawer();
               }}
               size="small"
@@ -209,7 +199,7 @@ function Navbar() {
       </Drawer>
 
       <Box className="sticky top-0 left-0 right-0 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl" sx={{ zIndex: 20 }}>
-        <div className="flex h-[69px] items-center justify-between gap-2 px-3 sm:px-5 lg:px-20">
+        <div className="flex h-17.25 items-center justify-between gap-2 px-3 sm:px-5 lg:px-20">
           <div className="flex min-w-0 items-center gap-2 lg:gap-8">
             <div className="flex min-w-0 items-center gap-1">
               {!isLarge && (
@@ -232,7 +222,7 @@ function Navbar() {
                       setSelectedCategory(item.categoryId);
                       setShowCategorySheet(true);
                     }}
-                    className="flex h-[69px] cursor-pointer items-center rounded-full px-4 transition-all duration-200 hover:bg-slate-100 hover:text-primary"
+                    className="flex h-17.25 cursor-pointer items-center rounded-full px-4 transition-all duration-200 hover:bg-slate-100 hover:text-primary"
                   >
                     {item.name}
                   </li>
@@ -242,93 +232,72 @@ function Navbar() {
           </div>
 
           {isLarge && (
-            <div
-              ref={searchRef}
-              className="relative mx-4 hidden flex-1 md:flex max-w-xl"
-            >
-              <div className="flex w-full items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 shadow-sm transition focus-within:border-primary focus-within:bg-white">
-                <SearchIcon onClick={handleSearch}
-                  sx={{
-                    cursor: "pointer",
-                    color: "gray",
-                  }} fontSize="small" className="text-slate-400" />
+            <div ref={searchRef} className="relative mx-4 hidden flex-1 md:flex max-w-xl">
+              <div className="relative flex w-full items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 shadow-sm transition-all duration-200 focus-within:border-teal-500 focus-within:bg-white">
+                <SearchIcon
+                  onClick={() => handleSearch(query)}
+                  sx={{ cursor: "pointer", color: "#64748b" }}
+                  fontSize="small"
+                />
                 <InputBase
-  value={query}
-  onChange={(e) => setQuery(e.target.value)}
-  onFocus={() => {
-    if (product.searchProducts.length > 0) {
-      setShowSearch(true);
-    }
-  }}
-  onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  }}
-  placeholder="Search products, brands and more"
-/>
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  onFocus={() => {
+                    if (searchResults.length > 0) {
+                      setShowSearch(true);
+                    }
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      handleSearch(query);
+                    }
+                  }}
+                  placeholder="Search products, brands and more"
+                  className="ml-2 flex-1"
+                  sx={{ fontSize: 14, color: "#0f172a" }}
+                />
               </div>
-            </div>
-          )}
 
-          {showSearch && (
-            <div className="absolute top-full mt-2 left-0 right-0 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50 max-h-96 overflow-y-auto">
-
-              {product.searchProducts.length === 0 ? (
-
-                <div className="p-5 text-center text-gray-500">
-                  No products found
-                </div>
-
-              ) : (
-
-                product.searchProducts.map((item) => (
-
-                  <div
-                    key={item.id}
-                    onClick={() => {
-                      navigate(
-                        `/product-details/${item.category.categoryId}/${item.id}`
-                      );
-
-                      setQuery("");
-                      setShowSearch(false);
-                    }}
-                    className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer transition"
-                  >
-
-                    <img
-                      src={item.images[0]}
-                      className="w-14 h-14 object-contain"
-                    />
-
-                    <div className="flex-1">
-
-                      <h4 className="text-sm font-medium line-clamp-1">
-                        {item.title}
-                      </h4>
-
-                      <p className="text-primary font-semibold">
-                        ₹{item.sellingPrice}
-                      </p>
-
+              {showSearch && (
+                <div className="absolute left-0 right-0 top-[calc(100%+0.65rem)] z-[60] max-h-96 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl">
+                  {isSearching ? (
+                    <div className="flex items-center justify-center gap-2 px-4 py-5 text-sm text-slate-500">
+                      <CircularProgress size={16} sx={{ color: ACCENT }} />
+                      <span>Searching...</span>
                     </div>
-
-                  </div>
-
-                ))
-
+                  ) : searchResults.length === 0 ? (
+                    <div className="px-4 py-5 text-center text-sm text-slate-500">
+                      No products found for this search.
+                    </div>
+                  ) : (
+                    searchResults.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          navigate(`/product-details/${item.category?.categoryId ?? item.categoryId}/${item.id}`);
+                          setQuery("");
+                          setShowSearch(false);
+                        }}
+                        className="flex cursor-pointer items-center gap-3 px-3 py-3 transition-colors hover:bg-slate-50"
+                      >
+                        <img src={item.images?.[0]} alt={item.title} className="h-14 w-14 rounded-lg object-contain" />
+                        <div className="min-w-0 flex-1">
+                          <h4 className="truncate text-sm font-semibold text-slate-800">{item.title}</h4>
+                          <p className="mt-1 text-sm font-semibold text-teal-600">₹{item.sellingPrice}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               )}
-
             </div>
           )}
-
-
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3">
             {!isLarge && (
               <>
-                <IconButton onClick={() => setMobileSearchOpen((v) => !v)} aria-label="Search" sx={iconBtnSx}>
+                <IconButton onClick={() => setMobileSearchOpen((value) => !value)} aria-label="Search" sx={iconBtnSx}>
                   <SearchIcon />
                 </IconButton>
                 <IconButton onClick={() => navigate("/cart")} aria-label="Cart" sx={iconBtnSx}>
@@ -374,9 +343,23 @@ function Navbar() {
         {!isLarge && (
           <Collapse in={mobileSearchOpen}>
             <div className="border-t border-slate-200 bg-white px-3 py-2">
-              <div className="flex w-full items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 shadow-sm focus-within:border-primary focus-within:bg-white">
+              <div className="flex w-full items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 shadow-sm focus-within:border-teal-500 focus-within:bg-white">
                 <SearchIcon fontSize="small" className="text-slate-400" />
-                <InputBase autoFocus placeholder="Search products, brands and more" className="ml-2 flex-1 text-sm" sx={{ fontSize: 14 }} />
+                <InputBase
+                  autoFocus
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      handleSearch(query);
+                      setMobileSearchOpen(false);
+                    }
+                  }}
+                  placeholder="Search products, brands and more"
+                  className="ml-2 flex-1 text-sm"
+                  sx={{ fontSize: 14 }}
+                />
               </div>
             </div>
           </Collapse>
@@ -398,8 +381,8 @@ function DrawerRow({ icon, label, onClick }) {
       role="button"
       tabIndex={0}
       onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") onClick();
+      onKeyDown={(event) => {
+        if (event.key === "Enter") onClick();
       }}
       className="flex cursor-pointer items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-slate-50 active:bg-slate-100"
     >
