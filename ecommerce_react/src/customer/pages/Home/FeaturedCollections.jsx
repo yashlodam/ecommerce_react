@@ -66,9 +66,10 @@ function FeaturedCollections() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-4 sm:gap-5 md:gap-6">
         {collections.map((item, index) => (
-          <div
+          <div onClick={()=> handleClick(item.category)}
             key={index}
             className={`group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-[24px] border border-slate-200/70 bg-white shadow-[0_24px_70px_-30px_rgba(15,23,42,0.35)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_80px_-24px_rgba(15,23,42,0.4)] sm:aspect-[16/10] md:aspect-[16/10] lg:aspect-[4/3] ${item.span}`}
+            
           >
             <img
               src={item.image}
@@ -87,13 +88,13 @@ function FeaturedCollections() {
                 {item.subtitle}
               </p>
 
-              <button onClick={()=> handleClick(item.category)}  className="self-start inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition-all duration-300 group-hover:gap-3 group-hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+              <button  className="self-start inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition-all duration-300 group-hover:gap-3 group-hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
                 Explore now
                 <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-0.5" />
               </button>
             </div>
 
-            <span className="absolute inset-0 rounded-[24px] ring-1 ring-inset ring-white/10 transition-colors duration-300 group-hover:ring-white/20" />
+            <span className=" cursor-pointer pointer-events-none absolute inset-0 rounded-[24px] ring-1 ring-inset ring-white/10 transition-colors duration-300 group-hover:ring-white/20" />
           </div>
         ))}
       </div>
