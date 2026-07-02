@@ -100,18 +100,18 @@ function BecomeSellerFormStep3({ formik }) {
 
         <TextField
           fullWidth
-          name="bankDetails.accountHolderName"
+          name="bankDetails.accountHoldername"
           label="Account Holder Name"
-          value={formik.values.bankDetails.accountHolderName}
+          value={formik.values.bankDetails.accountHoldername}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           error={
-            formik.touched.bankDetails?.accountHolderName &&
-            Boolean(formik.errors.bankDetails?.accountHolderName)
+            formik.touched.bankDetails?.accountHoldername &&
+            Boolean(formik.errors.bankDetails?.accountHoldername)
           }
           helperText={
-            formik.touched.bankDetails?.accountHolderName &&
-            formik.errors.bankDetails?.accountHolderName
+            formik.touched.bankDetails?.accountHoldername &&
+            formik.errors.bankDetails?.accountHoldername
           }
           sx={fieldStyle}
         />
