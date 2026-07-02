@@ -25,7 +25,7 @@ const steps = [
 
 function SellerAccountForm() {
   const [activeStep, setActiveStep] = useState(0);
-   const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -60,75 +60,75 @@ function SellerAccountForm() {
     },
     validationSchema: validationSchemas[activeStep],
     onSubmit: async (values) => {
-  console.log("Values:", values);
-  console.log("Errors:", await formik.validateForm());
+      console.log("Values:", values);
+      console.log("Errors:", await formik.validateForm());
 
-  dispatch(createSellers(values));
-}
+      dispatch(createSellers(values));
+    }
   });
 
- 
 
- const handleStep = (value) => async () => {
 
-  if (value === -1) {
-    if (activeStep > 0) {
-      setActiveStep((prev) => prev - 1);
+  const handleStep = (value) => async () => {
+
+    if (value === -1) {
+      if (activeStep > 0) {
+        setActiveStep((prev) => prev - 1);
+      }
+      return;
     }
-    return;
-  }
 
-  const errors = await formik.validateForm();
+    const errors = await formik.validateForm();
 
-  if (Object.keys(errors).length > 0) {
-    formik.setTouched({
-      mobile: true,
-      otp: true,
-      gstin: true,
-      pickupAddress: {
-        name: true,
+    if (Object.keys(errors).length > 0) {
+      formik.setTouched({
         mobile: true,
-        pincode: true,
-        address: true,
-        locality: true,
-        city: true,
-        state: true,
-      },
-      bankDetails: {
-        accountNumber: true,
-        ifscCode: true,
-        accountHoldername: true,
-      },
-      sellerName: true,
-      email: true,
-      password: true,
-      businessDetails: {
-        businessName: true,
-        businessEmail: true,
-        businessMobile: true,
-        logo: true,
-        banner: true,
-        businessAddress: true,
-      },
-    });
+        otp: true,
+        gstin: true,
+        pickupAddress: {
+          name: true,
+          mobile: true,
+          pincode: true,
+          address: true,
+          locality: true,
+          city: true,
+          state: true,
+        },
+        bankDetails: {
+          accountNumber: true,
+          ifscCode: true,
+          accountHoldername: true,
+        },
+        sellerName: true,
+        email: true,
+        password: true,
+        businessDetails: {
+          businessName: true,
+          businessEmail: true,
+          businessMobile: true,
+          logo: true,
+          banner: true,
+          businessAddress: true,
+        },
+      });
 
-    console.log(errors);
-    return;
-  }
+      console.log(errors);
+      return;
+    }
 
-  // Last step -> Call API
-  if (activeStep === steps.length - 1) {
-    console.log("Submitting...", formik.values);
+    // Last step -> Call API
+    if (activeStep === steps.length - 1) {
+      console.log("Submitting...", formik.values);
 
-    dispatch(createSellers(formik.values));
-    return;
-  }
+      dispatch(createSellers(formik.values));
+      return;
+    }
 
-  // Move to next step
-  setActiveStep((prev) => prev + 1);
-};
+    // Move to next step
+    setActiveStep((prev) => prev + 1);
+  };
 
-  
+
 
   return (
     <div>
@@ -153,11 +153,11 @@ function SellerAccountForm() {
             Back
           </Button>
           <Button
-  variant="contained"
-  onClick={handleStep(1)}
->
-  {activeStep === steps.length - 1 ? "Create Account" : "Continue"}
-</Button>
+            variant="contained"
+            onClick={handleStep(1)}
+          >
+            {activeStep === steps.length - 1 ? "Create Account" : "Continue"}
+          </Button>
         </div>
       </section>
 

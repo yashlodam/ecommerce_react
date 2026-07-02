@@ -2,9 +2,14 @@ import React, { useState } from "react";
 import SellerAccountForm from "./SellerAccountForm";
 import SellerLoginForm from "./SellerLoginForm";
 import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 function BecomeSeller() {
   const [isLogin, setIsLogin] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+const [snackbarMessage, setSnackbarMessage] = useState("");
+const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const handleShowPage = () => {
     setIsLogin(!isLogin);

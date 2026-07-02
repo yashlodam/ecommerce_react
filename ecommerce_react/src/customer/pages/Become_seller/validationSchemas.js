@@ -67,19 +67,10 @@ export const validationSchemas = [
     businessDetails: Yup.object({
       businessName: Yup.string().required("Business name is required"),
 
-      businessEmail: Yup.string()
-        .email("Invalid email")
-        .required("Business email is required"),
+      
 
-      businessMobile: Yup.string()
-        .matches(/^[6-9]\d{9}$/, "Invalid mobile")
-        .required("Business mobile is required"),
-
-      logo: Yup.string().required("Logo is required"),
-
-      banner: Yup.string().required("Banner is required"),
-
-      businessAddress: Yup.string().required("Business address is required"),
+      
+      
     }),
   }),
 ];
