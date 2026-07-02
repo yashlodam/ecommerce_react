@@ -80,86 +80,114 @@ export const homeCategories = [
   
   
   // Shop By Categories
-  {
-    name:"Home Decor",
-    categoryId: "home_decor",
-    section: "SHOP_BY_CATEGORIES",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7t5MXaf5jMs7y1bl_uWIiDQsQwF2S7IE4NiJNVRwMuWc9IJ8QuU0a6fo&s=10",
-  },
-  {
-    name:"Kitchen & Table",
-    categoryId: "kitchen_table",
-    section: "SHOP_BY_CATEGORIES",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTU3UWRd_YN7qBT1u1knuzoBttO0Sz8Sm9_ED4kRytUjw&s=10",
-  },
-
-  {
-    parentCategoryId: "women",
-    name: "Sports & Active wear",
-    categoryId: "women_sports_active_wear",
-    section: "SHOP_BY_CATEGORIES",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv6emf4ZSSGcS4BtqvFwvJfyc0m015mTAIrK2o4eJ4Kw&s=10",
-  },
-  {
-    parentCategoryId:"women",
-    name: "Lingerie Sleepwear",
-    categoryId: "women_lingerie_sleepwear",
-    section: "SHOP_BY_CATEGORIES",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoni2gckN92qjhsEsK5sCHTqvzdljCKjfjcCSGb1RxTg&s",
-  },
-  // SHOP_BY_CATEGORIES
+{
+  name: "Men's TopWear",
+  categoryId: "men_topwear",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/t-shirt/e/g/x/xxl-po2-fs49-blk-notme-brwn-roar-leotude-original-imah8cru3sbpcyyw.jpeg?q=90",
+},
 
 {
-  name: "Mobiles",
-  categoryId: "mobiles",
+  name: "Men's bottomWear",
+  categoryId: "men_bottomwear",
   section: "SHOP_BY_CATEGORIES",
-  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2WBJ-dO64DRzLV86v8H23pmZj8aBzAc05QiZdDGbd_A&s=10",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/jean/x/8/q/30-flipkart-ice-light-blue-30-hangerhood-original-imahm2cgkquakyed.jpeg?q=90",
+},
+
+{
+  name: "Men's Hoodies",
+  categoryId: "men_hoodies",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/sweatshirt/k/q/g/l-losangl-01-imsa-moda-original-imah5tgp6mx2ydzz.jpeg?q=90",
 },
 {
-  name: "Computers",
-  categoryId: "computers",
+  name: "Men's Jackets",
+  categoryId: "men_jackets",
   section: "SHOP_BY_CATEGORIES",
-  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKmmnFb6yRMuhOX9eIrDEDwrK0UrANr9WIBc8vXedXaQ&s=10",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/jacket/v/p/v/s-1-no-dark-bluiee-denim-dak-original-imahh8zzzjy3dn7t.jpeg?q=90",
 },
 {
-  name: "TVs & Appliances",
-  categoryId: "tvs_appliances",
+  name: "Men's Footwear",
+  categoryId: "men_footwear",
   section: "SHOP_BY_CATEGORIES",
-  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ__CgVEnEr-VLLhkEDgDiBLT_LTHMXUe66ooKckMzZ_g&s=10",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/shoe/6/n/g/9-6g-842-9-campus-bt-grn-blk-watermarked-original-imahhdjhbpncmxtz.jpeg?q=90",
 },
+{
+  name: "Women's Western Wear",
+  categoryId: "women_western_wear",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/top/z/n/q/s-1-d988-topss-deklook-original-imahnyhsmncbymyw.jpeg?q=90",
+},
+{
+  name: "Women's Dresses",
+  categoryId: "women_dresses",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/dress/l/d/j/xl-d13-jorjot-m1-zwerlon-original-imahg2aek55fynhk.jpeg?q=90",
+},
+{
+  name: "Women's Jewellery",
+  categoryId: "women_jewellery",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/jewellery-set/2/n/q/na-na-1-kl-100-1-bulsenk-original-imahjbavtntrdcdv.jpeg?q=90",
+},
+{
+  name: "Women's Kurtas",
+  categoryId: "women_kurtas",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/salwar-kurta-dupatta/s/6/d/xxs-v2v-01-v2vfashion-original-imahm5nvykwf65zy.jpeg?q=90",
+},
+{
+  name: "Women's Sarees",
+  categoryId: "women_sarees",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/sari/x/d/d/free-banarasi-avantika-fashion-unstitched-original-imahchzb6ywhh4af.jpeg?q=90",
+},
+{
+  name: "Women's Footwear",
+  categoryId: "women_footwear",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/sandal/x/i/w/6-85flat-6-0-piyari-beige-original-imahzm3gbvhbv4en.jpeg?q=90",
+},
+
+{
+  name: "Beds",
+  categoryId: "home_beds",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/bed/f/r/n/-original-imahzqvwvphfh7fy.jpeg?q=90",
+},
+{
+  name: "Furniture",
+  categoryId: "home_furniture",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/sofa-sectional/g/e/h/symmetrical-72-39-grey-cushion-177-8-cotton-no-20-kd8-kendalwood-original-imahzkz8hmmjhsgk.jpeg?q=90",
+},
+{
+  name: "Lighting",
+  categoryId: "home_lighting",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/rice-light/t/f/g/200-string-3-1-curtain-lights-artificial-vines-curtain-lights-original-imah5jg6axqe4x3p.jpeg?q=90",
+},
+{
+  name: "Home Garden Outdoor",
+  categoryId: "home_garden_outdoor",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/fence-post/c/e/e/12-garden-border-fence-for-lawn-plants-yard-pack-of-12-15-feet-original-imahmzchbqjssms9.jpeg?q=90",
+},
+{
+  name: "Home Kitchen & Dining",
+  categoryId: "home_kitchen_dining",
+  section: "SHOP_BY_CATEGORIES",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/table-placemat/q/m/3/4-1234-patelenterpric-original-imahnu83kduqewav.jpeg?q=90",
+},
+
 
 {
   name: "Beauty & Personal Care",
-  categoryId: "beauty_personal_care",
+  categoryId: "women_beauty_personal_care",
   section: "SHOP_BY_CATEGORIES",
-  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVZdOZ-K9LECH_ePHMYagzTE2C72tRX58VZi7-MfCIrA&s=10",
-},
-{
-  name: "Books",
-  categoryId: "books",
-  section: "SHOP_BY_CATEGORIES",
-  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcUYlfOmk2C2b4vYNTHAXlF7eixSdqwU875YvWovsnzA&s=10",
+  image: "https://rukminim1.flixcart.com/image/964/964/xif0q/hair-oil/q/o/v/200-0-onion-redensyl-for-fall-control-mamaearth-original-imahcksg7zysfufc.jpeg?q=90",
 },
 
-{
-  name: "Toys & Games",
-  categoryId: "toys_games",
-  section: "SHOP_BY_CATEGORIES",
-  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgzAc2N6ABTeg6ZHjS6Vn_DzFM4xhHlcSOKAzBXjBBlg&s=10",
-},
-{
-  name: "Pet Supplies",
-  categoryId: "pet_supplies",
-  section: "SHOP_BY_CATEGORIES",
-  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrb0D5Mzgla8U36iOCfdPKncoLAePJ1fzInnM3VqqDWg&s=10",
-},
-
-{
-  name: "Musical Instruments",
-  categoryId: "musical_instruments",
-  section: "SHOP_BY_CATEGORIES",
-  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_XwD9o7YEai9fK_qIezZdowxCmiV80IRr-Ci1ptva8Q&s=10",
-},
 
 
   //Deals

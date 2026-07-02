@@ -15,7 +15,8 @@ import { useAppSelector } from "../../../../State/Store";
 
 function Deals() {
   const { customer } = useAppSelector((state) => state);
-  const deals = customer?.homeCategories?.deals || [];
+  console.log("customer", customer);
+  const deals = customer?.homeCategories?.deals;
 
   return (
     <section className="rounded-md relative overflow-hidden px-4 py-12 sm:px-6 lg:px-8 xl:px-10">
@@ -62,7 +63,7 @@ function Deals() {
         </div>
 
         <div className="rounded-[32px] border border-slate-200/80 bg-white/80 p-3 shadow-[0_28px_90px_-35px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:p-4 lg:p-5">
-          {deals.length > 0 ? (
+          {deals?.length > 0 ? (
             <Swiper
               modules={[Navigation, Autoplay]}
               navigation

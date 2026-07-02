@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 function DealCard({ item }) {
   const navigate = useNavigate();
 
+  console.log("DealCard item:", item);
+
   const handleClick = () => {
     navigate(`/products/${item.category.categoryId}`);
   };
@@ -34,7 +36,7 @@ function DealCard({ item }) {
 
         <img
           src={item.category.image}
-          alt={item.category.name}
+          alt=""
           className="relative z-10 h-40 w-40 object-contain transition-all duration-500 group-hover:scale-110 group-hover:-rotate-1 sm:h-44 sm:w-44"
         />
       </div>
@@ -46,7 +48,7 @@ function DealCard({ item }) {
         </div>
 
         <h3 className="mt-3 min-h-[56px] text-lg font-semibold leading-7 text-slate-900 line-clamp-2">
-          {item.category.name}
+          {item.category?.name}
         </h3>
 
         <p className="mt-2 text-sm leading-6 text-slate-500">
