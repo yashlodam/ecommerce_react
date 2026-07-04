@@ -161,7 +161,7 @@ function Footer() {
             <ul className="space-y-4 text-gray-500 text-sm">
               <li className="flex items-start gap-3">
                 <MapPin size={17} className="text-[#2874f0] mt-0.5 shrink-0" />
-                <span>Nashik, Maharashtra, India</span>
+                <span>Amravati, Maharashtra, India</span>
               </li>
 
               <li className="flex items-center gap-3">
