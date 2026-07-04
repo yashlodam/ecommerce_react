@@ -9,6 +9,9 @@ import { useAppDispatch, useAppSelector } from "../../State/Store";
 import { getWishlistByUserId } from "../../State/customer/WishlistSlice";
 
 function Wishlist() {
+
+  //wishlist sections
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
