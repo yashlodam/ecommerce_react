@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -13,40 +13,39 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
-import { store, useAppSelector } from '../../../State/Store';
+import { store, useAppDispatch, useAppSelector } from '../../../State/Store';
 import { Menu,Fade } from '@mui/material';
+import { fetchAllSellers, updateSellerAccountStatus } from '../../../State/admin/adminFetchSlice';
 
 const accountS = [
   {
+    status: "ALL",
+    title: "All Sellers",
+  },
+  {
     status: "PENDING_VERIFICATION",
     title: "Pending Verification",
-    description: "Account is awaiting verification."
   },
   {
     status: "ACTIVE",
     title: "Active",
-    description: "Account is active and can access all features."
   },
   {
     status: "SUSPENDED",
     title: "Suspended",
-    description: "Account is temporarily suspended due to policy violations or review."
   },
   {
     status: "DEACTIVATED",
     title: "Deactivated",
-    description: "Account has been deactivated by the user or administrator."
   },
   {
     status: "BANNED",
     title: "Banned",
-    description: "Account has been permanently banned from the platform."
   },
   {
     status: "CLOSED",
     title: "Closed",
-    description: "Account has been permanently closed and can no longer be used."
-  }
+  },
 ];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -81,12 +80,19 @@ function SellersTable() {
 
   const { sellers, loading, error } = useAppSelector((store) => store.adminFetch);
 
+  
+      const dispatch = useAppDispatch();
+  
+      useEffect(()=>{
+          dispatch(fetchAllSellers(localStorage.getItem("jwt") || ""));
+      },[dispatch])
+
   const [anchorEl, setAnchorEl] = useState({});
 
-  const handleClick = (event, orderId) => {
+  const handleClick = (event, id) => {
     setAnchorEl((prev) => ({
       ...prev,
-      [orderId]: event.currentTarget,
+      [id]: event.currentTarget,
     }));
   };
 
@@ -95,25 +101,31 @@ function SellersTable() {
     setAccountStatus(e.target.value)
   }
 
-  const handleClose = (orderId) => {
+  const handleClose = (id) => {
     setAnchorEl((prev) => ({
       ...prev,
-      [orderId]: null,
+      [id]: null,
     }));
   };
 
-  const handleStatusChange = (orderId, status) => {
+  const handleStatusChange = (id, status) => {
     dispatch(
-      updateOrderStatus({
+      updateSellerAccountStatus({
         jwt: localStorage.getItem("jwt"),
-        orderId,
-        orderStatus: status,
+        id,
+        status,
       })
     );
 
-    handleClose(orderId);
+    handleClose(id);
   };
 
+   const filteredSellers =
+  accountStatus === "ALL"
+    ? sellers
+    : sellers.filter(
+        (seller) => seller.accountStatus === accountStatus
+      );
 
 
   return (
@@ -150,7 +162,7 @@ function SellersTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sellers.map((item, index) => (
+            {filteredSellers.map((item, index) => (
               <StyledTableRow key={index}>
                 <StyledTableCell component="th" scope="row">
                   {item.sellerName}
@@ -177,16 +189,7 @@ function SellersTable() {
                     onClose={() => handleClose(item.id)}
                     TransitionComponent={Fade}
                   >
-                    <MenuItem
-                      onClick={() =>
-                        handleStatusChange(
-                          item.id,
-                          "PENDING_VERIFICATION"
-                        )
-                      }
-                    >
-                      Pending Verification
-                    </MenuItem>
+                    
 
                     <MenuItem
                       onClick={() =>
@@ -203,47 +206,47 @@ function SellersTable() {
                       onClick={() =>
                         handleStatusChange(
                           item.id,
-                          "CONFIRMED"
+                          "SUSPENDED"
                         )
                       }
                     >
-                      Confirmed
+                      Suspended
                     </MenuItem>
 
                     <MenuItem
                       onClick={() =>
                         handleStatusChange(
                           item.id,
-                          "SHIPPED"
+                          "DEACTIVATED"
                         )
                       }
                     >
-                      Shipped
+                      Deactivated
                     </MenuItem>
 
                     <MenuItem
                       onClick={() =>
                         handleStatusChange(
                           item.id,
-                          "DELIVERED"
+                          "BANNNED"
                         )
                       }
                     >
-                      Delivered
+                      Banned
                     </MenuItem>
 
                     <MenuItem
                       onClick={() =>
                         handleStatusChange(
                           item.id,
-                          "CANCELLED"
+                          "CLOSED"
                         )
                       }
                       sx={{
                         color: "red",
                       }}
                     >
-                      Cancelled
+                      Closed
                     </MenuItem>
                   </Menu>
                 </StyledTableCell>

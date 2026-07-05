@@ -30,27 +30,55 @@ export const fetchAllSellers = createAsyncThunk(
   }
 );
 
-// ================= Fetch All Users =================
 
-export const getAllUsers = createAsyncThunk(
-  "admin/getAllUsers",
-  async (_, { rejectWithValue }) => {
+// ============= Update Sellers Account Status =======
+
+export const updateSellerAccountStatus = createAsyncThunk(
+  "admin/updateSellerAccountStatus",
+  async ({ jwt, id, status }, { rejectWithValue }) => {
     try {
-      const response = await api.get(`${BASE_URL}/users`);
+      const response = await api.patch(
+        `${BASE_URL}/sellers/${id}/status/${status}`,
+        {}, // request body
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
 
-      console.log("Users:", response.data);
+      console.log("Seller status updated:", response.data);
 
       return response.data;
     } catch (error) {
       console.log(error.response);
 
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch users"
+        error.response?.data?.message || "Failed to update seller status"
       );
     }
   }
 );
 
+// ================= Fetch All Users =================
+export const getAllUsers = createAsyncThunk(
+  "admin/getAllUsers",
+  async (jwt, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${BASE_URL}/users`, {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch users"
+      );
+    }
+  }
+);
 // ================= Initial State =================
 
 const initialState = {
@@ -102,7 +130,34 @@ const adminFetchSlice = createSlice({
       .addCase(getAllUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+
+      // uupdate sellers
+
+
+     .addCase(updateSellerAccountStatus.pending, (state) => {
+  state.loading = true;
+})
+
+.addCase(updateSellerAccountStatus.fulfilled, (state, action) => {
+  state.loading = false;
+
+  const index = state.sellers.findIndex(
+    (seller) => seller.id === action.payload.id
+  );
+
+  if (index !== -1) {
+    state.sellers[index] = action.payload;
+  }
+})
+
+.addCase(updateSellerAccountStatus.rejected, (state, action) => {
+  state.loading = false;
+  state.error = action.payload;
+});
+
+
+      
   },
 });
 

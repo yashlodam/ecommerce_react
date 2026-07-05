@@ -9,11 +9,6 @@ function AdminDashboard() {
 
     const toggleDrawer = ()=>{}
 
-    const dispatch = useAppDispatch();
-
-    useEffect(()=>{
-        dispatch(fetchAllSellers(localStorage.getItem("jwt") || ""));
-    },[])
 
   return (
     <div>
