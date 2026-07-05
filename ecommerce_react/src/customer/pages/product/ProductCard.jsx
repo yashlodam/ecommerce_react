@@ -21,14 +21,14 @@ function ProductCard({ item }) {
 
 
   useEffect(() => {
-    if (!isHovered || images.length <= 1) return;
+  if (!isHovered || images.length <= 1) return;
 
-    const interval = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % images.length);
-    }, 1200);
+  const interval = setInterval(() => {
+    setCurrentImage((prev) => (prev + 1) % images.length);
+  }, 1200);
 
-    return () => clearInterval(interval);
-  }, [isHovered, images]);
+  return () => clearInterval(interval);
+}, [isHovered, images.length]);
 
   const handleWishlist = (e) => {
   e.stopPropagation();
@@ -46,8 +46,20 @@ function ProductCard({ item }) {
   return (
     <div onClick={()=> navigate(`/product-details/${item.category?.categoryId}/${item.id}`)}
       className="group cursor-pointer bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden w-full max-w-[280px] mx-auto"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+     onMouseEnter={() => setIsHovered(true)}
+onMouseLeave={() => {
+  setIsHovered(false);
+  setCurrentImage(0);
+}}
+
+onTouchStart={() => {
+  setIsHovered(true);
+
+  setTimeout(() => {
+    setIsHovered(false);
+    setCurrentImage(0);
+  }, 3000);
+}}
     >
       {/* Image */}
 

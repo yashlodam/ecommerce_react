@@ -15,7 +15,7 @@ function ShopByCategory() {
 
   return (
     <section className="px-3 py-8 sm:px-4 lg:px-8 lg:py-10">
-      <div className="mx-auto max-w-[1400px] rounded-[32px] border border-slate-200/80 bg-white/85 p-4 shadow-[0_30px_90px_-35px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:p-6">
+      <div className="mx-auto max-w-[1600px] rounded-[32px] border border-slate-200/80 bg-white/85 p-4 shadow-[0_30px_90px_-35px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-600">Browse by interest</p>
