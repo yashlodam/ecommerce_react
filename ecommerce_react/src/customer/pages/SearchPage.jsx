@@ -28,7 +28,7 @@ const quickFilters = [
   "All",
   "Men",
   "Women",
-  "Smartphones",
+  "mobiles",
   "Fashion",
   "Electronics",
   "Shoes",
@@ -70,13 +70,19 @@ function SearchPage() {
 
   const handleSearch = (value = searchQuery) => {
     const trimmed = value.trim();
-    if (!trimmed) return;
 
     const params = new URLSearchParams(location.search);
-    params.set("q", trimmed);
+
+    if (trimmed) {
+        params.set("q", trimmed);
+    } else {
+        params.delete("q");
+    }
+
     navigate(`/search?${params.toString()}`);
+
     dispatch(searchProduct(trimmed));
-  };
+};
 
   const results = product?.searchProducts ?? [];
   const isLoading = product?.loading && searchQuery.trim().length > 0;
@@ -133,258 +139,264 @@ function SearchPage() {
           </Typography>
         </Box>
       </Box>
-     <Box
-  sx={{
-    width: "100%",
-    maxWidth: "1700px",
-    mx: "auto",
-    px: {
-      xs: 2,
-      sm: 3,
-      md: 4,
-      lg: 5,
-    },
-    mt: {
-      xs: -1,
-      sm: -2,
-      md: -3,
-    },
-  }}
->
-  <Grid container spacing={3}>
-      
-        {/* Sidebar */}
-        <Grid item xs={12} md={3}>
-          <Paper
-            sx={{
-              p: { xs: 2, sm: 2.5, md: 3 },
-              borderRadius: 3,
-              border: "1px solid",
-              borderColor: "divider",
-              boxShadow: "0 2px 10px rgba(15, 23, 42, 0.04)",
-              width: "100%",
-            }}
-          >
-            <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-              <TuneIcon sx={{ color: BRAND }} fontSize="small" />
-              <Typography variant="h6" fontWeight={700} fontSize={{ xs: "1.05rem", md: "1.25rem" }}>
-                Refine your search
-              </Typography>
-            </Stack>
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: "1700px",
+          mx: "auto",
+          px: {
+            xs: 2,
+            sm: 3,
+            md: 4,
+            lg: 5,
+          },
+          mt: {
+            xs: -1,
+            sm: -2,
+            md: -3,
+          },
+        }}
+      >
+        <Grid container spacing={3}>
 
-            <Divider sx={{ mb: 2 }} />
-
-            <Typography
-              fontWeight={600}
-              mb={1.2}
-              color="text.secondary"
-              variant="body2"
-              textTransform="uppercase"
-              letterSpacing={0.5}
-            >
-              Popular filters
-            </Typography>
-            <Stack
-              direction="row"
-              spacing={1}
-              useFlexGap
+          {/* Sidebar */}
+          <Grid item xs={12} md={3}>
+            <Paper
               sx={{
-                flexWrap: { xs: "nowrap", md: "wrap" },
-                overflowX: { xs: "auto", md: "visible" },
-                pb: { xs: 0.5, md: 0 },
-                scrollbarWidth: "thin",
+                p: { xs: 2, sm: 2.5, md: 3 },
+                borderRadius: 3,
+                border: "1px solid",
+                borderColor: "divider",
+                boxShadow: "0 2px 10px rgba(15, 23, 42, 0.04)",
+                width: "100%",
               }}
-              mb={1}
             >
-              {quickFilters.map((filter) => {
-                const isActive = activeFilter === filter;
-                return (
+              <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+                <TuneIcon sx={{ color: BRAND }} fontSize="small" />
+                <Typography variant="h6" fontWeight={700} fontSize={{ xs: "1.05rem", md: "1.25rem" }}>
+                  Refine your search
+                </Typography>
+              </Stack>
+
+              <Divider sx={{ mb: 2 }} />
+
+              <Typography
+                fontWeight={600}
+                mb={1.2}
+                color="text.secondary"
+                variant="body2"
+                textTransform="uppercase"
+                letterSpacing={0.5}
+              >
+                Popular filters
+              </Typography>
+              <Stack
+                direction="row"
+                spacing={1}
+                useFlexGap
+                sx={{
+                  flexWrap: { xs: "nowrap", md: "wrap" },
+                  overflowX: { xs: "auto", md: "visible" },
+                  pb: { xs: 0.5, md: 0 },
+                  scrollbarWidth: "thin",
+                }}
+                mb={1}
+              >
+                {quickFilters.map((filter) => {
+                  const isActive = activeFilter === filter;
+                  return (
+                    <Chip
+                      key={filter}
+                      label={filter}
+                      variant={isActive ? "filled" : "outlined"}
+                      clickable
+                      size="small"
+                      onClick={() => {
+                        setActiveFilter(filter);
+
+                        if (filter === "All") {
+                          setSearchQuery("");
+                          handleSearch("");
+                          return;
+                        }
+
+                        setSearchQuery(filter);
+                        handleSearch(filter);
+                      }}
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: { xs: "0.75rem", md: "0.8125rem" },
+                        "&:focus-visible": {
+                          outline: `2px solid ${BRAND_DARK}`,
+                          outlineOffset: 2,
+                        },
+                        ...(isActive && {
+                          bgcolor: BRAND,
+                          color: "#fff",
+                          "&:hover": { bgcolor: BRAND_DARK },
+                        }),
+                      }}
+                    />
+                  );
+                })}
+              </Stack>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Typography
+                fontWeight={600}
+                mb={1.2}
+                color="text.secondary"
+                variant="body2"
+                textTransform="uppercase"
+                letterSpacing={0.5}
+              >
+                Helpful searches
+              </Typography>
+              <Stack
+                direction="row"
+                spacing={1}
+                useFlexGap
+                sx={{
+                  flexWrap: { xs: "nowrap", md: "wrap" },
+                  overflowX: { xs: "auto", md: "visible" },
+                  pb: { xs: 0.5, md: 0 },
+                  scrollbarWidth: "thin",
+                }}
+              >
+                {quickSuggestions.map((suggestion) => (
                   <Chip
-                    key={filter}
-                    label={filter}
-                    variant={isActive ? "filled" : "outlined"}
+                    key={suggestion}
+                    label={suggestion}
+                    variant="outlined"
                     clickable
                     size="small"
                     onClick={() => {
-                      setActiveFilter(filter);
-                      const query = filter === "All" ? searchQuery : filter;
-                      setSearchQuery(query);
-                      handleSearch(query);
+                      setSearchQuery(suggestion);
+                      handleSearch(suggestion);
                     }}
                     sx={{
-                      fontWeight: 600,
+                      fontWeight: 500,
                       fontSize: { xs: "0.75rem", md: "0.8125rem" },
+                      borderColor: "rgba(0,146,124,0.35)",
+                      color: BRAND_DARK,
+                      "&:hover": { bgcolor: "rgba(0,146,124,0.08)" },
                       "&:focus-visible": {
                         outline: `2px solid ${BRAND_DARK}`,
                         outlineOffset: 2,
                       },
-                      ...(isActive && {
-                        bgcolor: BRAND,
-                        color: "#fff",
-                        "&:hover": { bgcolor: BRAND_DARK },
-                      }),
                     }}
                   />
-                );
-              })}
-            </Stack>
+                ))}
+              </Stack>
+            </Paper>
+          </Grid>
 
-            <Divider sx={{ my: 2 }} />
-
-            <Typography
-              fontWeight={600}
-              mb={1.2}
-              color="text.secondary"
-              variant="body2"
-              textTransform="uppercase"
-              letterSpacing={0.5}
-            >
-              Helpful searches
-            </Typography>
-            <Stack
-              direction="row"
-              spacing={1}
-              useFlexGap
+          {/* Results */}
+          <Grid item xs={12} md={9}>
+            <Paper
               sx={{
-                flexWrap: { xs: "nowrap", md: "wrap" },
-                overflowX: { xs: "auto", md: "visible" },
-                pb: { xs: 0.5, md: 0 },
-                scrollbarWidth: "thin",
+                p: { xs: 2, sm: 2.5, md: 3 },
+                borderRadius: 3,
+                border: "1px solid",
+                borderColor: "divider",
+                boxShadow: "0 2px 10px rgba(15, 23, 42, 0.04)",
               }}
             >
-              {quickSuggestions.map((suggestion) => (
-                <Chip
-                  key={suggestion}
-                  label={suggestion}
-                  variant="outlined"
-                  clickable
-                  size="small"
-                  onClick={() => {
-                    setSearchQuery(suggestion);
-                    handleSearch(suggestion);
-                  }}
-                  sx={{
-                    fontWeight: 500,
-                    fontSize: { xs: "0.75rem", md: "0.8125rem" },
-                    borderColor: "rgba(0,146,124,0.35)",
-                    color: BRAND_DARK,
-                    "&:hover": { bgcolor: "rgba(0,146,124,0.08)" },
-                    "&:focus-visible": {
-                      outline: `2px solid ${BRAND_DARK}`,
-                      outlineOffset: 2,
-                    },
-                  }}
-                />
-              ))}
-            </Stack>
-          </Paper>
-        </Grid>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                justifyContent="space-between"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={1}
+                mb={1}
+              >
+                <Typography variant="h6" fontWeight={700} fontSize={{ xs: "1.05rem", md: "1.25rem" }}>
+                  {searchQuery ? `Results for "${searchQuery}"` : "Start searching for products"}
+                </Typography>
 
-        {/* Results */}
-        <Grid item xs={12} md={9}>
-          <Paper
-            sx={{
-              p: { xs: 2, sm: 2.5, md: 3 },
-              borderRadius: 3,
-              border: "1px solid",
-              borderColor: "divider",
-              boxShadow: "0 2px 10px rgba(15, 23, 42, 0.04)",
-            }}
-          >
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              justifyContent="space-between"
-              alignItems={{ xs: "flex-start", sm: "center" }}
-              spacing={1}
-              mb={1}
-            >
-              <Typography variant="h6" fontWeight={700} fontSize={{ xs: "1.05rem", md: "1.25rem" }}>
-                {searchQuery ? `Results for "${searchQuery}"` : "Start searching for products"}
-              </Typography>
+                {!isLoading && hasResults && (
+                  <Chip
+                    label={resultsLabel}
+                    size="small"
+                    sx={{ bgcolor: "rgba(0,146,124,0.1)", color: BRAND_DARK, fontWeight: 600 }}
+                  />
+                )}
+              </Stack>
 
-              {!isLoading && hasResults && (
-                <Chip
-                  label={resultsLabel}
-                  size="small"
-                  sx={{ bgcolor: "rgba(0,146,124,0.1)", color: BRAND_DARK, fontWeight: 600 }}
-                />
+              {(isLoading || !hasResults) && (
+                <Typography color="text.secondary" mb={3} fontSize={{ xs: "0.875rem", md: "1rem" }}>
+                  {resultsLabel}
+                </Typography>
               )}
-            </Stack>
 
-            {(isLoading || !hasResults) && (
-              <Typography color="text.secondary" mb={3} fontSize={{ xs: "0.875rem", md: "1rem" }}>
-                {resultsLabel}
-              </Typography>
-            )}
-
-            {isLoading ? (
-              <Box
-                height={{ xs: 240, sm: 280, md: 320 }}
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                gap={1.5}
-              >
-                <CircularProgress sx={{ color: BRAND }} />
-                <Typography color="text.secondary" fontSize={{ xs: "0.875rem", md: "1rem" }}>
-                  Looking for the best matches...
-                </Typography>
-              </Box>
-            ) : !hasResults ? (
-              <Box
-                height={{ xs: 240, sm: 280, md: 320 }}
-                display="flex"
-                flexDirection="column"
-                justifyContent="center"
-                alignItems="center"
-                textAlign="center"
-                gap={1.5}
-                px={2}
-              >
+              {isLoading ? (
                 <Box
-                  sx={{
-                    width: { xs: 52, md: 64 },
-                    height: { xs: 52, md: 64 },
-                    borderRadius: "50%",
-                    bgcolor: "rgba(0,146,124,0.08)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  height={{ xs: 240, sm: 280, md: 320 }}
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  gap={1.5}
                 >
-                  <SearchOffIcon sx={{ color: BRAND, fontSize: { xs: 24, md: 30 } }} />
+                  <CircularProgress sx={{ color: BRAND }} />
+                  <Typography color="text.secondary" fontSize={{ xs: "0.875rem", md: "1rem" }}>
+                    Looking for the best matches...
+                  </Typography>
                 </Box>
-                <Typography variant="h6" fontWeight={700} fontSize={{ xs: "1rem", md: "1.25rem" }}>
-                  No products found
-                </Typography>
-                <Typography color="text.secondary" maxWidth={340} fontSize={{ xs: "0.8125rem", md: "0.875rem" }}>
-                  Try a different keyword or browse one of the suggestions on the left.
-                </Typography>
-              </Box>
-            ) : (
-              <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
-                {results.map((item) => (
-                  <Grid
-                    item
-                    xs={6}
-                    sm={6}
-                    md={4}
-                    lg={3}
-                    xl={2}
-                    key={item.id}
-                    sx={{ display: "flex", justifyContent: "center" }}
+              ) : !hasResults ? (
+                <Box
+                  height={{ xs: 240, sm: 280, md: 320 }}
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  textAlign="center"
+                  gap={1.5}
+                  px={2}
+                >
+                  <Box
+                    sx={{
+                      width: { xs: 52, md: 64 },
+                      height: { xs: 52, md: 64 },
+                      borderRadius: "50%",
+                      bgcolor: "rgba(0,146,124,0.08)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
                   >
-                    <Box sx={{ width: "100%" }}>
-                      <ProductCard item={item} />
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </Paper>
-        </Grid>
+                    <SearchOffIcon sx={{ color: BRAND, fontSize: { xs: 24, md: 30 } }} />
+                  </Box>
+                  <Typography variant="h6" fontWeight={700} fontSize={{ xs: "1rem", md: "1.25rem" }}>
+                    No products found
+                  </Typography>
+                  <Typography color="text.secondary" maxWidth={340} fontSize={{ xs: "0.8125rem", md: "0.875rem" }}>
+                    Try a different keyword or browse one of the suggestions on the left.
+                  </Typography>
+                </Box>
+              ) : (
+                <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
+                  {results.map((item) => (
+                    <Grid
+                      item
+                      xs={6}
+                      sm={6}
+                      md={4}
+                      lg={3}
+                      xl={2}
+                      key={item.id}
+                      sx={{ display: "flex", justifyContent: "center" }}
+                    >
+                      <Box sx={{ width: "100%" }}>
+                        <ProductCard item={item} />
+                      </Box>
                     </Grid>
+                  ))}
+                </Grid>
+              )}
+            </Paper>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   );

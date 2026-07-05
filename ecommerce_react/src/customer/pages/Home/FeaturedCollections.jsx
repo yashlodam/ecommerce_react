@@ -58,10 +58,7 @@ function FeaturedCollections() {
           </p>
         </div>
 
-        <button className="inline-flex items-center gap-2 self-start rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
-          View all
-          <ArrowRight size={16} />
-        </button>
+        
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-6 lg:grid-cols-4 sm:gap-5 md:gap-6">
@@ -99,10 +96,7 @@ function FeaturedCollections() {
         ))}
       </div>
 
-      <button className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-700 sm:hidden">
-        View all collections
-        <ArrowRight size={16} />
-      </button>
+      
     </section>
   );
 }

@@ -28,9 +28,9 @@ function Home() {
         <Deal/>
         <ShopByCategory/>
         <Grid/>
+        <FeaturedCollections/>
         <TopRatedProducts/>
         <SellerBanner/>
-        <FeaturedCollections/>
         <WhyChooseShopSphere/>
         <CustomerReviews/>
         <Footer/>

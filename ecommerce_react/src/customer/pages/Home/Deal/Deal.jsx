@@ -40,26 +40,26 @@ function Deals() {
             </p>
           </div>
 
-         <Button
-              onClick={() => (window.location.href = `/products/${section.category}`)}
-              variant="contained"
-              endIcon={<ArrowForwardRoundedIcon />}
-              sx={{
-                borderRadius: "999px",
-                textTransform: "none",
-                px: 2.7,
-                py: 0.95,
-                fontWeight: 600,
-                boxShadow: "none",
-                background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
-                "&:hover": {
-                  background: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
-                  boxShadow: "0 14px 28px rgba(37,99,235,0.24)",
-                },
-              }}
-            >
-              View All Deals
-            </Button>
+          <Button
+            onClick={() => (window.location.href = `/products/${section.category}`)}
+            variant="contained"
+            endIcon={<ArrowForwardRoundedIcon />}
+            sx={{
+              borderRadius: "999px",
+              textTransform: "none",
+              px: 2.7,
+              py: 0.95,
+              fontWeight: 600,
+              boxShadow: "none",
+              background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
+                boxShadow: "0 14px 28px rgba(37,99,235,0.24)",
+              },
+            }}
+          >
+            View All Deals
+          </Button>
         </div>
 
         <div className="rounded-[32px] border border-slate-200/80 bg-white/80 p-3 shadow-[0_28px_90px_-35px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:p-4 lg:p-5">
@@ -166,13 +166,27 @@ function Deals() {
             height: 46px;
           }
         }
+       @media (max-width: 768px) {
+  .deals-swiper .swiper-button-next,
+  .deals-swiper .swiper-button-prev {
+    width: 36px;
+    height: 36px;
+  }
 
-        @media (max-width: 768px) {
-          .deals-swiper .swiper-button-next,
-          .deals-swiper .swiper-button-prev {
-            display: none;
-          }
-        }
+  .deals-swiper .swiper-button-next::after,
+  .deals-swiper .swiper-button-prev::after {
+    font-size: 12px;
+  }
+
+  .deals-swiper .swiper-button-next {
+    right: 4px;
+  }
+
+  .deals-swiper .swiper-button-prev {
+    left: 4px;
+  }
+}
+       
       `}</style>
     </section>
   );
