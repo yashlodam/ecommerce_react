@@ -3,6 +3,7 @@ import AdminDrawerList from '../../components/AdminDrawerList'
 import AdminRoute from '../../../Routes/AdminRoute'
 import { useAppDispatch } from '../../../State/Store'
 import { fetchHomeCategories } from '../../../State/admin/adminSlice'
+import { fetchAllSellers } from '../../../State/admin/adminFetchSlice'
 
 function AdminDashboard() {
 
@@ -11,7 +12,7 @@ function AdminDashboard() {
     const dispatch = useAppDispatch();
 
     useEffect(()=>{
-        dispatch(fetchHomeCategories())
+        dispatch(fetchAllSellers(localStorage.getItem("jwt") || ""));
     },[])
 
   return (

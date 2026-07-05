@@ -48,6 +48,7 @@ export const fetchHomeCategories = createAsyncThunk(
   }
 );
 
+
 const initialState = {
   categories: [],
   loading: false,

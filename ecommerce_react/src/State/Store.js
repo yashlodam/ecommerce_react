@@ -11,6 +11,9 @@ import sellerOrderSlice from './seller/sellerOrderSlice'
 import transactionSlice from './seller/transactionSlice'
 import homeSlice from './customer/CustomerSlice'
 import homeCategorySlice from './admin/adminSlice'
+import adminFetchSlice from './admin/adminFetchSlice'
+
+
 const rootReducer = combineReducers({
 
   seller:sellerSlice,
@@ -26,6 +29,8 @@ const rootReducer = combineReducers({
   customer : homeSlice,
 
   admin: homeCategorySlice,
+
+  adminFetch: adminFetchSlice
 
 })
 
