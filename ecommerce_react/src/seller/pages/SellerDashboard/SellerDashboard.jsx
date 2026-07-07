@@ -1,6 +1,7 @@
 import React from 'react'
 import SellerDrawerList from '../../components/SellerDrawerList'
 import SellerRoute from '../../../Routes/SellerRoute'
+import SellerStatusGuard from './SellerStatusGuard'
 
 function SellerDashboard() {
 
@@ -9,8 +10,9 @@ function SellerDashboard() {
     }
 
   return (
+    <SellerStatusGuard>
     <div>
-
+         
         <div className='lg:flex lg:h-[90vh]'>
             <section className='hidden lg:block h-full'>
                 <SellerDrawerList toggleDrawer={toggleDrawer}/>
@@ -21,6 +23,7 @@ function SellerDashboard() {
         </div>
 
     </div>
+    </SellerStatusGuard>
   )
 }
 

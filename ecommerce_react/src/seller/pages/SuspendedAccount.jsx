@@ -12,7 +12,7 @@ import SupportAgentRoundedIcon from "@mui/icons-material/SupportAgentRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 import GavelRoundedIcon from "@mui/icons-material/GavelRounded";
-import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutline";
+
 import { useNavigate } from "react-router-dom";
 
 function SuspendedAccount() {
