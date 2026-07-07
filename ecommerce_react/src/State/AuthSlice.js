@@ -26,7 +26,7 @@ export const sendLoginSignupOtp = createAsyncThunk(
 );
 
 export const signin = createAsyncThunk(
-  "/auth/signin",
+  "auth/signin",
   async ({ email, otp }, { rejectWithValue }) => {
     try {
       const response = await api.post("/auth/login", {
@@ -34,11 +34,9 @@ export const signin = createAsyncThunk(
         otp,
       });
 
-      console.log(email,otp);
-
-      const jwt = response.data.jwt;
-      localStorage.setItem("jwt",jwt);
-
+      localStorage.setItem("jwt", response.data.jwt);
+      
+      console.log("Login successful", response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -51,17 +49,19 @@ export const signin = createAsyncThunk(
 
 
 export const signup = createAsyncThunk(
-  "/auth/signup",
+  "auth/signup",
   async (signupRequest, { rejectWithValue }) => {
     try {
       const response = await api.post("/auth/signup", signupRequest);
 
-      console.log("registered suceesfully",response.data)
+      if (response.data.jwt) {
+        localStorage.setItem("jwt", response.data.jwt);
+      }
 
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || "Login failed"
+        error.response?.data || "Signup failed"
       );
     }
   }
@@ -126,53 +126,143 @@ export const updateUserProfile = createAsyncThunk(
   }
 );
 
+export const fetchCurrentRole = createAsyncThunk(
+  "auth/fetchCurrentRole",
+  async (jwt, { rejectWithValue }) => {
+    try {
+
+      const response = await api.get("/auth/current-role", {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      });
+
+      return response.data.role;
+
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch role"
+      );
+    }
+  }
+);
+
 
 
 const initialState = {
-  jwt:null,
-  otpSend:false,
+  jwt: localStorage.getItem("jwt"),
+  role: null,
+  otpSend: false,
   isLoggedIn: !!localStorage.getItem("jwt"),
-  user:null
-}
+  user: null,
+  loading: false,
+  error: null,
+};
 
 
 const authSlice = createSlice({
    name:"auth",
    initialState,
    reducers:{},
-   extraReducers:(builder)=>{
-           builder.addCase(signin.fulfilled,(state,action)=>{
-            state.jwt = action.payload;
-            state.isLoggedIn = true
-           })
-           builder.addCase(signup.fulfilled,(state,action)=>{
-             state.jwt = action.payload
-             state.isLoggedIn = true
-           })
-           builder.addCase(fetchUserProfile.fulfilled,(state,action)=>{
-            state.user = action.payload
-            state.isLoggedIn=true
-           })
-           builder.addCase(logout.fulfilled,(state)=>{
-            state.jwt = null
-            state.isLoggedIn = false
-            state.user=null
-           })
+  extraReducers: (builder) => {
+  builder
 
-           builder
-  .addCase(updateUserProfile.pending, (state) => {
-    state.loading = true;
-    state.error = null;
-  })
-  .addCase(updateUserProfile.fulfilled, (state, action) => {
-    state.loading = false;
-    state.user = action.payload;
-  })
-  .addCase(updateUserProfile.rejected, (state, action) => {
-    state.loading = false;
-    state.error = action.payload;
-  });
-   }
+    // ===================== SEND OTP =====================
+    .addCase(sendLoginSignupOtp.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(sendLoginSignupOtp.fulfilled, (state) => {
+      state.loading = false;
+      state.otpSend = true;
+    })
+    .addCase(sendLoginSignupOtp.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+
+    .addCase(fetchCurrentRole.fulfilled,(state,action)=>{
+    state.role = action.payload;
+})
+
+    // ===================== SIGN IN =====================
+    .addCase(signin.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(signin.fulfilled, (state, action) => {
+      state.loading = false;
+      state.jwt = action.payload.jwt;
+      state.role = action.payload.role;
+      state.isLoggedIn = true;
+      state.error = null;
+    })
+    .addCase(signin.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.isLoggedIn = false;
+    })
+
+    // ===================== SIGN UP =====================
+    .addCase(signup.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(signup.fulfilled, (state, action) => {
+      state.loading = false;
+      state.jwt = action.payload.jwt;
+      state.role = action.payload.role;
+      state.isLoggedIn = true;
+      state.error = null;
+    })
+    .addCase(signup.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+
+    // ===================== FETCH USER PROFILE =====================
+    .addCase(fetchUserProfile.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(fetchUserProfile.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload;
+      state.role = action.payload.role;
+      state.isLoggedIn = true;
+    })
+    .addCase(fetchUserProfile.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.user = null;
+    })
+
+    // ===================== UPDATE USER PROFILE =====================
+    .addCase(updateUserProfile.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(updateUserProfile.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload;
+      state.role = action.payload.role;
+    })
+    .addCase(updateUserProfile.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+
+    // ===================== LOGOUT =====================
+    .addCase(logout.fulfilled, (state) => {
+      state.jwt = null;
+      state.role = null;
+      state.user = null;
+      state.isLoggedIn = false;
+      state.loading = false;
+      state.error = null;
+      state.otpSend = false;
+    });
+}
 })
 
 export default authSlice.reducer

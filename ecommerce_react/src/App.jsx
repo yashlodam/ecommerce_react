@@ -15,37 +15,77 @@ import SellerDashboard from './seller/pages/SellerDashboard/SellerDashboard';
 import Dashboard from './admin/pages/Dashboard/Dashboard';
 import AdminDashboard from './admin/pages/Dashboard/Dashboard';
 import { store, useAppDispatch, useAppSelector } from './State/Store';
-import { fetchSellerProfile } from './State/seller/sellerSlice';
+
 import LoginForm from './customer/pages/Auth/LoginForm';
 import Auth from './customer/pages/Auth/Auth';
-import { fetchUserProfile } from './State/AuthSlice';
+import { fetchCurrentRole, fetchUserProfile } from './State/AuthSlice';
 import PaymentSucess from './customer/PaymentSucess';
 import Wishlist from './customer/Wishlist/Wishlist';
 import { homeCategories } from './data/HomeCategories';
 import { createHomeCategories } from './State/customer/CustomerSlice';
 import ScrollToTop from './ScrollToTop';
 import SearchPage from './customer/pages/SearchPage';
+import AdminNavbar from './admin/components/AdminNavbar';
+import { fetchSellerProfile } from './State/seller/sellerSlice';
+import SellerNavbar from './seller/components/SellerNavbar';
 
 function App() {
   
-  const { auth, seller } = useAppSelector((state) => state);
+  const { auth, seller } = useAppSelector((store) => store);
   const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
 
 useEffect(() => {
-  const jwt = localStorage.getItem("jwt");
 
-  if (jwt) {
-    dispatch(fetchUserProfile(jwt));
-  }
-  dispatch(createHomeCategories(homeCategories));
+    const initialize = async () => {
+
+        const jwt = localStorage.getItem("jwt");
+
+        if (!jwt) {
+            dispatch(createHomeCategories(homeCategories));
+            return;
+        }
+
+        try {
+
+            const role = await dispatch(fetchCurrentRole(jwt)).unwrap();
+
+            if (role === "ROLE_SELLER") {
+                await dispatch(fetchSellerProfile(jwt));
+            } else {
+                await dispatch(fetchUserProfile(jwt));
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+
+        dispatch(createHomeCategories(homeCategories));
+    };
+
+    initialize();
+
 }, [dispatch]);
+
+
+const renderNavbar = () => {
+
+    if (auth.role === "ROLE_ADMIN") {
+        return <AdminNavbar />;
+    }
+
+    if (auth.role === "ROLE_SELLER") {
+        return <SellerNavbar />;
+    }
+
+    return <Navbar />;
+};
 
   return (
     <ThemeProvider theme={customeTheme}>
       <div>
-        <Navbar />
+        {renderNavbar()}
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />

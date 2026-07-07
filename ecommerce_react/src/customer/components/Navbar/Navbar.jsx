@@ -67,8 +67,8 @@ function Navbar() {
   const isLarge = useMediaQuery(theme.breakpoints.up("lg"));
   const navigate = useNavigate();
 
-  const { cart } = useAppSelector((state) => state);
-  const { isLoggedIn, user } = useAppSelector((state) => state.auth);
+  const { cart } = useAppSelector((store) => store);
+  const { isLoggedIn, user } = useAppSelector((store) => store.auth);
   const { product } = useAppSelector((store) => store);
 
   const [selectedCategory, setSelectedCategory] = useState("");
