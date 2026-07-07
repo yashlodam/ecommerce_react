@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -69,6 +69,8 @@ function Navbar() {
 
   const { cart } = useAppSelector((store) => store);
   const { isLoggedIn, user } = useAppSelector((store) => store.auth);
+
+  console.log("user navbar",user);
   const { product } = useAppSelector((store) => store);
 
   const [selectedCategory, setSelectedCategory] = useState("");
