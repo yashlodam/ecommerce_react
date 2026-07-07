@@ -10,7 +10,7 @@ import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledR
 import SupportAgentRoundedIcon from "@mui/icons-material/SupportAgentRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
-import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutline";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import { useNavigate } from "react-router-dom";
 
@@ -177,7 +177,7 @@ function DeactivatedAccount() {
                 className="flex items-center gap-3"
               >
 
-                <CheckCircleOutlineRoundedIcon
+                <CheckCircleOutlineIcon
                   sx={{
                     color: "#16a34a",
                   }}

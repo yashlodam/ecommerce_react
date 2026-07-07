@@ -12,7 +12,7 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 import AccessTimeFilledRoundedIcon from "@mui/icons-material/AccessTimeFilled";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
-import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutline";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import { useNavigate } from "react-router-dom";
 
 function PendingVerification() {
@@ -115,7 +115,7 @@ function PendingVerification() {
                 key={item}
                 className="flex items-center gap-3 bg-slate-50 rounded-xl p-4 hover:bg-teal-50 transition-all duration-300"
               >
-                <CheckCircleOutlineRoundedIcon
+                <CheckCircleOutlineIcon
                   sx={{
                     color: "#009688",
                   }}
@@ -235,7 +235,7 @@ function PendingVerification() {
             }}
           >
             Need help? Contact our support team at{" "}
-            <strong>support@shopsphere.com</strong>
+            <strong>yashlodam03@gmail.com</strong>
           </Typography>
 
         </div>

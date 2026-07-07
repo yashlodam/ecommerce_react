@@ -8,6 +8,8 @@ import SuspendedAccount from "../SuspendedAccount";
 function SellerStatusGuard({ children }) {
   const { profile, loading } = useAppSelector((store) => store.seller);
 
+  console.log("Seller's profile fetch",profile)
+
   if (loading) return null;
 
   if (!profile) return null;

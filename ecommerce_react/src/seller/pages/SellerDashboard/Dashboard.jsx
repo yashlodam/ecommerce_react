@@ -163,9 +163,6 @@ export default function Dashboard() {
   const { products } = useAppSelector((store) => store.sellerProduct);
   const { orders } = useAppSelector((store) => store.sellerOrder);
   const { transaction } = useAppSelector((store) => store);
-  
-  console.log("Seller products",products)
-
   const [range, setRange] = useState("6M");
   const [statusFilter, setStatusFilter] = useState(null);
 

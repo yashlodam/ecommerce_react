@@ -4,6 +4,7 @@ import AdminRoute from '../../../Routes/AdminRoute'
 import { useAppDispatch } from '../../../State/Store'
 import { fetchHomeCategories } from '../../../State/admin/adminSlice'
 import { fetchAllSellers } from '../../../State/admin/adminFetchSlice'
+import AdminNavbar from '../../components/AdminNavbar'
 
 function AdminDashboard() {
 
@@ -11,8 +12,8 @@ function AdminDashboard() {
 
 
   return (
-    <div>
-
+    <div> 
+        <AdminNavbar/>
         <div className='lg:flex lg:h-[90vh]'>
             <section className='hidden lg:block h-full'>
                 <AdminDrawerList toggleDrawer={toggleDrawer}/>

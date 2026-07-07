@@ -12,10 +12,14 @@ import WhyChooseShopSphere from "./WhyChooseShopSphere";
 import CustomerReviews from "./CustomerReviews";
 import Footer from "./Footer";
 import HomeProducts from "./HomeProduct";
+import Navbar from "../../components/Navbar/Navbar";
 
 function Home() {
   return (
+    <>
+    <Navbar/>
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+
       <div className="max-w-[1800px] mx-auto px-3 md:px-5 lg:px-8 py-6 md:py-8 lg:py-10">
         <section
           aria-label="Featured promotions"
@@ -38,6 +42,7 @@ function Home() {
         
       </div>
     </main>
+    </>
   );
 }
 

@@ -69,23 +69,12 @@ useEffect(() => {
 }, [dispatch]);
 
 
-const renderNavbar = () => {
 
-    if (auth.role === "ROLE_ADMIN") {
-        return <AdminNavbar />;
-    }
-
-    if (auth.role === "ROLE_SELLER") {
-        return <SellerNavbar />;
-    }
-
-    return <Navbar />;
-};
 
   return (
     <ThemeProvider theme={customeTheme}>
       <div>
-        {renderNavbar()}
+        
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
