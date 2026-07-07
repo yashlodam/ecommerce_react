@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Avatar, useMediaQuery } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
-import CloseIcon from "@mui/icons-material/Close";
 import { useAppSelector } from "../../State/Store";
+import SellerDrawerList from "./SellerDrawerList";
+import CloseIcon from "@mui/icons-material/Close";
+import Typography from "@mui/material/Typography";
+
 
 function SellerNavbar() {
   const theme = useTheme();
@@ -59,72 +62,28 @@ const iconBtnSx = {
   return (
     <div>
        <Drawer
-        anchor="left"
-        open={openDrawer}
-        onClose={closeDrawer}
-        PaperProps={{ sx: { width: 300, borderTopRightRadius: 24, borderBottomRightRadius: 24 } }}
-      >
-        <div className="flex h-full flex-col">
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => {
-              navigate("/account/orders");
-              closeDrawer();
-            }}
-            className="flex cursor-pointer items-center gap-3 p-5 text-white"
-            style={{ background: "linear-gradient(135deg, #00927c 0%, #0f766e 100%)" }}
-          >
-            <Avatar
-              sx={{ width: 48, height: 48, border: "2px solid rgba(255,255,255,0.6)" }}
-              src="https://yt3.ggpht.com/IQswhTaRAllO-9swJEwsLX3NO0OK_SrLrOFlTfLsjqrAwez9cSQ4cNOac0Ox9reNMsCOhg0hUA=s88-c-k-c0x00ffffff-no-rj"
-            />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-base font-semibold leading-tight">{isLoggedIn ? "Zosh" : "Welcome"}</p>
-              <p className="truncate text-xs text-white/80">{isLoggedIn ? "View your account" : "Sign in to continue"}</p>
-            </div>
-            <IconButton
-              onClick={(event) => {
-                event.stopPropagation();
-                closeDrawer();
-              }}
-              size="small"
-              sx={{ color: "white", alignSelf: "flex-start" }}
-              aria-label="Close menu"
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </div>
+  anchor="left"
+  open={openDrawer}
+  onClose={closeDrawer}
+  PaperProps={{
+    sx: {
+      width: 300,
+    },
+  }}
+>
+  <div
+    className="flex items-center justify-between px-4 py-3 text-white"
+    style={{ background: "linear-gradient(135deg, #00927c 0%, #0f766e 100%)" }}
+  >
+    <h2 className="text-lg font-semibold">ShopSphere</h2>
 
-          <div className="flex-1 overflow-y-auto">
-            <div className="py-2">
-              <DrawerRow icon={<ReceiptLongOutlinedIcon fontSize="small" />} label="My Orders" onClick={() => { navigate("/account/orders"); closeDrawer(); }} />
-              <DrawerRow icon={<ShoppingCartOutlinedIcon fontSize="small" />} label="Cart" onClick={() => { navigate("/cart"); closeDrawer(); }} />
-              <DrawerRow icon={<FavoriteBorderOutlinedIcon fontSize="small" />} label="Wishlist" onClick={() => { navigate("/wishlist"); closeDrawer(); }} />
-            </div>
+    <IconButton onClick={closeDrawer} sx={{ color: "white" }}>
+      <CloseIcon />
+    </IconButton>
+  </div>
 
-            <p className="px-5 pb-1 pt-3 text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Shop by category</p>
-            <div className="pb-2">
-              {mainCategory.map((item) => (
-                <DrawerRow
-                  key={item.categoryId}
-                  label={item.name}
-                  onClick={() => {
-                    navigate(`/products/${item.categoryId}`);
-                    closeDrawer();
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="border-t border-slate-200 p-4">
-            <Button fullWidth variant="outlined" startIcon={<StoreIcon />} sx={{ ...outlinedBtnSx, py: 1.2 }} onClick={() => { navigate("/become-seller"); closeDrawer(); }}>
-              Become a Seller
-            </Button>
-          </div>
-        </div>
-      </Drawer>
+  <SellerDrawerList toggleDrawer={closeDrawer} />
+</Drawer>
       <Box
         className="sticky top-0 left-0 right-0 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl"
         sx={{ zIndex: 20 }}
@@ -156,5 +115,7 @@ const iconBtnSx = {
     </div>
   );
 }
+
+
 
 export default SellerNavbar;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -10,6 +10,10 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import { useAppDispatch, useAppSelector } from "../../../State/Store";
+import { fetchAllProducts } from "../../../State/customer/ProductSlice";
+import { fetchSellerOrders } from "../../../State/seller/sellerOrderSlice";
+import { fetchTransactionsBySeller } from "../../../State/seller/transactionSlice";
 
 const salesData = [
   { month: "Jan", sales: 12000 },
@@ -28,43 +32,93 @@ const topProducts = [
 ];
 
 function Dashboard() {
-  const stats = [
-    {
-      title: "Total Revenue",
-      value: "₹1,25,000",
-    },
-    {
-      title: "Total Orders",
-      value: "356",
-    },
-    {
-      title: "Products",
-      value: "42",
-    },
-    {
-      title: "Customers",
-      value: "187",
-    },
-  ];
+
+  const dispatch = useAppDispatch();
+
+  const {products} = useAppSelector((store)=>store.sellerProduct)
+  console.log("Total products",products.length)
+
+  const {orders} = useAppSelector((store)=> store.sellerOrder);
+  const { transaction } = useAppSelector((store) => store);
+
+const totalEarning = transaction.transactions.reduce(
+  (sum, item) => sum + (item.order?.totalSellingPrice || 0),
+  0
+);
+  useEffect(()=>{
+    dispatch(fetchAllProducts(localStorage.getItem("jwt") || ""));
+    dispatch(fetchSellerOrders(localStorage.getItem("jwt") || " "));
+    dispatch(fetchTransactionsBySeller(localStorage.getItem("jwt") || ""));
+
+  },[dispatch])
+  
+  const totalRevenue = transaction.transactions.reduce(
+  (total, transaction) => total + transaction.order.totalSellingPrice,
+  0
+);
+  
+  
 
   return (
     <div className="p-5 lg:p-8 bg-slate-100 min-h-screen">
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-        {stats.map((item) => (
+        
           <div
-            key={item.title}
+            key={0}
             className="bg-white rounded-xl shadow-sm p-6"
           >
             <p className="text-gray-500 text-sm">
-              {item.title}
+              Total Revenue
             </p>
 
             <h2 className="text-3xl font-bold mt-2 text-teal-600">
-              {item.value}
+              {totalEarning}
             </h2>
           </div>
-        ))}
+
+
+          <div
+            key={1}
+            className="bg-white rounded-xl shadow-sm p-6"
+          >
+            <p className="text-gray-500 text-sm">
+              Total Orders
+            </p>
+
+            <h2 className="text-3xl font-bold mt-2 text-teal-600">
+              {orders?.length}
+            </h2>
+          </div>
+
+
+
+          <div
+            key={2}
+            className="bg-white rounded-xl shadow-sm p-6"
+          >
+            <p className="text-gray-500 text-sm">
+              Products
+            </p>
+
+            <h2 className="text-3xl font-bold mt-2 text-teal-600">
+              {products?.length}
+            </h2>
+          </div>
+
+          <div
+            key={3}
+            className="bg-white rounded-xl shadow-sm p-6"
+          >
+            <p className="text-gray-500 text-sm">
+              Customer
+            </p>
+
+            <h2 className="text-3xl font-bold mt-2 text-teal-600">
+              120000
+            </h2>
+          </div>
+      
       </div>
 
       {/* Sales Chart */}

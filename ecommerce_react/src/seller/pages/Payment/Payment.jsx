@@ -5,11 +5,12 @@ import { useAppSelector ,store} from '../../../State/Store';
 
 function Payment() {
   const { transaction } = useAppSelector((store) => store);
-
+ 
 const totalEarning = transaction.transactions.reduce(
-  (sum, item) => sum + item.amount,
+  (sum, item) => sum + item.order?.totalSellingPrice,
   0
 );
+
   return (
     <div className='space-y-5'>
         <Card className='rounded-md space-y-4 p-5'>
