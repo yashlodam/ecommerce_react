@@ -68,9 +68,9 @@ function Navbar() {
   const navigate = useNavigate();
 
   const { cart } = useAppSelector((store) => store);
-  const { isLoggedIn, user , role } = useAppSelector((store) => store.auth);
+  const { isLoggedIn, user, role } = useAppSelector((store) => store.auth);
 
-  console.log("user navbar",user);
+  console.log("user navbar", user);
   const { product } = useAppSelector((store) => store);
 
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -151,12 +151,24 @@ function Navbar() {
             style={{ background: "linear-gradient(135deg, #00927c 0%, #0f766e 100%)" }}
           >
             <Avatar
-              sx={{ width: 48, height: 48, border: "2px solid rgba(255,255,255,0.6)" }}
-              src="https://yt3.ggpht.com/IQswhTaRAllO-9swJEwsLX3NO0OK_SrLrOFlTfLsjqrAwez9cSQ4cNOac0Ox9reNMsCOhg0hUA=s88-c-k-c0x00ffffff-no-rj"
-            />
+              sx={{
+                width: 48,
+                height: 48,
+                bgcolor: ACCENT,
+                fontWeight: "bold"
+              }}
+            >
+              {user?.fullName?.charAt(0)?.toUpperCase()}
+            </Avatar>
+
             <div className="min-w-0 flex-1">
-              <p className="truncate text-base font-semibold leading-tight">{isLoggedIn ? "Zosh" : "Welcome"}</p>
-              <p className="truncate text-xs text-white/80">{isLoggedIn ? "View your account" : "Sign in to continue"}</p>
+              <p className="truncate text-base font-semibold">
+                {isLoggedIn ? user?.fullName : "Welcome"}
+              </p>
+
+              <p className="truncate text-xs text-white/80">
+                {isLoggedIn ? user?.email : "Sign in to continue"}
+              </p>
             </div>
             <IconButton
               onClick={(event) => {
@@ -174,6 +186,7 @@ function Navbar() {
           <div className="flex-1 overflow-y-auto">
             <div className="py-2">
               <DrawerRow icon={<ReceiptLongOutlinedIcon fontSize="small" />} label="My Orders" onClick={() => { navigate("/account/orders"); closeDrawer(); }} />
+              
               <DrawerRow icon={<ShoppingCartOutlinedIcon fontSize="small" />} label="Cart" onClick={() => { navigate("/cart"); closeDrawer(); }} />
               <DrawerRow icon={<FavoriteBorderOutlinedIcon fontSize="small" />} label="Wishlist" onClick={() => { navigate("/wishlist"); closeDrawer(); }} />
             </div>
@@ -323,7 +336,7 @@ function Navbar() {
                   <SearchIcon />
                 </IconButton>
                 <IconButton onClick={() => navigate("/cart")} aria-label="Cart" sx={iconBtnSx}>
-                  <Badge badgeContent={0} color="error" overlap="circular" max={9}>
+                  <Badge badgeContent={cart.cart?.totalItem || 0} color="error" overlap="circular" max={99}>
                     <AddShoppingCartIcon sx={{ fontSize: 24, color: "#334155" }} />
                   </Badge>
                 </IconButton>
@@ -332,7 +345,7 @@ function Navbar() {
 
             {isLarge && (
               <>
-                {isLoggedIn && role==="ROLE_CUSTOMER" ? (
+                {isLoggedIn && role === "ROLE_CUSTOMER" ? (
                   <IconButton onClick={() => navigate("/account/orders")} aria-label="Account" sx={iconBtnSx}>
                     <Avatar sx={{ width: 30, height: 30, bgcolor: ACCENT, fontWeight: "bold", fontSize: 16 }}>
                       {user?.fullName?.charAt(0).toUpperCase()}
