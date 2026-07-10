@@ -13,6 +13,7 @@ import { store, useAppDispatch, useAppSelector } from '../../../State/Store';
 import { fetchUserProfile } from '../../../State/AuthSlice';
 import { createOrder } from '../../../State/customer/OrderSlice';
 import { fetchUserCart } from '../../../State/customer/CartSlice';
+import { useNavigate } from 'react-router-dom';
 
 
 function Checkout() {
@@ -48,21 +49,28 @@ function Checkout() {
   dispatch(fetchUserCart(jwt)); // or whatever your thunk is called
 }, [dispatch]);
 
-  const handleBuyNow = async () => {
+  const navigate = useNavigate();
+
+const handleBuyNow = async () => {
   if (!selectedAddress) {
     alert("Please select an address");
     return;
   }
 
   try {
-    await dispatch(
+    const res = await dispatch(
       createOrder({
         address: selectedAddress,
         jwt: localStorage.getItem("jwt"),
-        paymentGateway: paymentGateway,
+        paymentGateway,
       })
     ).unwrap();
 
+    if (paymentGateway === "COD") {
+      navigate("/order-success");
+    } else {
+      window.location.href = res.payment_link_url;
+    }
   } catch (error) {
     console.error(error);
   }

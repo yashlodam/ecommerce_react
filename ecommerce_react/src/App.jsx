@@ -28,6 +28,7 @@ import SearchPage from './customer/pages/SearchPage';
 import AdminNavbar from './admin/components/AdminNavbar';
 import { fetchSellerProfile } from './State/seller/sellerSlice';
 import SellerNavbar from './seller/components/SellerNavbar';
+import OrderSuccess from './customer/OrderSuccess';
 
 function App() {
   
@@ -35,6 +36,9 @@ function App() {
   const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
+  const isSeller = location.pathname.startsWith("/seller");
+  const isAdmin = location.pathname.startsWith("/admin");
+
 
 useEffect(() => {
 
@@ -74,7 +78,14 @@ useEffect(() => {
   return (
     <ThemeProvider theme={customeTheme}>
       <div>
-        
+        {isAdmin ? (
+        <AdminNavbar />
+      ) : isSeller ? (
+        <SellerNavbar />
+      ) : (
+        <Navbar />
+      )}
+
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -91,6 +102,7 @@ useEffect(() => {
           <Route path="/payment-success/:orderId" element={<PaymentSucess />} />
           <Route path="/account/*" element={<Account />} />
           <Route path="/become-seller" element={<BecomeSeller />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/seller/*" element={<SellerDashboard />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="/login" element={<Auth />} />
