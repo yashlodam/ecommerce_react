@@ -21,6 +21,7 @@ import { useParams } from 'react-router-dom';
 import { store, useAppSelector } from '../../../State/Store';
 import { fetchProductById } from '../../../State/customer/ProductSlice';
 import { addItemToCart } from '../../../State/customer/CartSlice';
+import useRequireAuth from '../../../useRequireAuth';
 
 function ProductDetails() {
 
@@ -33,8 +34,9 @@ function ProductDetails() {
   console.log(product)
 
   const [activeImage,setActiveImage] = useState(0)
-
+  const requireauth = useRequireAuth()
   const addToCard = () => {
+    if (!requireauth()) return;
   const data = {
     productId: Number(productId),
     quantity,
