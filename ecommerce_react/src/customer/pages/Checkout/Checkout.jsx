@@ -36,7 +36,7 @@ function Checkout() {
   const [button, setButton] = useState(false);
   const [isChecked, setIsChecked] = useState(false)
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const paymentGatway = "RAZORPAY";
+ const [paymentGateway, setPaymentGateway] = useState("RAZORPAY");
   const dispatch = useAppDispatch();
   
   const { auth } = useAppSelector((store) => store)
@@ -59,7 +59,7 @@ function Checkout() {
       createOrder({
         address: selectedAddress,
         jwt: localStorage.getItem("jwt"),
-        paymentGateway: paymentGatway,
+        paymentGateway: paymentGateway,
       })
     ).unwrap();
 
@@ -126,22 +126,49 @@ function Checkout() {
                 Payment Gateway
               </h2>
 
-              <div className="">
+              <div className="space-y-4">
 
-                {/* Razorpay */}
-                <div className="flex items-center gap-2 md:gap-3 border-2 border-teal-500 rounded-lg p-3 sm:p-4 cursor-pointer bg-teal-50"
-                  onClick={() => setIsChecked(!isChecked)}>
-                  <Radio checked={true} />
-                  <img
-                    src="https://razorpay.com/assets/razorpay-logo.svg"
-                    alt="Razorpay"
-                    className="h-7 sm:h-8 w-18 md:w-full"
-                  />
-                </div>
+  {/* Razorpay */}
+  <div
+    className={`flex items-center gap-3 border-2 rounded-lg p-4 cursor-pointer ${
+      paymentGateway === "RAZORPAY"
+        ? "border-teal-500 bg-teal-50"
+        : "border-gray-300"
+    }`}
+    onClick={() => setPaymentGateway("RAZORPAY")}
+  >
+    <Radio checked={paymentGateway === "RAZORPAY"} />
 
+    <img
+      src="https://razorpay.com/assets/razorpay-logo.svg"
+      alt="Razorpay"
+      className="h-8"
+    />
+  </div>
 
+  {/* Cash On Delivery */}
+  <div
+    className={`flex items-center gap-3 border-2 rounded-lg p-4 cursor-pointer ${
+      paymentGateway === "COD"
+        ? "border-teal-500 bg-teal-50"
+        : "border-gray-300"
+    }`}
+    onClick={() => setPaymentGateway("COD")}
+  >
+    <Radio checked={paymentGateway === "COD"} />
 
-              </div>
+    <div>
+      <h3 className="font-semibold">
+        Cash On Delivery
+      </h3>
+
+      <p className="text-sm text-gray-500">
+        Pay when your order arrives
+      </p>
+    </div>
+  </div>
+
+</div>
             </div>
             <PricingCrd />
             <Button

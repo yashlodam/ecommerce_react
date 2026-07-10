@@ -68,7 +68,7 @@ function Navbar() {
   const navigate = useNavigate();
 
   const { cart } = useAppSelector((store) => store);
-  const { isLoggedIn, user } = useAppSelector((store) => store.auth);
+  const { isLoggedIn, user , role } = useAppSelector((store) => store.auth);
 
   console.log("user navbar",user);
   const { product } = useAppSelector((store) => store);
@@ -86,7 +86,7 @@ function Navbar() {
   const isSearching = product?.loading && query.trim().length > 1;
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && role == "ROLE_CUSTOMER") {
       const jwt = localStorage.getItem("jwt");
       dispatch(fetchUserProfile(jwt));
       dispatch(fetchUserCart(jwt));
@@ -332,7 +332,7 @@ function Navbar() {
 
             {isLarge && (
               <>
-                {isLoggedIn ? (
+                {isLoggedIn && role==="ROLE_CUSTOMER" ? (
                   <IconButton onClick={() => navigate("/account/orders")} aria-label="Account" sx={iconBtnSx}>
                     <Avatar sx={{ width: 30, height: 30, bgcolor: ACCENT, fontWeight: "bold", fontSize: 16 }}>
                       {user?.fullName?.charAt(0).toUpperCase()}
