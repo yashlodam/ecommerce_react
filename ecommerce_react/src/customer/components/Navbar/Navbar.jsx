@@ -70,7 +70,7 @@ function Navbar() {
   const { cart } = useAppSelector((store) => store);
   const { isLoggedIn, user, role } = useAppSelector((store) => store.auth);
 
-  console.log("user navbar", user);
+  
   const { product } = useAppSelector((store) => store);
 
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -79,6 +79,7 @@ function Navbar() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+
 
   const dispatch = useAppDispatch();
   const searchRef = useRef(null);
