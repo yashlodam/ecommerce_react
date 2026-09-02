@@ -9,7 +9,9 @@ export const fetchProductById = createAsyncThunk(
       const response = await api.get(`/products/${productId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to fetch product details"
+      );
     }
   }
 );
@@ -24,7 +26,9 @@ export const searchProduct = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to search products"
+      );
     }
   }
 );
@@ -42,7 +46,9 @@ export const fetchAllProducts = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to load marketplace catalog"
+      );
     }
   }
 );
@@ -63,7 +69,9 @@ export const fetchHomeProducts = createAsyncThunk(
         products: response.data?.content || (Array.isArray(response.data) ? response.data : []),
       };
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to fetch category products"
+      );
     }
   }
 );
@@ -73,6 +81,7 @@ const initialState = {
   product: null,
   products: [],
   totalPages: 1,
+  totalElements: 0,
   homeProducts: {
     men: [],
     women: [],
@@ -105,6 +114,7 @@ const productSlice = createSlice({
       .addCase(fetchProductById.fulfilled, (state, action) => {
         state.loading = false;
         state.product = action.payload;
+        state.error = null;
       })
       .addCase(fetchProductById.rejected, (state, action) => {
         state.loading = false;
@@ -119,8 +129,10 @@ const productSlice = createSlice({
       })
       .addCase(fetchAllProducts.fulfilled, (state, action) => {
         state.loading = false;
+        state.error = null;
         state.products = action.payload?.content || (Array.isArray(action.payload) ? action.payload : []);
         state.totalPages = action.payload?.totalPages ?? action.payload?.page?.totalPages ?? 1;
+        state.totalElements = action.payload?.totalElements ?? action.payload?.page?.totalElements ?? (Array.isArray(action.payload?.content) ? action.payload.content.length : (Array.isArray(action.payload) ? action.payload.length : 0));
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.loading = false;
@@ -135,6 +147,7 @@ const productSlice = createSlice({
       })
       .addCase(fetchHomeProducts.fulfilled, (state, action) => {
         state.loading = false;
+        state.error = null;
         const { category, products } = action.payload;
         state.homeProducts[category] = products;
       })
@@ -151,6 +164,7 @@ const productSlice = createSlice({
       })
       .addCase(searchProduct.fulfilled, (state, action) => {
         state.loading = false;
+        state.error = null;
         state.searchProducts = action.payload;
       })
       .addCase(searchProduct.rejected, (state, action) => {

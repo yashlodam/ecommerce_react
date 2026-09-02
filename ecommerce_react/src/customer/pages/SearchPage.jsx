@@ -1,226 +1,284 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  Box,
-  Grid,
-  Typography,
-  Paper,
-  Divider,
-  Chip,
-  CircularProgress,
-  Stack,
-} from "@mui/material";
-import TuneIcon from "@mui/icons-material/Tune";
-import SearchOffIcon from "@mui/icons-material/SearchOff";
-import { useLocation, useNavigate } from "react-router-dom";
-import { searchProduct } from "../../State/customer/ProductSlice";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
+import InputBase from "@mui/material/InputBase";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+
 import { useAppDispatch, useAppSelector } from "../../State/Store";
-import ProductCard from "./product/ProductCard";
-import { SkeletonGrid } from "../../common/SkeletonCard";
+import { fetchAllProducts, clearProductError } from "../../State/customer/ProductSlice";
+import ProductListingLayout from "./Listing/ProductListingLayout";
 
-const quickFilters = [
-  "All",
-  "Men",
-  "Women",
-  "Mobiles",
-  "Fashion",
-  "Electronics",
+const TRENDING_SEARCHES = [
+  "Nike",
   "Shoes",
-  "Watches",
-  "Beauty",
-];
-
-const quickSuggestions = [
-  "iPhone",
-  "Samsung",
-  "Smartphones",
+  "Smartwatch",
   "T-Shirts",
-  "Formal Shirts",
-  "Shoes",
   "Jeans",
-  "Watches",
+  "Headphones",
   "Kurtas",
-  "Dresses",
   "Beauty",
 ];
 
 function SearchPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { product } = useAppSelector((store) => store);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All");
+
+  // Parse search query, filters, sort, page from URL
+  const queryParam = searchParams.get("q") || "";
+  const priceParam = searchParams.get("price") || "";
+  const colorParam = searchParams.get("color") || "";
+  const brandParam = searchParams.get("brand") || "";
+  const discountParam = searchParams.get("discount") || "";
+  const stockParam = searchParams.get("stock") || "";
+  const sortParam = searchParams.get("sort") || "";
+  const pageParam = parseInt(searchParams.get("page") || "1", 10);
+
+  const [inputQuery, setInputQuery] = useState(queryParam);
+
+  // Sync internal input when URL query changes
+  useEffect(() => {
+    setInputQuery(queryParam);
+  }, [queryParam]);
+
+  const activeFilters = useMemo(
+    () => ({
+      price: priceParam,
+      color: colorParam,
+      brand: brandParam,
+      discount: discountParam,
+      stock: stockParam,
+    }),
+    [priceParam, colorParam, brandParam, discountParam, stockParam]
+  );
+
+  // Load products based on query & filters
+  const loadSearchProducts = useCallback(() => {
+    dispatch(clearProductError());
+
+    let minPrice = undefined;
+    let maxPrice = undefined;
+
+    if (priceParam) {
+      if (priceParam === "10000+") {
+        minPrice = 10000;
+      } else {
+        const [min, max] = priceParam.split("-");
+        minPrice = min ? Number(min) : undefined;
+        maxPrice = max ? Number(max) : undefined;
+      }
+    }
+
+    const filterRequest = {
+      query: queryParam ? queryParam.trim() : undefined,
+      colors: colorParam || undefined,
+      brand: brandParam || undefined,
+      minPrice,
+      maxPrice,
+      minDiscount: discountParam ? Number(discountParam) : undefined,
+      stock: stockParam || undefined,
+      sort: sortParam || undefined,
+      pageNumber: Math.max(0, pageParam - 1),
+    };
+
+    dispatch(fetchAllProducts(filterRequest));
+  }, [dispatch, queryParam, priceParam, colorParam, brandParam, discountParam, stockParam, sortParam, pageParam]);
 
   useEffect(() => {
-    const query = new URLSearchParams(location.search).get("q") || "";
-    setSearchQuery(query);
+    loadSearchProducts();
+  }, [loadSearchProducts]);
 
-    if (query.trim()) {
-      dispatch(searchProduct(query));
-    }
-  }, [dispatch, location.search]);
-
-  const handleSearch = (value = searchQuery) => {
-    const trimmed = value.trim();
-    const params = new URLSearchParams(location.search);
-
+  // Handler: Submit new search query
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    const trimmed = inputQuery.trim();
+    const nextParams = new URLSearchParams(searchParams);
     if (trimmed) {
-      params.set("q", trimmed);
+      nextParams.set("q", trimmed);
     } else {
-      params.delete("q");
+      nextParams.delete("q");
     }
-
-    navigate(`/search?${params.toString()}`);
-    dispatch(searchProduct(trimmed));
+    nextParams.set("page", "1");
+    setSearchParams(nextParams);
   };
 
-  const results = product?.searchProducts ?? [];
-  const isLoading = product?.loading && searchQuery.trim().length > 0;
-  const hasResults = results.length > 0;
+  // Handler: Update filter
+  const handleFilterChange = (name, value) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (value) {
+      nextParams.set(name, value);
+    } else {
+      nextParams.delete(name);
+    }
+    nextParams.set("page", "1");
+    setSearchParams(nextParams);
+  };
 
-  const resultsLabel = useMemo(() => {
-    if (isLoading) return "Searching for matches…";
-    return `${results.length} product${results.length === 1 ? "" : "s"} found`;
-  }, [isLoading, results.length]);
+  // Handler: Remove single filter
+  const handleRemoveFilter = (key) => {
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete(key);
+    nextParams.set("page", "1");
+    setSearchParams(nextParams);
+  };
 
-  return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 pb-12">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-teal-800 via-teal-700 to-emerald-800 py-10 px-4 text-center text-white">
-        <div className="max-w-3xl mx-auto space-y-2">
-          <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-teal-200">
-            ShopSphere Marketplace Search
-          </span>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
-            {searchQuery ? `Search Results for "${searchQuery}"` : "Discover Products Across All Stores"}
-          </h1>
-          <p className="text-xs sm:text-sm text-teal-100/90 max-w-xl mx-auto">
-            Browse verified marketplace inventory with live stock and multi-vendor fulfillment.
-          </p>
-        </div>
-      </div>
+  // Handler: Clear all filters
+  const handleClearAllFilters = () => {
+    const nextParams = new URLSearchParams();
+    if (queryParam) nextParams.set("q", queryParam);
+    if (sortParam) nextParams.set("sort", sortParam);
+    setSearchParams(nextParams);
+  };
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <Grid container spacing={3}>
-          {/* Sidebar */}
-          <Grid item xs={12} md={3}>
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-4 sticky top-24 transition-colors">
-              <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400">
-                <TuneIcon fontSize="small" />
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
-                  Refine Search
-                </h3>
-              </div>
+  // Handler: Sort
+  const handleSortChange = (newSort) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (newSort) {
+      nextParams.set("sort", newSort);
+    } else {
+      nextParams.delete("sort");
+    }
+    nextParams.set("page", "1");
+    setSearchParams(nextParams);
+  };
 
-              <Divider className="!border-slate-100 dark:!border-slate-800" />
+  // Handler: Page change
+  const handlePageChange = (newPage) => {
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.set("page", newPage.toString());
+    setSearchParams(nextParams);
+  };
 
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
-                  Category Filters
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {quickFilters.map((filter) => {
-                    const isActive = activeFilter === filter;
-                    return (
-                      <Chip
-                        key={filter}
-                        label={filter}
-                        variant={isActive ? "filled" : "outlined"}
-                        clickable
-                        size="small"
-                        onClick={() => {
-                          setActiveFilter(filter);
-                          if (filter === "All") {
-                            setSearchQuery("");
-                            handleSearch("");
-                            return;
-                          }
-                          setSearchQuery(filter);
-                          handleSearch(filter);
-                        }}
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: "12px",
-                          ...(isActive && {
-                            bgcolor: "primary.main",
-                            color: "primary.contrastText",
-                          }),
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
+  const breadcrumbs = [
+    { label: "Catalog", path: "/products/all" },
+    { label: "Search", path: "/search" },
+    ...(queryParam ? [{ label: `"${queryParam}"`, path: `/search?q=${queryParam}` }] : []),
+  ];
 
-              <Divider className="!border-slate-100 dark:!border-slate-800" />
+  const searchHeaderSlot = (
+    <div className="space-y-2 pt-1">
+      {/* Search Input Bar */}
+      <form
+        onSubmit={handleSearchSubmit}
+        className="flex items-center gap-2 max-w-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1 shadow-2xs focus-within:border-teal-500 focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:ring-2 focus-within:ring-teal-500/20 transition-all"
+      >
+        <SearchIcon sx={{ color: "text.secondary", fontSize: 18 }} />
+        <InputBase
+          value={inputQuery}
+          onChange={(e) => setInputQuery(e.target.value)}
+          placeholder="Search products, brands, or categories..."
+          className="flex-1 text-xs sm:text-sm text-slate-900 dark:text-slate-100"
+          sx={{ fontSize: "13px" }}
+        />
+        {inputQuery && (
+          <button
+            type="button"
+            onClick={() => {
+              setInputQuery("");
+              const nextParams = new URLSearchParams(searchParams);
+              nextParams.delete("q");
+              setSearchParams(nextParams);
+            }}
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-0.5"
+            aria-label="Clear search input"
+          >
+            <ClearIcon sx={{ fontSize: 15 }} />
+          </button>
+        )}
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          size="small"
+          sx={{
+            borderRadius: "9px",
+            textTransform: "none",
+            fontWeight: 700,
+            px: 2,
+            py: 0.4,
+            fontSize: "12px",
+          }}
+        >
+          Search
+        </Button>
+      </form>
 
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
-                  Trending Keywords
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {quickSuggestions.map((suggestion) => (
-                    <Chip
-                      key={suggestion}
-                      label={suggestion}
-                      variant="outlined"
-                      clickable
-                      size="small"
-                      onClick={() => {
-                        setSearchQuery(suggestion);
-                        handleSearch(suggestion);
-                      }}
-                      sx={{
-                        fontWeight: 500,
-                        fontSize: "12px",
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </Grid>
-
-          {/* Results Grid */}
-          <Grid item xs={12} md={9}>
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-sm transition-colors space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">
-                    {searchQuery ? `Products matching "${searchQuery}"` : "Catalog Products"}
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    {resultsLabel}
-                  </p>
-                </div>
-              </div>
-
-              {isLoading ? (
-                <SkeletonGrid count={6} />
-              ) : !hasResults ? (
-                <div className="py-16 text-center space-y-3">
-                  <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400 dark:text-slate-500">
-                    <SearchOffIcon sx={{ fontSize: 28 }} />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                    No matching products found
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                    Try checking your spelling or selecting one of the suggested keywords from the filter sidebar.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                  {results.map((item) => (
-                    <ProductCard key={item.id} item={item} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </Grid>
-        </Grid>
+      {/* Quick Category Chips & Trending Queries */}
+      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-0.5">
+          <TrendingUpIcon sx={{ fontSize: 13 }} />
+          Trending:
+        </span>
+        {TRENDING_SEARCHES.map((term) => (
+          <Chip
+            key={term}
+            label={term}
+            clickable
+            size="small"
+            variant="outlined"
+            onClick={() => {
+              setInputQuery(term);
+              const nextParams = new URLSearchParams(searchParams);
+              nextParams.set("q", term);
+              nextParams.set("page", "1");
+              setSearchParams(nextParams);
+            }}
+            sx={{
+              fontSize: "11px",
+              fontWeight: 500,
+              height: "22px",
+              bgcolor: "background.paper",
+              "&:hover": {
+                bgcolor: "primary.lighter",
+                borderColor: "primary.main",
+                color: "primary.main",
+              },
+            }}
+          />
+        ))}
       </div>
     </div>
+  );
+
+  return (
+    <ProductListingLayout
+      title={
+        queryParam ? (
+          <span>
+            Results for <span className="text-teal-600 dark:text-teal-400">"{queryParam}"</span>
+          </span>
+        ) : (
+          "Marketplace Product Search"
+        )
+      }
+      subtitle={
+        queryParam
+          ? "Verified inventory matching your search keyword and filter criteria."
+          : "Discover thousands of authentic items from verified sellers across India."
+      }
+      badge="Search Results"
+      breadcrumbs={breadcrumbs}
+      searchQuery={queryParam}
+      products={product.products || []}
+      totalElements={product.totalElements || product.products?.length || 0}
+      totalPages={product.totalPages || 1}
+      currentPage={pageParam}
+      loading={product.loading}
+      error={product.error}
+      filters={activeFilters}
+      sort={sortParam}
+      onFilterChange={handleFilterChange}
+      onRemoveFilter={handleRemoveFilter}
+      onClearAllFilters={handleClearAllFilters}
+      onSortChange={handleSortChange}
+      onPageChange={handlePageChange}
+      onRetry={loadSearchProducts}
+      isSearchPage
+      headerSlot={searchHeaderSlot}
+    />
   );
 }
 

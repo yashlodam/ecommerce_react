@@ -2,29 +2,32 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
-  Box,
   Button,
   CircularProgress,
   IconButton,
   InputAdornment,
   TextField,
-  Typography,
   LinearProgress,
 } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Collapse from "@mui/material/Collapse";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import PasswordOutlinedIcon from "@mui/icons-material/PasswordOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import LoginRoundedIcon from "@mui/icons-material/LoginRounded";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { sendLoginSignupOtp, signin } from "../../../State/AuthSlice";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircle";
+
+import { sendLoginSignupOtp, signin, fetchUserProfile } from "../../../State/AuthSlice";
+import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
+import { fetchUserCart } from "../../../State/customer/CartSlice";
 import { useAppDispatch } from "../../../State/Store";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const OTP_EXPIRY_SECONDS = 600; // 10 min
+const OTP_EXPIRY_SECONDS = 600; // 10 minutes
 
 function LoginForm() {
   const dispatch = useAppDispatch();
@@ -66,23 +69,23 @@ function LoginForm() {
     return `${m}:${s}`;
   };
 
-  const timerColor = countdown > 120 ? "success" : countdown > 30 ? "warning" : "error";
+  const timerColor = countdown > 120 ? "primary" : countdown > 30 ? "warning" : "error";
 
   const formik = useFormik({
     initialValues: { email: "", otp: "" },
     validationSchema: Yup.object({
       email: Yup.string()
-        .email("Enter a valid email")
-        .required("Email is required"),
+        .email("Enter a valid email address")
+        .required("Email address is required"),
       otp: otpSent
         ? Yup.string()
             .length(6, "OTP must be 6 digits")
-            .required("OTP is required")
+            .required("6-digit OTP is required")
         : Yup.string(),
     }),
     onSubmit: async (values) => {
       if (otpExpired) {
-        setErrorMessage("Your OTP has expired. Please request a new one.");
+        setErrorMessage("Your OTP has expired. Please request a fresh one.");
         return;
       }
       setLoginLoading(true);
@@ -93,19 +96,24 @@ function LoginForm() {
           signin({ email: values.email.trim(), otp: values.otp.trim() })
         ).unwrap();
 
-        setSuccessMessage("Login successful!");
+        setSuccessMessage("Login successful! Redirecting...");
         const from = location.state?.from?.pathname;
 
+        // Fetch user profile immediately so navbar and protected routes update instantly
         if (response.role === "ROLE_ADMIN") {
-          navigate(from || "/admin");
+          await dispatch(fetchUserProfile());
+          navigate(from || "/admin", { replace: true });
         } else if (response.role === "ROLE_SELLER") {
-          navigate(from || "/seller");
+          await dispatch(fetchSellerProfile());
+          navigate(from || "/seller", { replace: true });
         } else {
-          navigate(from || "/");
+          await dispatch(fetchUserProfile());
+          await dispatch(fetchUserCart());
+          navigate(from || "/", { replace: true });
         }
       } catch (error) {
         setErrorMessage(
-          typeof error === "string" ? error : "Invalid OTP. Please try again."
+          typeof error === "string" ? error : "Invalid OTP code. Please try again."
         );
       } finally {
         setLoginLoading(false);
@@ -124,12 +132,12 @@ function LoginForm() {
     try {
       await dispatch(sendLoginSignupOtp(formik.values.email.trim())).unwrap();
       setOtpSent(true);
-      setSuccessMessage("OTP sent to your email. Valid for 10 minutes.");
+      setSuccessMessage("OTP code sent to your email! Valid for 10 minutes.");
       formik.setFieldValue("otp", "");
       setTimeout(() => setSuccessMessage(""), 5000);
     } catch (error) {
       setErrorMessage(
-        typeof error === "string" ? error : "Failed to send OTP. Try again."
+        typeof error === "string" ? error : "Failed to send OTP code. Please try again."
       );
     } finally {
       setLoading(false);
@@ -137,34 +145,55 @@ function LoginForm() {
   };
 
   return (
-    <div>
-      <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-          Welcome Back
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="text-center space-y-1">
+        <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+          {otpSent ? "Verify Security Code" : "Welcome Back"}
         </h2>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Sign in via secure OTP to continue shopping
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          {otpSent ? (
+            <span>
+              Code sent to <strong className="text-slate-800 dark:text-slate-200">{formik.values.email}</strong>
+            </span>
+          ) : (
+            "Sign in with secure one-time password to continue"
+          )}
         </p>
       </div>
 
+      {/* Feedback Alerts */}
       <Collapse in={Boolean(successMessage)}>
-        <Alert severity="success" className="mb-4 rounded-xl text-xs font-semibold">
+        <Alert
+          severity="success"
+          icon={<CheckCircleOutlineIcon fontSize="inherit" />}
+          className="rounded-2xl text-xs font-semibold"
+          sx={{ py: 0.5 }}
+        >
           {successMessage}
         </Alert>
       </Collapse>
 
       <Collapse in={Boolean(errorMessage)}>
-        <Alert severity="error" className="mb-4 rounded-xl text-xs font-semibold">
+        <Alert
+          severity="error"
+          className="rounded-2xl text-xs font-semibold"
+          sx={{ py: 0.5 }}
+        >
           {errorMessage}
         </Alert>
       </Collapse>
 
-      <form onSubmit={formik.handleSubmit}>
-        <div className="space-y-4">
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
+        {/* Email Field */}
+        <div>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+            Email Address
+          </label>
           <TextField
             fullWidth
+            size="medium"
             name="email"
-            label="Email Address"
             placeholder="name@example.com"
             value={formik.values.email}
             onChange={formik.handleChange}
@@ -175,139 +204,183 @@ function LoginForm() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <EmailOutlinedIcon color={otpSent ? "disabled" : "primary"} />
+                  <EmailOutlinedIcon sx={{ fontSize: 19, color: "text.secondary" }} />
                 </InputAdornment>
               ),
             }}
-          />
-
-          {!otpSent ? (
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              onClick={handleSendOtp}
-              disabled={loading}
-              startIcon={
-                loading ? (
-                  <CircularProgress color="inherit" size={18} />
-                ) : (
-                  <SendRoundedIcon />
-                )
-              }
-              sx={{
-                py: 1.5,
+            sx={{
+              "& .MuiOutlinedInput-root": {
                 borderRadius: "14px",
-                fontWeight: 700,
-                textTransform: "none",
-                fontSize: "15px",
-              }}
-            >
-              {loading ? "Sending OTP..." : "Send Login OTP"}
-            </Button>
-          ) : (
-            <div className="space-y-3">
+                fontSize: "14px",
+                bgcolor: "background.paper",
+              },
+            }}
+          />
+        </div>
+
+        {/* Action: Send OTP vs Verify OTP */}
+        {!otpSent ? (
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={handleSendOtp}
+            disabled={loading}
+            startIcon={
+              loading ? (
+                <CircularProgress color="inherit" size={16} />
+              ) : (
+                <SendRoundedIcon sx={{ fontSize: 17 }} />
+              )
+            }
+            sx={{
+              py: 1.3,
+              borderRadius: "14px",
+              fontWeight: 700,
+              textTransform: "none",
+              fontSize: "14px",
+              boxShadow: "0 4px 14px rgba(0, 146, 124, 0.3)",
+            }}
+          >
+            {loading ? "Sending Security Code..." : "Send Login OTP"}
+          </Button>
+        ) : (
+          <div className="space-y-4 pt-1">
+            {/* OTP Input */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  6-Digit OTP Code
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOtpSent(false);
+                    formik.setFieldValue("otp", "");
+                  }}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+                >
+                  <ArrowBackIcon sx={{ fontSize: 13 }} />
+                  Change Email
+                </button>
+              </div>
+
               <TextField
                 fullWidth
+                size="medium"
                 name="otp"
-                label="Enter 6-Digit OTP"
-                placeholder="000000"
+                placeholder="••••••"
                 type={showOtp ? "text" : "password"}
                 value={formik.values.otp}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 disabled={loginLoading || otpExpired}
-                error={
-                  (formik.touched.otp && Boolean(formik.errors.otp)) ||
-                  otpExpired
-                }
+                error={(formik.touched.otp && Boolean(formik.errors.otp)) || otpExpired}
                 helperText={
                   otpExpired
-                    ? "OTP expired — please request a new one"
+                    ? "Code expired — please click resend below"
                     : formik.touched.otp && formik.errors.otp
                 }
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <PasswordOutlinedIcon color={otpExpired ? "error" : "primary"} />
+                      <LockOutlinedIcon sx={{ fontSize: 19, color: "text.secondary" }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowOtp(!showOtp)} edge="end">
-                        {showOtp ? <VisibilityOff /> : <Visibility />}
+                      <IconButton
+                        size="small"
+                        onClick={() => setShowOtp(!showOtp)}
+                        edge="end"
+                        aria-label={showOtp ? "Hide OTP" : "Show OTP"}
+                      >
+                        {showOtp ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "14px",
+                    fontSize: "16px",
+                    letterSpacing: "0.2em",
+                    bgcolor: "background.paper",
+                  },
+                }}
               />
+            </div>
 
-              {/* Countdown timer */}
-              {!otpExpired && (
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-slate-500 dark:text-slate-400">OTP Expires In</span>
-                    <span className="font-bold text-teal-600 dark:text-teal-400">
-                      {formatTime(countdown)}
-                    </span>
-                  </div>
-                  <LinearProgress
-                    variant="determinate"
-                    value={(countdown / OTP_EXPIRY_SECONDS) * 100}
-                    color={timerColor}
-                    sx={{ borderRadius: 4, height: 4 }}
-                  />
+            {/* Countdown timer */}
+            {!otpExpired && (
+              <div className="space-y-1.5 px-0.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-500 dark:text-slate-400">Code Expires In</span>
+                  <span className="font-extrabold text-teal-600 dark:text-teal-400">
+                    {formatTime(countdown)}
+                  </span>
                 </div>
-              )}
+                <LinearProgress
+                  variant="determinate"
+                  value={(countdown / OTP_EXPIRY_SECONDS) * 100}
+                  color={timerColor}
+                  sx={{ borderRadius: 4, height: 4 }}
+                />
+              </div>
+            )}
 
+            {/* Verify Button */}
+            <Button
+              fullWidth
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loginLoading || otpExpired}
+              startIcon={
+                loginLoading ? (
+                  <CircularProgress color="inherit" size={16} />
+                ) : (
+                  <LoginRoundedIcon sx={{ fontSize: 17 }} />
+                )
+              }
+              sx={{
+                py: 1.3,
+                borderRadius: "14px",
+                fontWeight: 700,
+                textTransform: "none",
+                fontSize: "14px",
+                boxShadow: "0 4px 14px rgba(0, 146, 124, 0.3)",
+              }}
+            >
+              {loginLoading ? "Verifying Credentials..." : "Verify & Sign In"}
+            </Button>
+
+            {/* Resend Action */}
+            <div className="text-center pt-0.5">
               <Button
-                fullWidth
-                type="submit"
-                variant="contained"
-                color="primary"
-                disabled={loginLoading || otpExpired}
+                variant="text"
+                size="small"
+                disabled={loading || loginLoading}
+                onClick={handleSendOtp}
                 startIcon={
-                  loginLoading ? (
-                    <CircularProgress color="inherit" size={18} />
+                  loading ? (
+                    <CircularProgress size={13} />
                   ) : (
-                    <LoginRoundedIcon />
+                    <RefreshIcon sx={{ fontSize: 15 }} />
                   )
                 }
                 sx={{
-                  py: 1.5,
-                  borderRadius: "14px",
-                  fontWeight: 700,
                   textTransform: "none",
-                  fontSize: "15px",
+                  fontWeight: 700,
+                  fontSize: "12px",
+                  color: "primary.main",
                 }}
               >
-                {loginLoading ? "Verifying..." : "Verify & Sign In"}
+                {otpExpired ? "Request New Code" : "Resend Code"}
               </Button>
-
-              <div className="text-center pt-1">
-                <Button
-                  variant="text"
-                  disabled={loading || loginLoading}
-                  onClick={handleSendOtp}
-                  startIcon={
-                    loading ? (
-                      <CircularProgress size={14} />
-                    ) : (
-                      <RefreshIcon fontSize="small" />
-                    )
-                  }
-                  sx={{
-                    textTransform: "none",
-                    fontWeight: 600,
-                    fontSize: "13px",
-                  }}
-                >
-                  {otpExpired ? "Request New OTP" : "Resend OTP"}
-                </Button>
-              </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </form>
     </div>
   );

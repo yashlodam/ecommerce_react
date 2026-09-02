@@ -1,88 +1,85 @@
-import TextField from '@mui/material/TextField';
-import React from 'react';
-import Box from '@mui/material/Box';
+import React from "react";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 
 function BecomeSellerFormStep1({ formik }) {
   return (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: "750px",
-        mx: "auto",
-        mt: { xs: 2, md: 4 },
-        p: { xs: 3, sm: 4, md: 5 },
-        backgroundColor: "#fff",
-        borderRadius: "20px",
-        boxShadow: "0 10px 35px rgba(0,0,0,0.08)",
-        border: "1px solid #f1f5f9",
-      }}
-    >
-      {/* Header */}
-      <div className="text-center mb-10">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+    <div className="space-y-4">
+      <div className="text-center space-y-1 mb-6">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
           Contact Details
-        </h2>
-
-        <p className="text-sm md:text-base text-gray-500 mt-3">
-          Provide your mobile number and GST details to continue
+        </h3>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          Provide your primary mobile number and registered GSTIN details
         </p>
       </div>
 
-      {/* Form Fields */}
-      <div className="flex flex-col gap-6 md:gap-8">
-        <TextField
-          fullWidth
-          name="mobile"
-          label="Mobile Number"
-          variant="outlined"
-          value={formik.values.mobile}
-          onChange={formik.handleChange}
-          error={formik.touched.mobile && Boolean(formik.errors.mobile)}
-          helperText={formik.touched.mobile && formik.errors.mobile}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "14px",
-              backgroundColor: "#fafafa",
-              transition: "all .3s ease",
-
-              "&:hover": {
-                backgroundColor: "#fff",
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+            Mobile Number
+          </label>
+          <TextField
+            fullWidth
+            size="medium"
+            name="mobile"
+            placeholder="10-digit mobile number"
+            value={formik.values.mobile}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.mobile && Boolean(formik.errors.mobile)}
+            helperText={formik.touched.mobile && formik.errors.mobile}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PhoneOutlinedIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "14px",
+                fontSize: "14px",
+                bgcolor: "background.paper",
               },
+            }}
+          />
+        </div>
 
-              "&.Mui-focused": {
-                backgroundColor: "#fff",
+        <div>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+            GSTIN Number
+          </label>
+          <TextField
+            fullWidth
+            size="medium"
+            name="gstin"
+            placeholder="15-character GSTIN (e.g. 27ABCDE1234F1Z5)"
+            value={formik.values.gstin}
+            onChange={(e) => formik.setFieldValue("gstin", e.target.value.toUpperCase())}
+            onBlur={formik.handleBlur}
+            error={formik.touched.gstin && Boolean(formik.errors.gstin)}
+            helperText={formik.touched.gstin && formik.errors.gstin}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <ReceiptLongOutlinedIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "14px",
+                fontSize: "14px",
+                bgcolor: "background.paper",
               },
-            },
-          }}
-        />
-
-        <TextField
-          fullWidth
-          name="gstin"
-          label="GSTIN Number"
-          variant="outlined"
-          value={formik.values.gstin}
-          onChange={formik.handleChange}
-          error={formik.touched.gstin && Boolean(formik.errors.gstin)}
-          helperText={formik.touched.gstin && formik.errors.gstin}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "14px",
-              backgroundColor: "#fafafa",
-              transition: "all .3s ease",
-
-              "&:hover": {
-                backgroundColor: "#fff",
-              },
-
-              "&.Mui-focused": {
-                backgroundColor: "#fff",
-              },
-            },
-          }}
-        />
+            }}
+          />
+        </div>
       </div>
-    </Box>
+    </div>
   );
 }
 

@@ -1,32 +1,32 @@
-import Button from '@mui/material/Button';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import Stepper from '@mui/material/Stepper';
-import React, { useState } from 'react'
-import BecomeSellerFormStep1 from './BecomeSellerFormStep1';
+import React, { useState } from "react";
+import Button from "@mui/material/Button";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import Stepper from "@mui/material/Stepper";
+import CircularProgress from "@mui/material/CircularProgress";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useFormik } from "formik";
-import BecomeSellerFormStep2 from './BecomeSellerFormStep2';
-import BecomeSellerFormStep3 from './BecomeSellerFormStep3';
-import BecomeSellerFormStep4 from './BecomeSellerFormStep4';
-import { validationSchemas } from './validationSchemas';
 
-import { useAppDispatch } from '../../../State/Store'
-import { createSellers } from '../../../State/seller/sellerSlice';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-
+import BecomeSellerFormStep1 from "./BecomeSellerFormStep1";
+import BecomeSellerFormStep2 from "./BecomeSellerFormStep2";
+import BecomeSellerFormStep3 from "./BecomeSellerFormStep3";
+import BecomeSellerFormStep4 from "./BecomeSellerFormStep4";
+import { validationSchemas } from "./validationSchemas";
+import { useAppDispatch } from "../../../State/Store";
+import { createSellers } from "../../../State/seller/sellerSlice";
 
 const steps = [
-  "Tax Details & Mobile",
-  "Pickup Address",
+  "Tax & Mobile",
+  "Pickup Location",
   "Bank Details",
-  "Supplier Details"
-
-]
-
+  "Store & Login",
+];
 
 function SellerAccountForm({ onRegisterSuccess }) {
   const [activeStep, setActiveStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
   const dispatch = useAppDispatch();
 
   const formik = useFormik({
@@ -61,18 +61,11 @@ function SellerAccountForm({ onRegisterSuccess }) {
       password: "",
     },
     validationSchema: validationSchemas[activeStep],
-    onSubmit: async (values) => {
-      
-    }
+    onSubmit: async () => {},
   });
-  const handleCloseSnackbar = () => {
-  setOpenSnackbar(false);
-};
 
-
-  const handleStep = (value) => async () => {
-
-    if (value === -1) {
+  const handleStep = (direction) => async () => {
+    if (direction === -1) {
       if (activeStep > 0) {
         setActiveStep((prev) => prev - 1);
       }
@@ -112,71 +105,129 @@ function SellerAccountForm({ onRegisterSuccess }) {
           businessAddress: true,
         },
       });
-
-      console.log(errors);
       return;
     }
 
-    // Last step -> Call API
-    // Last step -> Call API
-if (activeStep === steps.length - 1) {
- try {
-  const resultAction = await dispatch(createSellers(formik.values));
-
-  if (createSellers.fulfilled.match(resultAction)) {
-    onRegisterSuccess();
-  } else {
-    alert(
-      resultAction.payload?.message ||
-      "Unable to create seller account."
-    );
-  }
-} catch (error) {
-  alert("Something went wrong.");
-}
-
-return;
-}
+    // Last step -> Submit to backend
+    if (activeStep === steps.length - 1) {
+      setSubmitting(true);
+      try {
+        const resultAction = await dispatch(createSellers(formik.values));
+        if (createSellers.fulfilled.match(resultAction)) {
+          onRegisterSuccess();
+        } else {
+          alert(
+            resultAction.payload?.message ||
+              "Unable to complete seller registration. Please verify details."
+          );
+        }
+      } catch {
+        alert("Something went wrong during registration. Please try again.");
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
 
     // Move to next step
     setActiveStep((prev) => prev + 1);
   };
 
-//working on sellerAccount
-
   return (
-    <div>
-      <Stepper activeStep={activeStep} alternativeLabel>
-        {
-          steps.map((label, index) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))
-        }
+    <div className="space-y-6">
+      {/* Horizontal Stepper */}
+      <Stepper
+        activeStep={activeStep}
+        alternativeLabel
+        sx={{
+          "& .MuiStepLabel-label": {
+            fontSize: "11px",
+            fontWeight: 600,
+            mt: 0.5,
+          },
+          "& .MuiStepLabel-label.Mui-active": {
+            color: "#00927c",
+            fontWeight: 700,
+          },
+          "& .MuiStepLabel-label.Mui-completed": {
+            color: "#00927c",
+          },
+          "& .MuiStepIcon-root.Mui-active": {
+            color: "#00927c",
+          },
+          "& .MuiStepIcon-root.Mui-completed": {
+            color: "#00927c",
+          },
+        }}
+      >
+        {steps.map((label) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
       </Stepper>
-      <section className='mt-20 space-y-10'>
-        <div>
-          {activeStep == 0 ? <BecomeSellerFormStep1 formik={formik} /> : activeStep == 1 ? <BecomeSellerFormStep2 formik={formik} /> :
-            activeStep == 2 ? <BecomeSellerFormStep3 formik={formik} /> :
-              activeStep == 3 ? <BecomeSellerFormStep4 formik={formik} /> : ""
-          }
-        </div>
-        <div className='flex items-center justify-between'>
-          <Button onClick={handleStep(-1)} variant='contained' disabled={activeStep == 0}>
-            Back
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleStep(1)}
-          >
-            {activeStep === steps.length - 1 ? "Create Account" : "Continue"}
-          </Button>
-        </div>
-      </section>
 
+      {/* Step Form Body */}
+      <div className="pt-2 min-h-[280px]">
+        {activeStep === 0 && <BecomeSellerFormStep1 formik={formik} />}
+        {activeStep === 1 && <BecomeSellerFormStep2 formik={formik} />}
+        {activeStep === 2 && <BecomeSellerFormStep3 formik={formik} />}
+        {activeStep === 3 && <BecomeSellerFormStep4 formik={formik} />}
+      </div>
+
+      {/* Step Actions Toolbar */}
+      <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <Button
+          onClick={handleStep(-1)}
+          variant="outlined"
+          color="inherit"
+          disabled={activeStep === 0 || submitting}
+          startIcon={<ArrowBackIcon sx={{ fontSize: 16 }} />}
+          sx={{
+            borderRadius: "12px",
+            textTransform: "none",
+            fontWeight: 600,
+            fontSize: "13px",
+            px: 2.5,
+            py: 0.9,
+          }}
+        >
+          Back
+        </Button>
+
+        <Button
+          variant="contained"
+          color="primary"
+          disabled={submitting}
+          onClick={handleStep(1)}
+          endIcon={
+            submitting ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : activeStep === steps.length - 1 ? (
+              <CheckCircleIcon sx={{ fontSize: 17 }} />
+            ) : (
+              <ArrowForwardIcon sx={{ fontSize: 16 }} />
+            )
+          }
+          sx={{
+            borderRadius: "12px",
+            textTransform: "none",
+            fontWeight: 700,
+            fontSize: "13px",
+            px: 3,
+            py: 0.9,
+            boxShadow: "0 4px 14px rgba(0, 146, 124, 0.3)",
+          }}
+        >
+          {submitting
+            ? "Creating Account..."
+            : activeStep === steps.length - 1
+            ? "Complete Registration"
+            : "Continue"}
+        </Button>
+      </div>
     </div>
-  )
+  );
 }
 
-export default SellerAccountForm
+export default SellerAccountForm;

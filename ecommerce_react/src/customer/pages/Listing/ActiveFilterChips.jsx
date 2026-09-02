@@ -2,7 +2,7 @@ import React from "react";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 export default function ActiveFilterChips({
   filters = {},
@@ -93,7 +93,7 @@ export default function ActiveFilterChips({
         <Button
           size="small"
           onClick={onClearAll}
-          startIcon={<DeleteOutlineIcon fontSize="small" />}
+          startIcon={<RestartAltIcon fontSize="small" />}
           sx={{
             textTransform: "none",
             fontSize: "12px",

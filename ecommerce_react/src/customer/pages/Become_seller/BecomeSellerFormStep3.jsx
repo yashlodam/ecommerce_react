@@ -1,122 +1,135 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
+import InputAdornment from "@mui/material/InputAdornment";
+import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlined";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 
 function BecomeSellerFormStep3({ formik }) {
-  const fieldStyle = {
-    "& .MuiOutlinedInput-root": {
-      borderRadius: "16px",
-      backgroundColor: "#fafafa",
-      transition: "all .3s ease",
-
-      "& fieldset": {
-        borderColor: "#e5e7eb",
-      },
-
-      "&:hover fieldset": {
-        borderColor: "#14b8a6",
-      },
-
-      "&.Mui-focused fieldset": {
-        borderWidth: "2px",
-        borderColor: "#14b8a6",
-      },
-    },
-
-    "& .MuiInputLabel-root.Mui-focused": {
-      color: "#14b8a6",
-    },
-  };
-
   return (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: "800px",
-        mx: "auto",
-        mt: { xs: 1, md: 3 },
-        p: { xs: 3, sm: 4, md: 5 },
-        backgroundColor: "#fff",
-        borderRadius: "24px",
-        border: "1px solid #f1f5f9",
-        boxShadow: `
-          0px 4px 6px rgba(0,0,0,0.04),
-          0px 10px 20px rgba(0,0,0,0.06)
-        `,
-      }}
-    >
-      {/* Header */}
-      <div className="text-center mb-10">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-teal-50 flex items-center justify-center">
-          <span className="text-2xl">🏦</span>
-        </div>
-
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
-          Bank Details
-        </h2>
-
-        <p className="text-gray-500 text-sm md:text-base mt-3 max-w-md mx-auto">
-          Enter your bank account information to receive payments from orders.
+    <div className="space-y-4">
+      <div className="text-center space-y-1 mb-6">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+          Bank Account Details
+        </h3>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          Enter your settlement bank account to receive automated payouts from completed orders
         </p>
       </div>
 
-      {/* Form Fields */}
-      <div className="flex flex-col gap-6">
-        <TextField
-          fullWidth
-          name="bankDetails.accountNumber"
-          label="Account Number"
-          value={formik.values.bankDetails.accountNumber}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={
-            formik.touched.bankDetails?.accountNumber &&
-            Boolean(formik.errors.bankDetails?.accountNumber)
-          }
-          helperText={
-            formik.touched.bankDetails?.accountNumber &&
-            formik.errors.bankDetails?.accountNumber
-          }
-          sx={fieldStyle}
-        />
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+            Account Number
+          </label>
+          <TextField
+            fullWidth
+            size="medium"
+            name="bankDetails.accountNumber"
+            placeholder="e.g. 123456789012"
+            value={formik.values.bankDetails.accountNumber}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.bankDetails?.accountNumber &&
+              Boolean(formik.errors.bankDetails?.accountNumber)
+            }
+            helperText={
+              formik.touched.bankDetails?.accountNumber &&
+              formik.errors.bankDetails?.accountNumber
+            }
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountBalanceOutlinedIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "14px",
+                fontSize: "14px",
+                bgcolor: "background.paper",
+              },
+            }}
+          />
+        </div>
 
-        <TextField
-          fullWidth
-          name="bankDetails.ifscCode"
-          label="IFSC Code"
-          value={formik.values.bankDetails.ifscCode}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={
-            formik.touched.bankDetails?.ifscCode &&
-            Boolean(formik.errors.bankDetails?.ifscCode)
-          }
-          helperText={
-            formik.touched.bankDetails?.ifscCode &&
-            formik.errors.bankDetails?.ifscCode
-          }
-          sx={fieldStyle}
-        />
+        <div>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+            IFSC Code
+          </label>
+          <TextField
+            fullWidth
+            size="medium"
+            name="bankDetails.ifscCode"
+            placeholder="11-character IFSC (e.g. HDFC0001234)"
+            value={formik.values.bankDetails.ifscCode}
+            onChange={(e) => formik.setFieldValue("bankDetails.ifscCode", e.target.value.toUpperCase())}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.bankDetails?.ifscCode &&
+              Boolean(formik.errors.bankDetails?.ifscCode)
+            }
+            helperText={
+              formik.touched.bankDetails?.ifscCode &&
+              formik.errors.bankDetails?.ifscCode
+            }
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <BadgeOutlinedIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "14px",
+                fontSize: "14px",
+                bgcolor: "background.paper",
+              },
+            }}
+          />
+        </div>
 
-        <TextField
-          fullWidth
-          name="bankDetails.accountHoldername"
-          label="Account Holder Name"
-          value={formik.values.bankDetails.accountHoldername}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={
-            formik.touched.bankDetails?.accountHoldername &&
-            Boolean(formik.errors.bankDetails?.accountHoldername)
-          }
-          helperText={
-            formik.touched.bankDetails?.accountHoldername &&
-            formik.errors.bankDetails?.accountHoldername
-          }
-          sx={fieldStyle}
-        />
+        <div>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+            Account Holder Name
+          </label>
+          <TextField
+            fullWidth
+            size="medium"
+            name="bankDetails.accountHoldername"
+            placeholder="Name as registered with bank"
+            value={formik.values.bankDetails.accountHoldername}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.bankDetails?.accountHoldername &&
+              Boolean(formik.errors.bankDetails?.accountHoldername)
+            }
+            helperText={
+              formik.touched.bankDetails?.accountHoldername &&
+              formik.errors.bankDetails?.accountHoldername
+            }
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonOutlineOutlinedIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "14px",
+                fontSize: "14px",
+                bgcolor: "background.paper",
+              },
+            }}
+          />
+        </div>
       </div>
-    </Box>
+    </div>
   );
 }
 

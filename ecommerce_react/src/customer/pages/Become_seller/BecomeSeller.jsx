@@ -4,9 +4,6 @@ import SellerLoginForm from "./SellerLoginForm";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import StorefrontIcon from "@mui/icons-material/Storefront";
-import SupportAgentIcon from "@mui/icons-material/SupportAgent";
-import ShieldCheckIcon from "@mui/icons-material/GppGoodOutlined";
 
 function BecomeSeller() {
   const [isLogin, setIsLogin] = useState(false);
@@ -67,9 +64,9 @@ function BecomeSeller() {
             </div>
           </section>
 
-          {/* Right / Value Proposition Section */}
-          <section className="lg:col-span-7 order-1 lg:order-2 space-y-8">
-            <div className="space-y-4">
+          {/* Right / Value Proposition & Illustration Section */}
+          <section className="lg:col-span-7 order-1 lg:order-2 space-y-6">
+            <div className="space-y-3">
               <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-800">
                 Seller Partner Program
               </span>
@@ -78,7 +75,7 @@ function BecomeSeller() {
                 <span className="text-teal-600 dark:text-teal-400">ShopSphere</span>
               </h1>
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
-                Connect directly with thousands of verified shoppers nationwide. Manage listings, track fulfillment, and receive automated settlement payouts with zero setup fees.
+                Reach thousands of customers, grow your business, and manage everything from a single seller dashboard.
               </p>
             </div>
 
@@ -86,7 +83,7 @@ function BecomeSeller() {
             <div className="grid grid-cols-3 gap-3 sm:gap-4">
               <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-teal-600 dark:text-teal-400">
-                  10.4K+
+                  10K+
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">
                   Active Buyers
@@ -98,56 +95,27 @@ function BecomeSeller() {
                   24/7
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">
-                  Partner Support
+                  Seller Support
                 </p>
               </div>
 
               <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-teal-600 dark:text-teal-400">
-                  100%
+                  99%
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">
-                  Direct Payouts
+                  Secure Payments
                 </p>
               </div>
             </div>
 
-            {/* Feature Highlights */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-              <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-slate-100">
-                Why Top Indian Vendors Choose ShopSphere
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
-                    <StorefrontIcon sx={{ fontSize: 18 }} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">Dedicated Storefront & Brand Identity</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Your store logo, policies, and branded listings showcased to high-intent shoppers.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
-                    <ShieldCheckIcon sx={{ fontSize: 18 }} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">Automated Razorpay & Bank Settlement</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Funds settled directly to your registered bank IFSC account upon delivery confirmation.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-                    <SupportAgentIcon sx={{ fontSize: 18 }} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">Priority Merchant Helpdesk</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">24-hour SLA ticket resolution for shipping logistics and inventory management.</p>
-                  </div>
-                </div>
-              </div>
+            {/* Restored Hero Illustration Image */}
+            <div className="flex justify-center pt-2">
+              <img
+                src="/images/becomeSeller.png"
+                alt="Scale Your Business with ShopSphere"
+                className="w-full max-w-lg lg:max-w-xl mx-auto drop-shadow-2xl object-contain hover:scale-[1.02] transition-transform duration-500"
+              />
             </div>
           </section>
         </div>
