@@ -1,179 +1,174 @@
-import React, { useEffect, useState } from 'react'
-import CartItem from './CartItem'
-import PricingCrd from './PricingCrd'
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-import { store, useAppDispatch, useAppSelector } from "../../../State/Store";
-import { fetchUserCart } from '../../../State/customer/CartSlice';
-import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import CartItem from "./CartItem";
+import PricingCrd from "./PricingCrd";
+import EmptyState from "../../../common/EmptyState";
+import { useAppDispatch, useAppSelector } from "../../../State/Store";
+import { fetchUserCart } from "../../../State/customer/CartSlice";
+import { applyCoupon } from "../../../State/customer/CouponSlice";
 
 function Cart() {
-
-  const [couponCode, setCouponCode] = useState("")
-
+  const [couponCode, setCouponCode] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
-
-  
-  const handleApplyCoupon = () => {
-    if (!couponCode.trim()) return;
-
-    // API call here
-
-    setCouponApplied(true);
-  };
-  const handleRemoveCoupon = () => {
-    setCouponApplied(false);
-    setCouponCode("");
-  };
-
-  const handleChange = (e) => {
-    setCouponCode(e.target.value)
-  }
+  const [couponError, setCouponError] = useState("");
 
   const navigate = useNavigate();
-
   const dispatch = useAppDispatch();
-  const { cart } = useAppSelector(store => store)
+  const { cart } = useAppSelector((store) => store);
 
   const cartItems = cart.cart?.cartItems || [];
 
-
   useEffect(() => {
-    dispatch(fetchUserCart(localStorage.getItem("jwt") || ""))
-  }, [])
+    dispatch(fetchUserCart());
+  }, [dispatch]);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponError("");
+    try {
+      await dispatch(
+        applyCoupon({
+          apply: true,
+          code: couponCode.trim(),
+          orderValue: cart.cart?.totalSellingPrice || 0,
+        })
+      ).unwrap();
+      setCouponApplied(true);
+    } catch (err) {
+      setCouponError(
+        typeof err === "string" ? err : "Invalid coupon code. Please try again."
+      );
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponApplied(false);
+    setCouponCode("");
+    setCouponError("");
+    dispatch(fetchUserCart());
+  };
 
   return (
-    <div className='pt-10 px-5 sm:px-10 md:px-60 min-h-screen'>
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-5'>
-        <div className="cartItemSection lg:col-span-2 space-y-3">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8 min-h-[80vh]">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+          Shopping Cart ({cartItems.length} {cartItems.length === 1 ? "item" : "items"})
+        </h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Review your selected items before proceeding to secure checkout.
+        </p>
+      </div>
 
-          {cartItems.length === 0 ? (
+      {cartItems.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+          <EmptyState
+            icon={ShoppingBagOutlinedIcon}
+            title="Your Cart is Empty"
+            description="Looks like you haven't added anything to your cart yet. Explore our top categories and discover trending collections!"
+            actionText="Start Shopping"
+            onAction={() => navigate("/")}
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Cart Items List */}
+          <div className="lg:col-span-8 space-y-4">
+            {cartItems.map((item) => (
+              <CartItem key={item.id} item={item} />
+            ))}
+          </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 min-h-[70vh] flex items-center justify-center">
-
-              <div className="text-center px-6">
-
-                <div className="w-28 h-28 mx-auto rounded-full bg-gray-100 flex items-center justify-center">
-                  <ShoppingCartOutlinedIcon
-                    sx={{
-                      fontSize: 65,
-                      color: "#9ca3af",
-                    }}
-                  />
-                </div>
-
-                <h1 className="mt-6 text-3xl font-bold text-gray-800">
-                  Your Cart is Empty
-                </h1>
-
-                <p className="mt-3 text-gray-500 max-w-sm mx-auto">
-                  Looks like you haven't added anything to your cart yet.
-                  Browse our latest collections and discover products you'll love.
-                </p>
-
-                <button
-                  onClick={() => navigate("/")}
-                  className="cursor-pointer mt-8 px-8 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-300"
-                >
-                  Continue Shopping
-                </button>
-
+          {/* Checkout & Coupon Sidebar */}
+          <div className="lg:col-span-4 sticky top-24 space-y-4">
+            {/* Coupon Card */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <LocalOfferIcon className="text-teal-600" fontSize="small" />
+                <h3 className="font-bold text-slate-900 text-sm">
+                  Apply Discount Coupon
+                </h3>
               </div>
 
-            </div>
-
-          ) : (
-
-            cartItems.map((item) => (
-              <CartItem item={item} />
-            ))
-
-          )}
-        
-      </div>
-     {cart.cart?.cartItems?.length > 0 && (
- <div className='col-span-1 sticky top-5 h-fit text-sm space-y-3'>
-        <div className="col-span-1 rounded-xl bg-white shadow-sm p-5 space-y-5">
-
-          {/* Apply Offer Section */}
-          <div>
-            <h2 className="font-semibold text-lg mb-3">Apply Offer</h2>
-
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Enter coupon code"
-                value={couponCode}
-                onChange={handleChange}
-                disabled={couponApplied}
-                className={`flex-1 border rounded-lg px-3 py-2 outline-none transition-all ${couponApplied
-                    ? 'bg-green-50 border-green-500 text-green-700'
-                    : 'focus:ring-2 focus:ring-blue-500'
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter promo code"
+                  value={couponCode}
+                  onChange={(e) => {
+                    setCouponCode(e.target.value.toUpperCase());
+                    setCouponError("");
+                  }}
+                  disabled={couponApplied}
+                  className={`flex-1 border uppercase font-mono rounded-xl px-3.5 py-2 text-sm outline-none transition-all ${
+                    couponApplied
+                      ? "bg-emerald-50 border-emerald-400 text-emerald-700 font-bold"
+                      : "border-slate-200 focus:border-teal-500 bg-slate-50 focus:bg-white"
                   }`}
-              />
+                />
+                {!couponApplied ? (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleApplyCoupon}
+                    disabled={!couponCode.trim()}
+                    className="font-bold text-xs rounded-xl px-4"
+                  >
+                    Apply
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={handleRemoveCoupon}
+                    className="font-bold text-xs rounded-xl px-3"
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
 
-              {!couponApplied ? (
-                <button
-                  onClick={handleApplyCoupon}
-                  className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition"
-                >
-                  Apply
-                </button>
-              ) : (
-                <button
-                  onClick={handleRemoveCoupon}
-                  className="border border-red-200 text-red-600 px-5 py-2 rounded-lg hover:bg-red-50 transition"
-                >
-                  Remove
-                </button>
+              {couponError && (
+                <Alert severity="error" className="text-xs rounded-xl py-0.5">
+                  {couponError}
+                </Alert>
+              )}
+
+              {couponApplied && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                  <p className="text-xs font-bold text-emerald-800">
+                    ✓ Coupon code applied to cart
+                  </p>
+                </div>
               )}
             </div>
 
-            {couponApplied && (
-              <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3">
-                <p className="text-sm font-semibold text-green-700">
-                  ✓ Coupon Applied Successfully
-                </p>
-                <p className="text-xs text-green-600 mt-1">
-                  Discount has been applied to your order.
-                </p>
-              </div>
-            )}
+            {/* Pricing Breakdown Card */}
+            <PricingCrd />
+
+            {/* Checkout Button */}
+            <Button
+              fullWidth
+              size="large"
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/checkout")}
+              endIcon={<ArrowForwardIcon />}
+              className="py-3.5 font-bold rounded-xl shadow-md text-base"
+            >
+              Proceed to Checkout
+            </Button>
           </div>
-
-          {/* Available Offers */}
-          <div className="space-y-3">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <p className="text-sm font-medium text-green-700">
-                SAVE20
-              </p>
-              <p className="text-xs text-green-600">
-                Get 20% off on orders above ₹999
-              </p>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm font-medium text-blue-700">
-                FREESHIP
-              </p>
-              <p className="text-xs text-blue-600">
-                Free delivery on orders above ₹499
-              </p>
-            </div>
-          </div>
-
         </div>
-        <PricingCrd />
-        {/* Checkout Button */}
-        <button onClick={() => navigate("/checkout")} className="w-full cursor-pointer bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">
-          Proceed to Checkout
-        </button>
-      </div>
-     )
-}
+      )}
     </div>
-    </div >
-  )
+  );
 }
 
-export default Cart
+export default Cart;

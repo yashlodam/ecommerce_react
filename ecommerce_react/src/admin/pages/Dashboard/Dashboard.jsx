@@ -1,28 +1,20 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import AdminDrawerList from '../../components/AdminDrawerList'
 import AdminRoute from '../../../Routes/AdminRoute'
-import { useAppDispatch } from '../../../State/Store'
-import { fetchHomeCategories } from '../../../State/admin/adminSlice'
-import { fetchAllSellers } from '../../../State/admin/adminFetchSlice'
-import AdminNavbar from '../../components/AdminNavbar'
 
 function AdminDashboard() {
-
-    const toggleDrawer = ()=>{}
-
+  const toggleDrawer = () => {}
 
   return (
     <div> 
-        <AdminNavbar/>
-        <div className='lg:flex lg:h-[90vh]'>
-            <section className='hidden lg:block h-full'>
-                <AdminDrawerList toggleDrawer={toggleDrawer}/>
-            </section>
-            <section className='p-10 w-full lg:w-[80%] overflow-y-auto'>
-                <AdminRoute/>
-            </section>
-        </div>
-
+      <div className='lg:flex lg:h-[90vh]'>
+        <section className='hidden lg:block h-full'>
+          <AdminDrawerList toggleDrawer={toggleDrawer}/>
+        </section>
+        <section className='p-6 lg:p-10 w-full lg:w-[80%] overflow-y-auto'>
+          <AdminRoute/>
+        </section>
+      </div>
     </div>
   )
 }

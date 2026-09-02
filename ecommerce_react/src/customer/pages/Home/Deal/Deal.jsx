@@ -1,6 +1,6 @@
 import React from "react";
 import DealCard from "./DealCard";
-
+import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 
@@ -14,8 +14,8 @@ import LocalOfferRoundedIcon from "@mui/icons-material/LocalOfferRounded";
 import { useAppSelector } from "../../../../State/Store";
 
 function Deals() {
+  const navigate = useNavigate();
   const { customer } = useAppSelector((state) => state);
-  console.log("customer", customer);
   const deals = customer?.homeCategories?.deals;
 
   return (
@@ -41,7 +41,7 @@ function Deals() {
           </div>
 
           <Button
-            onClick={() => (window.location.href = `/products/${section.category}`)}
+            onClick={() => navigate("/products/men")}
             variant="contained"
             endIcon={<ArrowForwardRoundedIcon />}
             sx={{
@@ -186,7 +186,6 @@ function Deals() {
     left: 4px;
   }
 }
-       
       `}</style>
     </section>
   );

@@ -3,7 +3,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import { Divider, ListItemText } from '@mui/material';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../State/Store";
-import { logout } from '../../State/seller/sellerSlice';
+import { logout } from '../../State/AuthSlice';
+import { logoutSeller } from '../../State/seller/sellerSlice';
 
 
 function DrawerList({menu,menu2,toggleDrawer}) {
@@ -16,7 +17,8 @@ function DrawerList({menu,menu2,toggleDrawer}) {
 
     const handleLogout = () => {
     localStorage.removeItem("jwt");
-    dispatch(logout());
+    dispatch(logoutSeller());
+    dispatch(logout(null));
     navigate("/");
 };
     

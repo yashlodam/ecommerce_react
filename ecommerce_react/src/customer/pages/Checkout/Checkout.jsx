@@ -1,214 +1,299 @@
-import Button from '@mui/material/Button'
-import React, { useEffect, useState } from 'react'
-import AddressCard from './AddressCard'
-import AddIcon from '@mui/icons-material/Add';
-import Modal from '@mui/material/Modal';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import AddressForm from './AddressForm';
-import PricingCrd from '../Cart/PricingCrd';
-import Radio from '@mui/material/Radio';
-import ButtonBase from '@mui/material/ButtonBase';
-import { store, useAppDispatch, useAppSelector } from '../../../State/Store';
-import { fetchUserProfile } from '../../../State/AuthSlice';
-import { createOrder } from '../../../State/customer/OrderSlice';
-import { fetchUserCart } from '../../../State/customer/CartSlice';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import Radio from "@mui/material/Radio";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import LocalAtmIcon from "@mui/icons-material/LocalAtm";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
+import AddressCard from "./AddressCard";
+import AddressForm from "./AddressForm";
+import PricingCrd from "../Cart/PricingCrd";
 
-function Checkout() {
+import { useAppDispatch, useAppSelector } from "../../../State/Store";
+import { fetchUserProfile } from "../../../State/AuthSlice";
+import { createOrder } from "../../../State/customer/OrderSlice";
+import { fetchUserCart } from "../../../State/customer/CartSlice";
+import { useNavigate } from "react-router-dom";
 
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: { xs: '92%', sm: 500, md: 600 },
-    maxHeight: '90vh',
-    overflowY: 'auto',
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 0,  // remove padding here since AddAddressForm has its own
-  };
-
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const [button, setButton] = useState(false);
-  const [isChecked, setIsChecked] = useState(false)
-  const [selectedAddress, setSelectedAddress] = useState(null);
- const [paymentGateway, setPaymentGateway] = useState("RAZORPAY");
-  const dispatch = useAppDispatch();
-  
-  const { auth } = useAppSelector((store) => store)
-
-  useEffect(() => {
-  const jwt = localStorage.getItem("jwt");
-
-  dispatch(fetchUserProfile(jwt));
-  dispatch(fetchUserCart(jwt)); // or whatever your thunk is called
-}, [dispatch]);
-
-  const navigate = useNavigate();
-
-const handleBuyNow = async () => {
-  if (!selectedAddress) {
-    alert("Please select an address");
-    return;
-  }
-
-  try {
-    const res = await dispatch(
-      createOrder({
-        address: selectedAddress,
-        jwt: localStorage.getItem("jwt"),
-        paymentGateway,
-      })
-    ).unwrap();
-
-    if (paymentGateway === "COD") {
-      navigate("/order-success");
-    } else {
-      window.location.href = res.payment_link_url;
-    }
-  } catch (error) {
-    console.error(error);
-  }
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: { xs: "92%", sm: 540, md: 620 },
+  maxHeight: "90vh",
+  overflowY: "auto",
+  bgcolor: "background.paper",
+  borderRadius: "18px",
+  boxShadow: 24,
+  p: 0,
 };
 
+function Checkout() {
+  const [open, setOpen] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [paymentGateway, setPaymentGateway] = useState("RAZORPAY");
+  const [orderError, setOrderError] = useState("");
+  const [placing, setPlacing] = useState(false);
 
-  console.log("addresses is ", auth.user)
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { auth, cart } = useAppSelector((store) => store);
 
+  useEffect(() => {
+    dispatch(fetchUserProfile());
+    dispatch(fetchUserCart());
+  }, [dispatch]);
 
+  // Default to first saved address if available
+  useEffect(() => {
+    if (!selectedAddress && auth.user?.addresses?.length > 0) {
+      setSelectedAddress(auth.user.addresses[0]);
+    }
+  }, [auth.user, selectedAddress]);
+
+  const handleBuyNow = async () => {
+    if (!selectedAddress) {
+      setOrderError("Please select or add a delivery address to proceed.");
+      return;
+    }
+
+    if (!cart.cart?.cartItems?.length) {
+      setOrderError("Your shopping cart is empty.");
+      return;
+    }
+
+    setOrderError("");
+    setPlacing(true);
+
+    try {
+      const res = await dispatch(
+        createOrder({
+          address: selectedAddress,
+          paymentGateway,
+        })
+      ).unwrap();
+
+      if (paymentGateway === "COD") {
+        navigate("/order-success");
+      } else {
+        if (res.payment_link_url) {
+          window.location.href = res.payment_link_url;
+        } else {
+          navigate("/order-success");
+        }
+      }
+    } catch (error) {
+      const msg =
+        typeof error === "string"
+          ? error
+          : error?.message ||
+            "Failed to initiate order. Please check your cart and try again.";
+      setOrderError(msg);
+    } finally {
+      setPlacing(false);
+    }
+  };
 
   return (
-    <div>
-      <div className='pt-10 px-4 sm:px-10 md:px-44 lg:px-60 min-h-screen'>
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8 min-h-[85vh]">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+          Secure Checkout
+        </h1>
+        <p className="text-sm text-slate-500 mt-1 flex items-center gap-1">
+          <LockOutlinedIcon fontSize="small" className="text-emerald-600" />
+          256-bit SSL encrypted & authenticated payment checkout
+        </p>
+      </div>
 
-        <div className='space-y-5 lg:space-y-0 lg:grid grid-cols-3 lg:gap-9'>
-          <div className='col-span-2 space-y-5'>
-            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
-              <h1 className='font-semibold'>Select Address</h1>
-              <Button onClick={handleOpen} className='w-full sm:w-auto py-4 px-5  border border-gray-200 rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer'>
-                <AddIcon className='mr-2' /> Add new Address
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Addresses */}
+        <div className="lg:col-span-7 space-y-6">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div>
+                <h2 className="font-bold text-lg text-slate-900">
+                  1. Delivery Address
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Choose where you want your order delivered.
+                </p>
+              </div>
+              <Button
+                onClick={() => setOpen(true)}
+                variant="outlined"
+                color="primary"
+                startIcon={<AddIcon />}
+                className="font-bold text-xs rounded-xl"
+              >
+                Add Address
               </Button>
             </div>
-            <div className='text-xs font-medium space-y-5'>
-              <p className='font-semibold text-[15px]'>Saved Addresses</p>
-              <div className="space-y-3">
-                {auth.user?.addresses?.length > 0 ? (
-                  auth.user.addresses.map((item) => (
-                    <AddressCard
-                     key={item.id}
-                      selectedAddress={selectedAddress}
-                      setSelectedAddress={setSelectedAddress}
-                      item={item}
-                    />
-                  ))
-                ) : (
-                  <p className="text-gray-500">No saved addresses.</p>
-                )}
-              </div>
+
+            <div className="space-y-3">
+              {auth.user?.addresses?.length > 0 ? (
+                auth.user.addresses.map((item) => (
+                  <AddressCard
+                    key={item.id}
+                    selectedAddress={selectedAddress}
+                    setSelectedAddress={setSelectedAddress}
+                    item={item}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-12 text-slate-400 border border-dashed border-slate-200 rounded-2xl">
+                  <p className="text-sm font-medium mb-3">
+                    No saved addresses found.
+                  </p>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setOpen(true)}
+                    startIcon={<AddIcon />}
+                    className="font-semibold text-xs"
+                  >
+                    Add Delivery Address
+                  </Button>
+                </div>
+              )}
             </div>
-            <Button onClick={handleOpen} className='w-full sm:w-auto py-4 px-5  border border-gray-200 rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer'>
-              <AddIcon className='mr-2' /> Add new Address
-            </Button>
-          </div>
-        <Modal
-  open={open}
-  onClose={handleClose}
->
-  <Box sx={style}>
-    <AddressForm
-      handleClose={handleClose}
-      onSuccess={() => {
-        dispatch(fetchUserProfile(localStorage.getItem("jwt")));
-        handleClose();
-      }}
-    />
-  </Box>
-</Modal>
-          <div>
-            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
-              <h2 className="text-center text-xl sm:text-2xl font-semibold text-teal-600 mb-6">
-                Payment Gateway
-              </h2>
-
-              <div className="space-y-4">
-
-  {/* Razorpay */}
-  <div
-    className={`flex items-center gap-3 border-2 rounded-lg p-4 cursor-pointer ${
-      paymentGateway === "RAZORPAY"
-        ? "border-teal-500 bg-teal-50"
-        : "border-gray-300"
-    }`}
-    onClick={() => setPaymentGateway("RAZORPAY")}
-  >
-    <Radio checked={paymentGateway === "RAZORPAY"} />
-
-    <img
-      src="https://razorpay.com/assets/razorpay-logo.svg"
-      alt="Razorpay"
-      className="h-8"
-    />
-  </div>
-
-  {/* Cash On Delivery */}
-  <div
-    className={`flex items-center gap-3 border-2 rounded-lg p-4 cursor-pointer ${
-      paymentGateway === "COD"
-        ? "border-teal-500 bg-teal-50"
-        : "border-gray-300"
-    }`}
-    onClick={() => setPaymentGateway("COD")}
-  >
-    <Radio checked={paymentGateway === "COD"} />
-
-    <div>
-      <h3 className="font-semibold">
-        Cash On Delivery
-      </h3>
-
-      <p className="text-sm text-gray-500">
-        Pay when your order arrives
-      </p>
-    </div>
-  </div>
-
-</div>
-            </div>
-            <PricingCrd />
-            <Button
-              variant="contained"
-              fullWidth
-              size="large"
-              sx={{
-                py: 1.5,
-                borderRadius: 2,
-                textTransform: "none",
-                fontSize: "16px",
-                fontWeight: 600,
-                bgcolor: "#009688",
-                "&:hover": {
-                  bgcolor: "#00796b",
-                },
-              }}
-              onClick={handleBuyNow}
-            >
-              Buy Now
-            </Button>
           </div>
         </div>
 
+        {/* Right Column: Payment & Summary */}
+        <div className="lg:col-span-5 space-y-5 sticky top-24">
+          {/* Payment Method Selector */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+            <div>
+              <h2 className="font-bold text-lg text-slate-900">
+                2. Payment Method
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Select your preferred checkout payment option.
+              </p>
+            </div>
 
+            <div className="space-y-3">
+              {/* Razorpay */}
+              <div
+                className={`flex items-center justify-between border-2 rounded-xl p-4 cursor-pointer transition-all ${
+                  paymentGateway === "RAZORPAY"
+                    ? "border-teal-600 bg-teal-50/40 shadow-sm"
+                    : "border-slate-200 hover:border-slate-300"
+                }`}
+                onClick={() => setPaymentGateway("RAZORPAY")}
+              >
+                <div className="flex items-center gap-3">
+                  <Radio
+                    checked={paymentGateway === "RAZORPAY"}
+                    color="primary"
+                  />
+                  <div>
+                    <p className="font-bold text-sm text-slate-900">Razorpay</p>
+                    <p className="text-xs text-slate-500">UPI, Cards, NetBanking, Wallets</p>
+                  </div>
+                </div>
+                <CreditCardIcon className="text-teal-700" />
+              </div>
 
+              {/* Stripe */}
+              <div
+                className={`flex items-center justify-between border-2 rounded-xl p-4 cursor-pointer transition-all ${
+                  paymentGateway === "STRIPE"
+                    ? "border-teal-600 bg-teal-50/40 shadow-sm"
+                    : "border-slate-200 hover:border-slate-300"
+                }`}
+                onClick={() => setPaymentGateway("STRIPE")}
+              >
+                <div className="flex items-center gap-3">
+                  <Radio
+                    checked={paymentGateway === "STRIPE"}
+                    color="primary"
+                  />
+                  <div>
+                    <p className="font-bold text-sm text-slate-900">Stripe International</p>
+                    <p className="text-xs text-slate-500">Credit / Debit Cards (Global)</p>
+                  </div>
+                </div>
+                <CreditCardIcon className="text-indigo-600" />
+              </div>
+
+              {/* Cash on Delivery */}
+              <div
+                className={`flex items-center justify-between border-2 rounded-xl p-4 cursor-pointer transition-all ${
+                  paymentGateway === "COD"
+                    ? "border-teal-600 bg-teal-50/40 shadow-sm"
+                    : "border-slate-200 hover:border-slate-300"
+                }`}
+                onClick={() => setPaymentGateway("COD")}
+              >
+                <div className="flex items-center gap-3">
+                  <Radio
+                    checked={paymentGateway === "COD"}
+                    color="primary"
+                  />
+                  <div>
+                    <p className="font-bold text-sm text-slate-900">Cash on Delivery (COD)</p>
+                    <p className="text-xs text-slate-500">Pay when order is delivered</p>
+                  </div>
+                </div>
+                <LocalAtmIcon className="text-emerald-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Pricing Breakdown */}
+          <PricingCrd />
+
+          {/* Error Banner */}
+          {orderError && (
+            <Alert
+              severity="error"
+              className="rounded-xl text-xs font-semibold"
+              onClose={() => setOrderError("")}
+            >
+              {orderError}
+            </Alert>
+          )}
+
+          {/* Place Order CTA */}
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            size="large"
+            disabled={placing}
+            startIcon={
+              placing ? <CircularProgress size={18} color="inherit" /> : <LockOutlinedIcon />
+            }
+            className="py-4 font-extrabold text-base rounded-xl shadow-lg"
+            onClick={handleBuyNow}
+          >
+            {placing ? "Processing Order..." : `Pay & Place Order`}
+          </Button>
+        </div>
       </div>
 
+      {/* Add Address Modal */}
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <Box sx={modalStyle}>
+          <AddressForm
+            handleClose={() => setOpen(false)}
+            onSuccess={() => {
+              dispatch(fetchUserProfile());
+              setOpen(false);
+            }}
+          />
+        </Box>
+      </Modal>
     </div>
-
-
-  )
+  );
 }
 
-export default Checkout
+export default Checkout;

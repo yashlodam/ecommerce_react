@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import { api } from "../../config/Api";
 
 const API_URL = "/api/orders";
@@ -7,18 +6,13 @@ const API_URL = "/api/orders";
 // ================= Fetch User Orders =================
 export const fetchUserOrderHistory = createAsyncThunk(
   "orders/fetchUserOrderHistory",
-  async (jwt, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get(`${API_URL}/user`, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-      console.log(response.data)
+      const response = await api.get(`${API_URL}/user`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error || "Failed to fetch order history"
+        error.response?.data?.message || "Failed to fetch order history"
       );
     }
   }
@@ -27,92 +21,77 @@ export const fetchUserOrderHistory = createAsyncThunk(
 // ================= Fetch Order By Id =================
 export const fetchOrderById = createAsyncThunk(
   "orders/fetchOrderById",
-  async ({ orderId, jwt }, { rejectWithValue }) => {
+  async (orderId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`${API_URL}/${orderId}`, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-
-      console.log(response.data)
-
+      const response = await api.get(`${API_URL}/${orderId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue("Failed to fetch order");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch order"
+      );
     }
   }
 );
 
 // ================= Create Order =================
+// paymentGateway: "RAZORPAY" | "COD"
 export const createOrder = createAsyncThunk(
   "orders/createOrder",
-  async ({ address, jwt, paymentGateway }, { rejectWithValue }) => {
+  async ({ address, paymentGateway }, { rejectWithValue }) => {
     try {
       const response = await api.post(API_URL, address, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-        params: {
-          paymentMethod: paymentGateway,
-        },
+        params: { paymentMethod: paymentGateway },
       });
 
+      // For online payment — redirect to Razorpay immediately
       if (response.data.payment_link_url) {
         window.location.href = response.data.payment_link_url;
       }
 
       return response.data;
     } catch (error) {
-  console.log("Status:", error.response?.status);
-  console.log("Response:", error.response?.data);
+      // Extract meaningful error message from backend
+      const backendMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.response?.data ||
+        "Failed to create order";
 
-  return rejectWithValue(
-    error.response?.data || "Failed to create order"
-  );
-}
+      return rejectWithValue(backendMessage);
+    }
   }
 );
 
 // ================= Fetch Order Item =================
 export const fetchOrderItemById = createAsyncThunk(
   "orders/fetchOrderItemById",
-  async ({ orderItemId, jwt }, { rejectWithValue }) => {
+  async (orderItemId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`${API_URL}/item/${orderItemId}`, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-
-      console.log(response.data)
+      const response = await api.get(`${API_URL}/item/${orderItemId}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue("Failed to fetch order item");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch order item"
+      );
     }
   }
 );
 
 // ================= Payment Success =================
+// Called after Razorpay redirect back to frontend.
+// Backend: GET /api/payment/{paymentId}?paymentLinkId=xxx
 export const paymentSuccess = createAsyncThunk(
   "orders/paymentSuccess",
-  async ({ paymentId, paymentLinkId, jwt }, { rejectWithValue }) => {
+  async ({ paymentId, paymentLinkId }, { rejectWithValue }) => {
     try {
       const response = await api.get(`/api/payment/${paymentId}`, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-        params: {
-          paymentLinkId,
-        },
+        params: { paymentLinkId },
       });
-
-      console.log(response.data)
-      
-
       return response.data;
     } catch (error) {
-      return rejectWithValue("Failed to process payment");
+      return rejectWithValue(
+        error.response?.data?.message || "Payment confirmation failed"
+      );
     }
   }
 );
@@ -122,84 +101,47 @@ export const cancelOrder = createAsyncThunk(
   "orders/cancelOrder",
   async (orderId, { rejectWithValue }) => {
     try {
-      const response = await api.put(
-        `${API_URL}/${orderId}/cancel`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
-        }
-      );
-
+      // JWT is auto-attached by the api interceptor
+      const response = await api.put(`${API_URL}/${orderId}/cancel`, {});
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        return rejectWithValue(error.response.data);
-      }
-
       return rejectWithValue(
-        "An error occurred while cancelling the order"
+        error.response?.data?.message ||
+          "An error occurred while cancelling the order"
       );
     }
   }
 );
 
-
+// ================= Add Address =================
 export const addUserAddress = createAsyncThunk(
   "user/addUserAddress",
-  async ({ address, jwt }, { rejectWithValue }) => {
+  async (address, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        "api/users/add-address",
-        address,
-        {
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        }
-      );
-
-      console.log("Address added successfully", response.data);
-
+      const response = await api.post("/api/users/add-address", address);
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || "Failed to add address"
+        error.response?.data?.message || "Failed to add address"
       );
     }
   }
 );
 
-
-
-
-
-
+// ================= Delete Address =================
 export const deleteUserAddress = createAsyncThunk(
   "user/deleteUserAddress",
-  async ({ addressId, jwt }, { rejectWithValue }) => {
+  async (addressId, { rejectWithValue }) => {
     try {
-      const response = await api.delete(
-        `api/users/address/${addressId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        }
-      );
-
-      console.log("Address deleted successfully", response.data);
-
+      const response = await api.delete(`/api/users/address/${addressId}`);
       return { addressId, user: response.data };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || "Failed to delete address"
+        error.response?.data?.message || "Failed to delete address"
       );
     }
   }
 );
-
 
 // ================= Initial State =================
 const initialState = {
@@ -216,12 +158,18 @@ const initialState = {
 const orderSlice = createSlice({
   name: "orders",
   initialState,
-  reducers: {},
+  reducers: {
+    clearOrderError: (state) => {
+      state.error = null;
+    },
+    resetOrderCanceled: (state) => {
+      state.orderCanceled = false;
+    },
+  },
 
   extraReducers: (builder) => {
     builder
-
-      // ================= Fetch User Orders =================
+      // Fetch User Orders
       .addCase(fetchUserOrderHistory.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -236,7 +184,7 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ================= Fetch Order By Id =================
+      // Fetch Order By Id
       .addCase(fetchOrderById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -250,7 +198,7 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ================= Create Order =================
+      // Create Order
       .addCase(createOrder.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -264,7 +212,7 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ================= Fetch Order Item =================
+      // Fetch Order Item
       .addCase(fetchOrderItemById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -278,7 +226,7 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ================= Payment Success =================
+      // Payment Success
       .addCase(paymentSuccess.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -292,7 +240,7 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ================= Cancel Order =================
+      // Cancel Order
       .addCase(cancelOrder.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -300,17 +248,10 @@ const orderSlice = createSlice({
       .addCase(cancelOrder.fulfilled, (state, action) => {
         state.loading = false;
         state.orderCanceled = true;
-
-        // Update cancelled order in list
         state.orders = state.orders.map((order) =>
           order.id === action.payload.id ? action.payload : order
         );
-
-        // Update current order if open
-        if (
-          state.currentOrder &&
-          state.currentOrder.id === action.payload.id
-        ) {
+        if (state.currentOrder?.id === action.payload.id) {
           state.currentOrder = action.payload;
         }
       })
@@ -321,4 +262,5 @@ const orderSlice = createSlice({
   },
 });
 
+export const { clearOrderError, resetOrderCanceled } = orderSlice.actions;
 export default orderSlice.reducer;

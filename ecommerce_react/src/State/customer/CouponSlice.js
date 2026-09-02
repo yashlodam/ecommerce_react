@@ -1,48 +1,33 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../config/Api";
 
-
 const API_URL = "/api/coupons";
+
+// JWT is auto-attached by the api interceptor
 
 export const applyCoupon = createAsyncThunk(
   "coupon/applyCoupon",
-  async ({ apply, code, orderValue, jwt }, { rejectWithValue }) => {
+  async ({ apply, code, orderValue }, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        `${API_URL}/apply`,
-        null,
-        {
-          params: {
-            apply,
-            code,
-            orderValue,
-          },
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        }
-      );
-
-      console.log("Apply Coupon:", response.data);
+      const response = await api.post(`${API_URL}/apply`, null, {
+        params: { apply, code, orderValue },
+      });
       return response.data;
-
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to apply coupon"
+        error.response?.data?.message || "Invalid coupon code"
       );
     }
   }
 );
 
 const initialState = {
-    coupons:[],
-    cart:null,
-    loading:false,
-    error:null,
-    couponCreated:false,
-    couponApplied:false
-}
-
+  coupons: [],
+  cart: null,
+  loading: false,
+  error: null,
+  couponApplied: false,
+};
 
 const couponSlice = createSlice({
   name: "coupon",
@@ -52,28 +37,23 @@ const couponSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.couponApplied = false;
-      state.couponCreated = false;
+    },
+    clearCouponError: (state) => {
+      state.error = null;
     },
   },
-
   extraReducers: (builder) => {
     builder
-
-      // Apply Coupon
       .addCase(applyCoupon.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.couponApplied = false;
       })
-
       .addCase(applyCoupon.fulfilled, (state, action) => {
         state.loading = false;
         state.couponApplied = true;
-
-        // Backend should return updated cart
         state.cart = action.payload;
       })
-
       .addCase(applyCoupon.rejected, (state, action) => {
         state.loading = false;
         state.couponApplied = false;
@@ -82,6 +62,5 @@ const couponSlice = createSlice({
   },
 });
 
-export const { resetCouponState } = couponSlice.actions;
-
+export const { resetCouponState, clearCouponError } = couponSlice.actions;
 export default couponSlice.reducer;

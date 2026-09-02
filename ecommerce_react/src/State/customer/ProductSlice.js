@@ -1,25 +1,15 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-
-const API_URL = "http://localhost:5454";
+import { api } from "../../config/Api";
 
 // ================= Fetch Product By Id =================
 export const fetchProductById = createAsyncThunk(
   "products/fetchProductById",
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${API_URL}/products/${productId}`
-      );
-
-      console.log("Fetched Product:", response.data);
-
+      const response = await api.get(`/products/${productId}`);
       return response.data;
     } catch (error) {
-      console.error(error);
-      return rejectWithValue(
-        error.response?.data || error.message
-      );
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -29,23 +19,12 @@ export const searchProduct = createAsyncThunk(
   "products/searchProduct",
   async (query, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${API_URL}/products/search`,
-        {
-          params: {
-            query,
-          },
-        }
-      );
-
-      console.log("Search Products:", response.data);
-
+      const response = await api.get("/products/search", {
+        params: { query },
+      });
       return response.data;
     } catch (error) {
-      console.error(error);
-      return rejectWithValue(
-        error.response?.data || error.message
-      );
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -55,47 +34,36 @@ export const fetchAllProducts = createAsyncThunk(
   "products/fetchAllProducts",
   async (params, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${API_URL}/products`,
-        {
-          params: {
-            ...params,
-            pageNumber: params?.pageNumber ?? 0,
-          },
-        }
-      );
-
-      console.log("Fetched Products:", response.data);
-
+      const response = await api.get("/products", {
+        params: {
+          ...params,
+          pageNumber: params?.pageNumber ?? 0,
+        },
+      });
       return response.data;
     } catch (error) {
-      console.error(error);
-      return rejectWithValue(
-        error.response?.data || error.message
-      );
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
+// ================= Fetch Home Products by Category =================
 export const fetchHomeProducts = createAsyncThunk(
   "products/fetchHomeProducts",
   async ({ category }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/products`, {
+      const response = await api.get("/products", {
         params: {
           category,
           pageNumber: 0,
         },
       });
-
       return {
         category,
-        products: response.data.content,
+        products: response.data?.content || (Array.isArray(response.data) ? response.data : []),
       };
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data || error.message
-      );
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -105,7 +73,6 @@ const initialState = {
   product: null,
   products: [],
   totalPages: 1,
-
   homeProducts: {
     men: [],
     women: [],
@@ -113,7 +80,6 @@ const initialState = {
     home_furniture: [],
     beauty: [],
   },
-
   loading: false,
   error: null,
   searchProducts: [],
@@ -123,13 +89,18 @@ const initialState = {
 const productSlice = createSlice({
   name: "products",
   initialState,
-  reducers: {},
+  reducers: {
+    clearProductError: (state) => {
+      state.error = null;
+    },
+  },
 
   extraReducers: (builder) => {
     // Fetch Product By Id
     builder
       .addCase(fetchProductById.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchProductById.fulfilled, (state, action) => {
         state.loading = false;
@@ -144,37 +115,39 @@ const productSlice = createSlice({
     builder
       .addCase(fetchAllProducts.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchAllProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload.content;
-        state.totalPages = action.payload.totalPages;
+        state.products = action.payload?.content || (Array.isArray(action.payload) ? action.payload : []);
+        state.totalPages = action.payload?.totalPages ?? action.payload?.page?.totalPages ?? 1;
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
 
+    // Fetch Home Products
+    builder
+      .addCase(fetchHomeProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchHomeProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        const { category, products } = action.payload;
+        state.homeProducts[category] = products;
+      })
+      .addCase(fetchHomeProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
 
-      builder
-  .addCase(fetchHomeProducts.pending, (state) => {
-    state.loading = true;
-  })
-  .addCase(fetchHomeProducts.fulfilled, (state, action) => {
-    state.loading = false;
-
-    const { category, products } = action.payload;
-
-    state.homeProducts[category] = products;
-  })
-  .addCase(fetchHomeProducts.rejected, (state, action) => {
-    state.loading = false;
-    state.error = action.payload;
-  });
     // Search Products
     builder
       .addCase(searchProduct.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(searchProduct.fulfilled, (state, action) => {
         state.loading = false;
@@ -187,4 +160,5 @@ const productSlice = createSlice({
   },
 });
 
+export const { clearProductError } = productSlice.actions;
 export default productSlice.reducer;

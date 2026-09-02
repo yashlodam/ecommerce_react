@@ -1,182 +1,201 @@
-import React, { useState } from 'react';
-import Divider from '@mui/material/Divider';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import CloseIcon from '@mui/icons-material/Close';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../../State/Store';
-import { deleteCartItem, updateCartItem } from '../../../State/customer/CartSlice';
+import React, { useState } from "react";
+import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import CloseIcon from "@mui/icons-material/Close";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../../State/Store";
+import {
+  deleteCartItem,
+  updateCartItem,
+} from "../../../State/customer/CartSlice";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
-function CartItem({item}) {
+function formatINR(val) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(val || 0);
+}
 
+function CartItem({ item }) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const [snackbar, setSnackbar] = useState({
-  open: false,
-  message: "",
-  severity: "success",
-});
-  
-  const handleUpdateQuantity = (value) => {
-  dispatch(
-    updateCartItem({
-      jwt: localStorage.getItem("jwt"),
-      cartItemId: item.id,
-      cartItem: {
-        quantity: value,
-      },
-    })
-  );
-};
-
- const handleCloseSnackbar = () => {
-  setSnackbar((prev) => ({
-    ...prev,
     open: false,
-  }));
-};
+    message: "",
+    severity: "success",
+  });
 
-  const handleRemoveItem = async () => {
-  try {
-    await dispatch(
-      deleteCartItem({
+  const product = item?.product;
+
+  const handleUpdateQuantity = (value) => {
+    dispatch(
+      updateCartItem({
         jwt: localStorage.getItem("jwt"),
         cartItemId: item.id,
+        cartItem: {
+          quantity: value,
+        },
       })
-    ).unwrap();
+    );
+  };
 
-    setSnackbar({
-      open: true,
-      message: "Item removed from your cart.",
-      severity: "success",
-    });
-  } catch (error) {
-    setSnackbar({
-      open: true,
-      message: "Unable to remove the item. Please try again.",
-      severity: "error",
-    });
-  }
-};
+  const handleCloseSnackbar = () => {
+    setSnackbar((prev) => ({
+      ...prev,
+      open: false,
+    }));
+  };
+
+  const handleRemoveItem = async () => {
+    try {
+      await dispatch(
+        deleteCartItem({
+          jwt: localStorage.getItem("jwt"),
+          cartItemId: item.id,
+        })
+      ).unwrap();
+
+      setSnackbar({
+        open: true,
+        message: "Item removed from your cart.",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Unable to remove the item. Please try again.",
+        severity: "error",
+      });
+    }
+  };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative">
-
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative">
       <Snackbar
-  open={snackbar.open}
-  autoHideDuration={3000}
-  onClose={handleCloseSnackbar}
-  anchorOrigin={{
-    vertical: "bottom",
-    horizontal: "right",
-  }}
->
-  <Alert
-    onClose={handleCloseSnackbar}
-    severity={snackbar.severity}
-    variant="filled"
-    sx={{ width: "100%" }}
-  >
-    {snackbar.message}
-  </Alert>
-</Snackbar>
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
 
       {/* Remove Item Button */}
       <IconButton
         onClick={handleRemoveItem}
-        className="!absolute top-3 right-3"
+        className="!absolute top-3 right-3 z-10"
         size="small"
         sx={{
-          backgroundColor: '#f5f5f5',
-          '&:hover': {
-            backgroundColor: '#fee2e2',
-            color: '#dc2626',
+          backgroundColor: "#f8fafc",
+          "&:hover": {
+            backgroundColor: "#fee2e2",
+            color: "#dc2626",
           },
         }}
       >
-        <CloseIcon  fontSize="small" />
+        <CloseIcon fontSize="small" />
       </IconButton>
 
       {/* Product Details */}
-      <div className="p-5 flex gap-4 cursor-pointer" onClick={()=> navigate(`/product-details/${item.product.category?.categoryId}/${item.product.title}/${item.product.id}`)}>
-        <div className="flex-shrink-0" >
+      <div
+        className="p-4 sm:p-5 flex gap-4 cursor-pointer"
+        onClick={() =>
+          navigate(
+            `/product-details/${product?.category?.categoryId || "catalog"}/${product?.id}`
+          )
+        }
+      >
+        <div className="shrink-0 w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 flex items-center justify-center">
           <img
-            className="w-[90px] h-[110px] object-cover rounded-lg border"
-            src={item.product.images[0]}
-            alt="Product"
+            className="w-full h-full object-contain"
+            src={product?.images?.[0] || "https://placehold.co/120x120?text=Item"}
+            alt={product?.title || "Item"}
           />
         </div>
 
-        <div className="flex-1 space-y-2 pr-10">
-          <h1 className="font-semibold text-lg text-gray-900">
-            {item.product.seller.businesssDetails.businessName}
-          </h1>
+        <div className="flex-1 space-y-1.5 pr-8 min-w-0">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full inline-block">
+            {product?.seller?.businesssDetails?.businessName ||
+              product?.brand ||
+              "Verified Seller"}
+          </span>
 
-          <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
-           {item.product.title}
+          <h3 className="font-bold text-base text-slate-900 leading-snug line-clamp-2">
+            {product?.title}
+          </h3>
+
+          <p className="text-xs text-slate-400">
+            Color: <span className="text-slate-600 font-medium">{product?.color || "Standard"}</span> • Size: <span className="text-slate-600 font-medium">{item?.size || "Standard"}</span>
           </p>
 
-          <p className="text-gray-500 text-xs">
-            <strong>Sold by:</strong>{' '}
-            Natural Lifestyle Products Private Limited
-          </p>
-
-          <p className="text-sm text-green-600 font-medium">
-            7 days replacement available
-          </p>
-
-          <p className="text-sm text-gray-700">
-            <strong>Quantity:</strong> {item.quantity}
+          <p className="text-xs text-emerald-600 font-semibold">
+            ✓ In Stock • Eligible for Fast Shipping
           </p>
         </div>
       </div>
 
       <Divider />
 
-      {/* Quantity Controls */}
-      <div className="px-5 py-4 flex justify-between items-center bg-gray-50">
-        <div className="flex items-center gap-3">
+      {/* Quantity & Price Controls */}
+      <div className="px-4 sm:px-5 py-3.5 flex justify-between items-center bg-slate-50">
+        <div className="flex items-center gap-2 sm:gap-3 bg-white border border-slate-200 rounded-xl p-1">
           <Button
-           onClick={() => handleUpdateQuantity(item.quantity - 1)}
+            size="small"
+            onClick={() => handleUpdateQuantity(item.quantity - 1)}
             disabled={item.quantity <= 1}
-            variant="outlined"
             sx={{
-              minWidth: '40px',
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
+              minWidth: "32px",
+              width: "32px",
+              height: "32px",
+              borderRadius: "8px",
             }}
           >
-            <RemoveIcon />
+            <RemoveIcon fontSize="small" />
           </Button>
 
-          <span className="font-semibold text-lg min-w-[30px] text-center">
+          <span className="font-bold text-sm min-w-[24px] text-center text-slate-800">
             {item.quantity}
           </span>
 
           <Button
-           onClick={() => handleUpdateQuantity(item.quantity + 1)}
-            variant="outlined"
+            size="small"
+            onClick={() => handleUpdateQuantity(item.quantity + 1)}
+            disabled={item.quantity >= (product?.quantity || 10)}
             sx={{
-              minWidth: '40px',
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
+              minWidth: "32px",
+              width: "32px",
+              height: "32px",
+              borderRadius: "8px",
             }}
           >
-            <AddIcon />
+            <AddIcon fontSize="small" />
           </Button>
         </div>
 
         {/* Price Section */}
         <div className="text-right">
-          <p className="text-lg font-bold text-gray-900">₹{item.sellingPrice}</p>
-          <p className="text-sm text-gray-500 line-through">₹{item.mrpPrice}</p>
+          <p className="text-base sm:text-lg font-extrabold text-slate-900">
+            {formatINR(item.sellingPrice)}
+          </p>
+          {item.mrpPrice > item.sellingPrice && (
+            <p className="text-xs text-slate-400 line-through">
+              {formatINR(item.mrpPrice)}
+            </p>
+          )}
         </div>
       </div>
     </div>

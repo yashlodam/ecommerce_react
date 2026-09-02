@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { Button } from "@mui/material";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import { useNavigate } from "react-router-dom";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -10,8 +11,6 @@ import "swiper/css/navigation";
 import ProductCard from "../product/ProductCard";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { fetchHomeProducts } from "../../../State/customer/ProductSlice";
-
-
 
 const sections = [
   {
@@ -25,35 +24,27 @@ const sections = [
     category: "women",
   },
   {
-  title: "Latest Smartphones",
-  subtitle: "Explore flagship devices with cutting-edge technology",
-  category: "electronics_smartphones",
-},
+    title: "Latest Smartphones",
+    subtitle: "Explore flagship devices with cutting-edge technology",
+    category: "electronics_smartphones",
+  },
 ];
 
-
-
 function HomeProducts() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-    const dispatch = useAppDispatch();
+  useEffect(() => {
+    sections.forEach((section) => {
+      dispatch(fetchHomeProducts({ category: section.category }));
+    });
+  }, [dispatch]);
 
-
-
-   useEffect(() => {
-  sections.forEach((section) => {
-    dispatch(fetchHomeProducts({ category: section.category }));
-  });
-}, [dispatch]);
-
-    const { product } = useAppSelector((store) => store);
-
-     const {homeProducts} = product;
-
-
+  const { product } = useAppSelector((store) => store);
+  const { homeProducts } = product;
 
   return (
     <div className="mt-8 space-y-8 sm:mt-10 sm:space-y-10 lg:space-y-12">
-
       {sections.map((section) => (
         <section
           key={section.category}
@@ -73,7 +64,7 @@ function HomeProducts() {
             </div>
 
             <Button
-              onClick={() => (window.location.href = `/products/${section.category}`)}
+              onClick={() => navigate(`/products/${section.category}`)}
               variant="contained"
               endIcon={<ArrowForwardRoundedIcon />}
               sx={{
@@ -194,7 +185,6 @@ function HomeProducts() {
           }
         }
       `}</style>
-
     </div>
   );
 }
