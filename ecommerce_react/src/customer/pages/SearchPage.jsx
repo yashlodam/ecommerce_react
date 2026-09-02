@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-
 import {
   Box,
   Grid,
@@ -10,25 +9,19 @@ import {
   CircularProgress,
   Stack,
 } from "@mui/material";
-
 import TuneIcon from "@mui/icons-material/Tune";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
-
 import { useLocation, useNavigate } from "react-router-dom";
-
 import { searchProduct } from "../../State/customer/ProductSlice";
 import { useAppDispatch, useAppSelector } from "../../State/Store";
-
 import ProductCard from "./product/ProductCard";
-
-const BRAND = "#00927c";
-const BRAND_DARK = "#00695c";
+import { SkeletonGrid } from "../../common/SkeletonCard";
 
 const quickFilters = [
   "All",
   "Men",
   "Women",
-  "mobiles",
+  "Mobiles",
   "Fashion",
   "Electronics",
   "Shoes",
@@ -39,8 +32,7 @@ const quickFilters = [
 const quickSuggestions = [
   "iPhone",
   "Samsung",
-  "OnePlus",
-  "Google Pixel",
+  "Smartphones",
   "T-Shirts",
   "Formal Shirts",
   "Shoes",
@@ -55,7 +47,7 @@ function SearchPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { product } = useAppSelector(store => store);
+  const { product } = useAppSelector((store) => store);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
@@ -70,19 +62,17 @@ function SearchPage() {
 
   const handleSearch = (value = searchQuery) => {
     const trimmed = value.trim();
-
     const params = new URLSearchParams(location.search);
 
     if (trimmed) {
-        params.set("q", trimmed);
+      params.set("q", trimmed);
     } else {
-        params.delete("q");
+      params.delete("q");
     }
 
     navigate(`/search?${params.toString()}`);
-
     dispatch(searchProduct(trimmed));
-};
+  };
 
   const results = product?.searchProducts ?? [];
   const isLoading = product?.loading && searchQuery.trim().length > 0;
@@ -94,311 +84,143 @@ function SearchPage() {
   }, [isLoading, results.length]);
 
   return (
-    <Box sx={{ bgcolor: "#f6f7f8", minHeight: "100vh", pb: { xs: 4, md: 6 }, overflowX: "hidden" }}>
-      <Box
-        sx={{
-          background: `linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND} 55%, #00a896 100%)`,
-          pt: { xs: 3.5, sm: 4.5, md: 6 },
-          pb: { xs: 4, sm: 5, md: 7 },
-          px: { xs: 2, md: 4 },
-        }}
-      >
-        <Box maxWidth={860} mx="auto" textAlign="center">
-          <Typography
-            variant="overline"
-            sx={{
-              color: "rgba(255,255,255,0.8)",
-              letterSpacing: 2,
-              fontWeight: 700,
-              fontSize: { xs: "0.7rem", md: "0.75rem" },
-            }}
-          >
-            ShopSphere Search
-          </Typography>
-          <Typography
-            fontWeight={800}
-            sx={{
-              color: "#fff",
-              mb: 1.5,
-              letterSpacing: -0.5,
-              fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2.125rem" },
-              lineHeight: 1.25,
-            }}
-          >
-            Find the right product faster
-          </Typography>
-          <Typography
-            sx={{
-              color: "rgba(255,255,255,0.9)",
-              maxWidth: 680,
-              mx: "auto",
-              fontSize: { xs: "0.875rem", sm: "0.95rem", md: "1rem" },
-            }}
-          >
-            Browse curated results with a clean, focused experience designed for quick decision-making.
-          </Typography>
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          width: "100%",
-          maxWidth: "1700px",
-          mx: "auto",
-          px: {
-            xs: 2,
-            sm: 3,
-            md: 4,
-            lg: 5,
-          },
-          mt: {
-            xs: -1,
-            sm: -2,
-            md: -3,
-          },
-        }}
-      >
-        <Grid container spacing={3}>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 pb-12">
+      {/* Header Banner */}
+      <div className="bg-gradient-to-r from-teal-800 via-teal-700 to-emerald-800 py-10 px-4 text-center text-white">
+        <div className="max-w-3xl mx-auto space-y-2">
+          <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-teal-200">
+            ShopSphere Marketplace Search
+          </span>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+            {searchQuery ? `Search Results for "${searchQuery}"` : "Discover Products Across All Stores"}
+          </h1>
+          <p className="text-xs sm:text-sm text-teal-100/90 max-w-xl mx-auto">
+            Browse verified marketplace inventory with live stock and multi-vendor fulfillment.
+          </p>
+        </div>
+      </div>
 
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <Grid container spacing={3}>
           {/* Sidebar */}
           <Grid item xs={12} md={3}>
-            <Paper
-              sx={{
-                p: { xs: 2, sm: 2.5, md: 3 },
-                borderRadius: 3,
-                border: "1px solid",
-                borderColor: "divider",
-                boxShadow: "0 2px 10px rgba(15, 23, 42, 0.04)",
-                width: "100%",
-              }}
-            >
-              <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-                <TuneIcon sx={{ color: BRAND }} fontSize="small" />
-                <Typography variant="h6" fontWeight={700} fontSize={{ xs: "1.05rem", md: "1.25rem" }}>
-                  Refine your search
-                </Typography>
-              </Stack>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-sm space-y-4 sticky top-24 transition-colors">
+              <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400">
+                <TuneIcon fontSize="small" />
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
+                  Refine Search
+                </h3>
+              </div>
 
-              <Divider sx={{ mb: 2 }} />
+              <Divider className="!border-slate-100 dark:!border-slate-800" />
 
-              <Typography
-                fontWeight={600}
-                mb={1.2}
-                color="text.secondary"
-                variant="body2"
-                textTransform="uppercase"
-                letterSpacing={0.5}
-              >
-                Popular filters
-              </Typography>
-              <Stack
-                direction="row"
-                spacing={1}
-                useFlexGap
-                sx={{
-                  flexWrap: { xs: "nowrap", md: "wrap" },
-                  overflowX: { xs: "auto", md: "visible" },
-                  pb: { xs: 0.5, md: 0 },
-                  scrollbarWidth: "thin",
-                }}
-                mb={1}
-              >
-                {quickFilters.map((filter) => {
-                  const isActive = activeFilter === filter;
-                  return (
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+                  Category Filters
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {quickFilters.map((filter) => {
+                    const isActive = activeFilter === filter;
+                    return (
+                      <Chip
+                        key={filter}
+                        label={filter}
+                        variant={isActive ? "filled" : "outlined"}
+                        clickable
+                        size="small"
+                        onClick={() => {
+                          setActiveFilter(filter);
+                          if (filter === "All") {
+                            setSearchQuery("");
+                            handleSearch("");
+                            return;
+                          }
+                          setSearchQuery(filter);
+                          handleSearch(filter);
+                        }}
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: "12px",
+                          ...(isActive && {
+                            bgcolor: "primary.main",
+                            color: "primary.contrastText",
+                          }),
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
+              <Divider className="!border-slate-100 dark:!border-slate-800" />
+
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+                  Trending Keywords
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {quickSuggestions.map((suggestion) => (
                     <Chip
-                      key={filter}
-                      label={filter}
-                      variant={isActive ? "filled" : "outlined"}
+                      key={suggestion}
+                      label={suggestion}
+                      variant="outlined"
                       clickable
                       size="small"
                       onClick={() => {
-                        setActiveFilter(filter);
-
-                        if (filter === "All") {
-                          setSearchQuery("");
-                          handleSearch("");
-                          return;
-                        }
-
-                        setSearchQuery(filter);
-                        handleSearch(filter);
+                        setSearchQuery(suggestion);
+                        handleSearch(suggestion);
                       }}
                       sx={{
-                        fontWeight: 600,
-                        fontSize: { xs: "0.75rem", md: "0.8125rem" },
-                        "&:focus-visible": {
-                          outline: `2px solid ${BRAND_DARK}`,
-                          outlineOffset: 2,
-                        },
-                        ...(isActive && {
-                          bgcolor: BRAND,
-                          color: "#fff",
-                          "&:hover": { bgcolor: BRAND_DARK },
-                        }),
+                        fontWeight: 500,
+                        fontSize: "12px",
                       }}
                     />
-                  );
-                })}
-              </Stack>
-
-              <Divider sx={{ my: 2 }} />
-
-              <Typography
-                fontWeight={600}
-                mb={1.2}
-                color="text.secondary"
-                variant="body2"
-                textTransform="uppercase"
-                letterSpacing={0.5}
-              >
-                Helpful searches
-              </Typography>
-              <Stack
-                direction="row"
-                spacing={1}
-                useFlexGap
-                sx={{
-                  flexWrap: { xs: "nowrap", md: "wrap" },
-                  overflowX: { xs: "auto", md: "visible" },
-                  pb: { xs: 0.5, md: 0 },
-                  scrollbarWidth: "thin",
-                }}
-              >
-                {quickSuggestions.map((suggestion) => (
-                  <Chip
-                    key={suggestion}
-                    label={suggestion}
-                    variant="outlined"
-                    clickable
-                    size="small"
-                    onClick={() => {
-                      setSearchQuery(suggestion);
-                      handleSearch(suggestion);
-                    }}
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: { xs: "0.75rem", md: "0.8125rem" },
-                      borderColor: "rgba(0,146,124,0.35)",
-                      color: BRAND_DARK,
-                      "&:hover": { bgcolor: "rgba(0,146,124,0.08)" },
-                      "&:focus-visible": {
-                        outline: `2px solid ${BRAND_DARK}`,
-                        outlineOffset: 2,
-                      },
-                    }}
-                  />
-                ))}
-              </Stack>
-            </Paper>
+                  ))}
+                </div>
+              </div>
+            </div>
           </Grid>
 
-          {/* Results */}
+          {/* Results Grid */}
           <Grid item xs={12} md={9}>
-            <Paper
-              sx={{
-                p: { xs: 2, sm: 2.5, md: 3 },
-                borderRadius: 3,
-                border: "1px solid",
-                borderColor: "divider",
-                boxShadow: "0 2px 10px rgba(15, 23, 42, 0.04)",
-              }}
-            >
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                justifyContent="space-between"
-                alignItems={{ xs: "flex-start", sm: "center" }}
-                spacing={1}
-                mb={1}
-              >
-                <Typography variant="h6" fontWeight={700} fontSize={{ xs: "1.05rem", md: "1.25rem" }}>
-                  {searchQuery ? `Results for "${searchQuery}"` : "Start searching for products"}
-                </Typography>
-
-                {!isLoading && hasResults && (
-                  <Chip
-                    label={resultsLabel}
-                    size="small"
-                    sx={{ bgcolor: "rgba(0,146,124,0.1)", color: BRAND_DARK, fontWeight: 600 }}
-                  />
-                )}
-              </Stack>
-
-              {(isLoading || !hasResults) && (
-                <Typography color="text.secondary" mb={3} fontSize={{ xs: "0.875rem", md: "1rem" }}>
-                  {resultsLabel}
-                </Typography>
-              )}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-sm transition-colors space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">
+                    {searchQuery ? `Products matching "${searchQuery}"` : "Catalog Products"}
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    {resultsLabel}
+                  </p>
+                </div>
+              </div>
 
               {isLoading ? (
-                <Box
-                  height={{ xs: 240, sm: 280, md: 320 }}
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                  gap={1.5}
-                >
-                  <CircularProgress sx={{ color: BRAND }} />
-                  <Typography color="text.secondary" fontSize={{ xs: "0.875rem", md: "1rem" }}>
-                    Looking for the best matches...
-                  </Typography>
-                </Box>
+                <SkeletonGrid count={6} />
               ) : !hasResults ? (
-                <Box
-                  height={{ xs: 240, sm: 280, md: 320 }}
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                  textAlign="center"
-                  gap={1.5}
-                  px={2}
-                >
-                  <Box
-                    sx={{
-                      width: { xs: 52, md: 64 },
-                      height: { xs: 52, md: 64 },
-                      borderRadius: "50%",
-                      bgcolor: "rgba(0,146,124,0.08)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <SearchOffIcon sx={{ color: BRAND, fontSize: { xs: 24, md: 30 } }} />
-                  </Box>
-                  <Typography variant="h6" fontWeight={700} fontSize={{ xs: "1rem", md: "1.25rem" }}>
-                    No products found
-                  </Typography>
-                  <Typography color="text.secondary" maxWidth={340} fontSize={{ xs: "0.8125rem", md: "0.875rem" }}>
-                    Try a different keyword or browse one of the suggestions on the left.
-                  </Typography>
-                </Box>
+                <div className="py-16 text-center space-y-3">
+                  <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400 dark:text-slate-500">
+                    <SearchOffIcon sx={{ fontSize: 28 }} />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                    No matching products found
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                    Try checking your spelling or selecting one of the suggested keywords from the filter sidebar.
+                  </p>
+                </div>
               ) : (
-                <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                   {results.map((item) => (
-                    <Grid
-                      item
-                      xs={6}
-                      sm={6}
-                      md={4}
-                      lg={3}
-                      xl={2}
-                      key={item.id}
-                      sx={{ display: "flex", justifyContent: "center" }}
-                    >
-                      <Box sx={{ width: "100%" }}>
-                        <ProductCard item={item} />
-                      </Box>
-                    </Grid>
+                    <ProductCard key={item.id} item={item} />
                   ))}
-                </Grid>
+                </div>
               )}
-            </Paper>
+            </div>
           </Grid>
         </Grid>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 

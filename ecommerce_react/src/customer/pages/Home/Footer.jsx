@@ -7,8 +7,6 @@ import {
   CreditCard,
 } from "lucide-react";
 
-// Lucide removed brand/logo icons (Instagram, LinkedIn, Twitter, etc.) from
-// its core set, so these are small inline SVGs instead of package imports.
 function InstagramIcon({ size = 18, ...props }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -39,22 +37,30 @@ function TwitterIcon({ size = 18, ...props }) {
 
 function Footer() {
   return (
-    <footer className="bg-white text-gray-900 mt-16 border-t border-slate-100">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10">
-
-        {/* Newsletter strip */}
-        <div className="py-8 sm:py-10 -mt-8 sm:-mt-10">
-          <div className="bg-gradient-to-r from-[#2874f0] to-[#1f5fd1] rounded-3xl px-6 sm:px-10 py-8 sm:py-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg shadow-blue-100">
+    <footer className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 mt-12 rounded-[32px] border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors overflow-hidden">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10">
+        {/* Newsletter Banner */}
+        <div className="pt-8 sm:pt-10">
+          <div className="bg-gradient-to-r from-teal-800 via-teal-700 to-emerald-800 rounded-3xl px-6 sm:px-10 py-8 sm:py-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl text-white">
             <div className="text-center md:text-left">
-              <h3 className="text-lg sm:text-xl font-bold text-white">
-                Get offers before anyone else
+              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-teal-200">
+                VIP Newsletter Club
+              </span>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-white mt-1">
+                Get Exclusive Deals & Flash Drop Alerts
               </h3>
-              <p className="text-blue-100 text-sm mt-1">
-                Subscribe for deals, new arrivals, and exclusive discounts.
+              <p className="text-teal-100 text-xs sm:text-sm mt-1">
+                Join over 50,000 smart shoppers for coupon codes and early access.
               </p>
             </div>
 
-            <form className="w-full md:w-auto flex items-center gap-2 bg-white rounded-full p-1.5 pl-5 max-w-md md:max-w-none shadow-sm">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                alert("Thank you for subscribing to ShopSphere VIP Deals!");
+              }}
+              className="w-full md:w-auto flex items-center gap-2 bg-white dark:bg-slate-900 rounded-full p-1.5 pl-4 max-w-md md:max-w-none shadow-sm"
+            >
               <label htmlFor="footer-email" className="sr-only">
                 Email address
               </label>
@@ -62,165 +68,138 @@ function Footer() {
                 id="footer-email"
                 type="email"
                 required
-                placeholder="Enter your email"
-                className="bg-transparent flex-1 min-w-0 text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+                placeholder="Enter your email address..."
+                className="bg-transparent flex-1 min-w-0 text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 outline-none"
               />
               <button
                 type="submit"
-                className="flex items-center gap-1.5 bg-[#2874f0] hover:bg-[#1f5fd1] text-white text-sm font-semibold px-4 sm:px-5 py-2.5 rounded-full transition-colors whitespace-nowrap"
+                className="flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold px-4 sm:px-5 py-2.5 rounded-full transition-colors whitespace-nowrap cursor-pointer"
               >
                 Subscribe
-                <ArrowRight size={15} />
+                <ArrowRight size={14} />
               </button>
             </form>
           </div>
         </div>
 
-        {/* Main Footer */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 py-10">
-
-          {/* Brand */}
-          <div className="sm:col-span-2 lg:col-span-2">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+        {/* Main Footer Links */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-10 py-10">
+          {/* Brand Column */}
+          <div className="sm:col-span-2 lg:col-span-2 space-y-4">
+            <span className="logo text-2xl sm:text-3xl font-bold tracking-tight text-teal-600 dark:text-teal-400">
               ShopSphere
-            </h2>
+            </span>
 
-            <p className="text-gray-500 mt-4 leading-relaxed max-w-sm">
-              Your trusted multi-vendor marketplace for fashion,
-              electronics, home essentials, and more.
+            <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm leading-relaxed max-w-sm">
+              India's premier multi-vendor e-commerce destination connecting verified merchants with millions of shoppers nationwide.
             </p>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex gap-2.5 pt-2">
               <a
                 href="#"
                 aria-label="Instagram"
-                className="p-2 bg-slate-100 text-gray-600 rounded-xl hover:bg-[#2874f0] hover:text-white transition-colors duration-200"
+                className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-teal-600 hover:text-white dark:hover:bg-teal-600 transition-colors duration-200"
               >
-                <InstagramIcon size={18} />
+                <InstagramIcon size={16} />
               </a>
               <a
                 href="#"
                 aria-label="LinkedIn"
-                className="p-2 bg-slate-100 text-gray-600 rounded-xl hover:bg-[#2874f0] hover:text-white transition-colors duration-200"
+                className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-teal-600 hover:text-white dark:hover:bg-teal-600 transition-colors duration-200"
               >
-                <LinkedinIcon size={18} />
+                <LinkedinIcon size={16} />
               </a>
               <a
                 href="#"
                 aria-label="Twitter"
-                className="p-2 bg-slate-100 text-gray-600 rounded-xl hover:bg-[#2874f0] hover:text-white transition-colors duration-200"
+                className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-teal-600 hover:text-white dark:hover:bg-teal-600 transition-colors duration-200"
               >
-                <TwitterIcon size={18} />
+                <TwitterIcon size={16} />
               </a>
               <a
                 href="mailto:support@shopsphere.com"
                 aria-label="Email"
-                className="p-2 bg-slate-100 text-gray-600 rounded-xl hover:bg-[#2874f0] hover:text-white transition-colors duration-200"
+                className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-teal-600 hover:text-white dark:hover:bg-teal-600 transition-colors duration-200"
               >
-                <Mail size={18} />
+                <Mail size={16} />
               </a>
             </div>
           </div>
 
-          {/* Shop */}
+          {/* Shop Column */}
           <nav aria-label="Shop categories">
-            <h3 className="font-semibold text-base mb-5 text-gray-900">
-              Shop
-            </h3>
-
-            <ul className="space-y-3 text-gray-500 text-sm">
-              <li><a href="#" className="hover:text-[#2874f0] transition-colors">Fashion</a></li>
-              <li><a href="#" className="hover:text-[#2874f0] transition-colors">Electronics</a></li>
-              <li><a href="#" className="hover:text-[#2874f0] transition-colors">Mobiles</a></li>
-              <li><a href="#" className="hover:text-[#2874f0] transition-colors">Home & Furniture</a></li>
-              <li><a href="#" className="hover:text-[#2874f0] transition-colors">Sports</a></li>
+            <h4 className="font-bold text-sm mb-4 text-slate-900 dark:text-slate-100 uppercase tracking-wider text-[11px]">
+              Categories
+            </h4>
+            <ul className="space-y-2.5 text-slate-500 dark:text-slate-400 text-xs sm:text-sm">
+              <li><a href="/products/men" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Men's Apparel</a></li>
+              <li><a href="/products/women" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Women's Fashion</a></li>
+              <li><a href="/products/electronics" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Electronics & Gadgets</a></li>
+              <li><a href="/products/home_furniture" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Home & Living</a></li>
+              <li><a href="/products/beauty" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Beauty & Personal Care</a></li>
             </ul>
           </nav>
 
-          {/* Company */}
+          {/* Company Column */}
           <nav aria-label="Company">
-            <h3 className="font-semibold text-base mb-5 text-gray-900">
-              Company
-            </h3>
-
-            <ul className="space-y-3 text-gray-500 text-sm">
-              <li><a href="#" className="hover:text-[#2874f0] transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-[#2874f0] transition-colors">Careers</a></li>
-              <li><a href="#" className="hover:text-[#2874f0] transition-colors">Become a Seller</a></li>
-              <li><a href="#" className="hover:text-[#2874f0] transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-[#2874f0] transition-colors">Contact Us</a></li>
+            <h4 className="font-bold text-sm mb-4 text-slate-900 dark:text-slate-100 uppercase tracking-wider text-[11px]">
+              Platform
+            </h4>
+            <ul className="space-y-2.5 text-slate-500 dark:text-slate-400 text-xs sm:text-sm">
+              <li><a href="/become-seller" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors font-semibold text-teal-600 dark:text-teal-400">Become a Seller</a></li>
+              <li><a href="/seller/login" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Seller Portal Login</a></li>
+              <li><a href="/account/orders" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Track Orders</a></li>
+              <li><a href="/wishlist" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Saved Wishlist</a></li>
             </ul>
           </nav>
 
-          {/* Contact */}
+          {/* Contact Column */}
           <div>
-            <h3 className="font-semibold text-base mb-5 text-gray-900">
-              Contact
-            </h3>
-
-            <ul className="space-y-4 text-gray-500 text-sm">
-              <li className="flex items-start gap-3">
-                <MapPin size={17} className="text-[#2874f0] mt-0.5 shrink-0" />
-                <span>Amravati, Maharashtra, India</span>
+            <h4 className="font-bold text-sm mb-4 text-slate-900 dark:text-slate-100 uppercase tracking-wider text-[11px]">
+              Merchant Helpdesk
+            </h4>
+            <ul className="space-y-3 text-slate-500 dark:text-slate-400 text-xs sm:text-sm">
+              <li className="flex items-start gap-2.5">
+                <MapPin size={15} className="text-teal-600 dark:text-teal-400 mt-0.5 shrink-0" />
+                <span>Maharashtra, India</span>
               </li>
-
-              <li className="flex items-center gap-3">
-                <Phone size={17} className="text-[#2874f0] shrink-0" />
-                <a href="tel:+919665774924" className="hover:text-[#2874f0] transition-colors">
-                  +91 96657 74924
-                </a>
+              <li className="flex items-center gap-2.5">
+                <Phone size={15} className="text-teal-600 dark:text-teal-400 shrink-0" />
+                <span>+91 96657 74924</span>
               </li>
-
-              <li className="flex items-center gap-3">
-                <Mail size={17} className="text-[#2874f0] shrink-0" />
-                <a href="mailto:support@shopsphere.com" className="hover:text-[#2874f0] transition-colors">
-                  yashlodam03@gmail.com
-                </a>
+              <li className="flex items-center gap-2.5">
+                <Mail size={15} className="text-teal-600 dark:text-teal-400 shrink-0" />
+                <span>support@shopsphere.com</span>
               </li>
             </ul>
           </div>
-
         </div>
 
-        {/* Payments strip */}
-        <div className="border-t border-slate-100 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-gray-500 text-sm">
-            <CreditCard size={16} className="text-[#2874f0]" />
-            <span>We accept all major payment methods</span>
+        {/* Payments Strip */}
+        <div className="border-t border-slate-100 dark:border-slate-800 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs">
+            <CreditCard size={15} className="text-teal-600 dark:text-teal-400" />
+            <span>256-Bit Razorpay & UPI Encrypted Settlement</span>
           </div>
 
-          <div className="flex items-center gap-2.5 text-xs font-semibold text-gray-600">
-            <span className="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-md">VISA</span>
-            <span className="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-md">Mastercard</span>
-            <span className="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-md">UPI</span>
-            <span className="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-md">PayPal</span>
-            <span className="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-md">RuPay</span>
+          <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600 dark:text-slate-300">
+            <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-2.5 py-1 rounded-md">UPI</span>
+            <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-2.5 py-1 rounded-md">VISA</span>
+            <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-2.5 py-1 rounded-md">Mastercard</span>
+            <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-2.5 py-1 rounded-md">RuPay</span>
+            <span className="bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-2.5 py-1 rounded-md">NetBanking</span>
           </div>
         </div>
 
-        {/* Bottom Footer */}
-        <div className="border-t border-slate-100 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-
-          <p className="text-gray-500 text-sm text-center">
-            © 2026 ShopSphere. All rights reserved.
-          </p>
-
-          <div className="flex flex-wrap gap-5 text-sm text-gray-500 justify-center">
-            <a href="#" className="hover:text-[#2874f0] transition-colors">
-              Privacy Policy
-            </a>
-
-            <a href="#" className="hover:text-[#2874f0] transition-colors">
-              Terms & Conditions
-            </a>
-
-            <a href="#" className="hover:text-[#2874f0] transition-colors">
-              Refund Policy
-            </a>
+        {/* Bottom Copyright */}
+        <div className="border-t border-slate-100 dark:border-slate-800 py-5 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
+          <p>© 2026 ShopSphere Multi-Vendor Marketplace. All rights reserved.</p>
+          <div className="flex gap-4">
+            <a href="#" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors">Refund & Cancellation</a>
           </div>
-
         </div>
-
       </div>
     </footer>
   );

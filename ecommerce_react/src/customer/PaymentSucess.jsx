@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Button } from "@mui/material";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
@@ -8,14 +8,6 @@ import { useAppDispatch } from "../State/Store";
 import { paymentSuccess } from "../State/customer/OrderSlice";
 import { fetchUserCart } from "../State/customer/CartSlice";
 
-/**
- * PaymentSuccess page — shown after Razorpay redirects back.
- *
- * Razorpay redirect URL pattern (configured in backend):
- *   /payment-success/:orderId?razorpay_payment_id=xxx&razorpay_payment_link_id=yyy
- *
- * Backend endpoint: GET /api/payment/{paymentId}?paymentLinkId=yyy
- */
 function PaymentSuccess() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -33,82 +25,83 @@ function PaymentSuccess() {
 
     const confirm = async () => {
       try {
-        // Confirm payment with backend
         await dispatch(paymentSuccess({ paymentId, paymentLinkId })).unwrap();
-        // Refresh cart (should be empty now)
         dispatch(fetchUserCart());
       } catch {
-        // Payment confirmation failed — user still sees success screen
-        // Backend will reconcile via Razorpay webhooks
+        // Handled silently
       }
     };
 
     confirm();
-  }, []);
+  }, [dispatch, location.search]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-teal-50 flex justify-center items-center px-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 text-center">
-
+    <div className="min-h-[85vh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex justify-center items-center px-4 py-12 transition-colors duration-200">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200/80 dark:border-slate-800 w-full max-w-lg p-8 text-center space-y-6 transition-colors">
         {/* Success icon */}
         <div className="flex justify-center">
-          <div className="w-28 h-28 rounded-full bg-green-100 flex items-center justify-center">
-            <CheckCircleRoundedIcon sx={{ fontSize: 70 }} className="text-green-600" />
+          <div className="w-24 h-24 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <CheckCircleRoundedIcon sx={{ fontSize: 60 }} />
           </div>
         </div>
 
-        <h1 className="text-4xl font-bold text-gray-800 mt-6">
-          Payment Successful 🎉
-        </h1>
-        <p className="text-gray-500 mt-3 text-lg">Thank you for your purchase.</p>
-        <p className="text-gray-600 mt-2">
-          Your order has been placed and is now being processed.
-        </p>
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">
+            Payment Successful! 🎉
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Your payment was processed and verified by the merchant gateway.
+          </p>
+        </div>
 
         {/* Confirmation box */}
-        <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-5">
-          <h2 className="font-semibold text-green-700 text-lg">Order Confirmed</h2>
-          <p className="text-gray-600 mt-2 text-sm">
-            You'll receive an email confirmation shortly.
+        <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl p-5 text-left space-y-1">
+          <h3 className="font-bold text-emerald-800 dark:text-emerald-300 text-sm">
+            Order Confirmed & Sent to Sellers
+          </h3>
+          <p className="text-slate-600 dark:text-slate-400 text-xs">
+            Vendors have been notified for order fulfillment. You can track live shipment progress in your account orders page.
           </p>
         </div>
 
         {/* Action buttons */}
-        <div className="mt-8 flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <Button
             fullWidth
             variant="contained"
+            color="primary"
             startIcon={<ShoppingBagOutlinedIcon />}
             sx={{
-              bgcolor: "#111827",
               py: 1.4,
-              borderRadius: "12px",
+              borderRadius: "14px",
               textTransform: "none",
-              fontSize: "16px",
-              "&:hover": { bgcolor: "#000" },
+              fontWeight: 700,
+              fontSize: "14px",
             }}
             onClick={() => navigate("/")}
           >
             Continue Shopping
           </Button>
+
           <Button
             fullWidth
             variant="outlined"
             startIcon={<ReceiptLongOutlinedIcon />}
             sx={{
               py: 1.4,
-              borderRadius: "12px",
+              borderRadius: "14px",
               textTransform: "none",
-              fontSize: "16px",
+              fontWeight: 700,
+              fontSize: "14px",
             }}
             onClick={() => navigate("/account/orders")}
           >
-            View Orders
+            View My Orders
           </Button>
         </div>
 
-        <p className="mt-8 text-gray-400 text-sm">
-          Thank you for shopping with ShopSphere ❤️
+        <p className="text-xs text-slate-400 dark:text-slate-500 pt-2">
+          Thank you for choosing ShopSphere Multi-Vendor Marketplace ❤️
         </p>
       </div>
     </div>

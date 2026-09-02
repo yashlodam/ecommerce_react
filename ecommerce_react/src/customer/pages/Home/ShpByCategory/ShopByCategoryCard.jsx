@@ -2,17 +2,24 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 function ShopByCategoryCard({ item }) {
-  
-
   const navigate = useNavigate();
 
   return (
-    <div onClick={() => navigate(`/products/${item.categoryId}`)} className="group flex w-[78px] flex-shrink-0 cursor-pointer flex-col items-center sm:w-[92px] md:w-[104px] lg:w-[112px]">
-      <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-[20px] border border-slate-200/80 bg-[radial-gradient(circle_at_top,_rgba(37,99,235,0.12),_transparent_60%),linear-gradient(135deg,_#f8fbff_0%,_#eef4ff_100%)] shadow-[0_18px_42px_-24px_rgba(15,23,42,0.35)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_24px_56px_-24px_rgba(37,99,235,0.35)] sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 lg:rounded-[24px]">
-        <img src={item.image} alt={item.title} className="h-7 w-7 object-contain transition-transform duration-300 group-hover:scale-110 sm:h-8 sm:w-8 md:h-10 md:w-10 lg:h-12 lg:w-12" />
+    <div
+      onClick={() => navigate(`/products/${item.categoryId}`)}
+      className="group flex w-[90px] sm:w-[110px] md:w-[124px] lg:w-[136px] flex-shrink-0 cursor-pointer flex-col items-center p-2 rounded-2xl transition-all duration-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:-translate-y-1"
+    >
+      <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-xs transition-all duration-300 group-hover:border-teal-500 group-hover:shadow-md group-hover:ring-4 group-hover:ring-teal-50 dark:group-hover:ring-teal-950/40 flex items-center justify-center p-2">
+        <img
+          src={item.image}
+          alt={item.name || "Category"}
+          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-teal-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
       </div>
 
-      <p className="mt-2 text-center text-[11px] font-medium leading-tight text-slate-700 transition-colors duration-300 group-hover:text-blue-700 sm:text-xs md:text-sm">
+      <p className="mt-2.5 text-center text-xs sm:text-sm font-bold leading-tight text-slate-800 dark:text-slate-200 transition-colors duration-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 line-clamp-2">
         {item.name}
       </p>
     </div>

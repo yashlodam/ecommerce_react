@@ -20,7 +20,6 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
@@ -31,10 +30,6 @@ import {
   deleteSellerProduct,
   updateSellerProduct,
 } from "../../../State/seller/sellerProductSlice";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  fontWeight: 600,
-}));
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -91,53 +86,64 @@ export default function ProductTable() {
   };
 
   return (
-    <Box>
-      <Box className="flex justify-between items-center mb-6">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80 dark:border-slate-800">
         <div>
-          <Typography variant="h5" className="font-bold text-slate-800">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
             Product Inventory
-          </Typography>
-          <Typography variant="body2" className="text-slate-500">
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             Manage your store's listings, stock availability, and retail pricing.
-          </Typography>
+          </p>
         </div>
         <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={() => navigate("/seller/add-product")}
-          className="normal-case font-semibold"
+          sx={{
+            borderRadius: "12px",
+            fontWeight: 700,
+            textTransform: "none",
+            px: 2.5,
+          }}
         >
           Add Product
         </Button>
-      </Box>
+      </div>
 
       {loading ? (
-        <Box className="flex justify-center items-center py-20">
-          <CircularProgress />
-        </Box>
+        <div className="flex justify-center items-center py-20">
+          <CircularProgress color="primary" />
+        </div>
       ) : (
         <TableContainer
           component={Paper}
-          elevation={1}
-          className="rounded-xl overflow-hidden border border-slate-100"
+          elevation={0}
+          sx={{
+            borderRadius: "20px",
+            border: "1px solid",
+            borderColor: "divider",
+            overflow: "hidden",
+            bgcolor: "background.paper",
+          }}
         >
           <Table sx={{ minWidth: 700 }} aria-label="seller products table">
-            <TableHead className="bg-slate-50">
+            <TableHead className="bg-slate-50 dark:bg-slate-950/60">
               <TableRow>
-                <StyledTableCell>Item</StyledTableCell>
-                <StyledTableCell>Title</StyledTableCell>
-                <StyledTableCell align="right">MRP</StyledTableCell>
-                <StyledTableCell align="right">Selling Price</StyledTableCell>
-                <StyledTableCell align="center">Discount</StyledTableCell>
-                <StyledTableCell align="center">Stock Status</StyledTableCell>
-                <StyledTableCell align="right">Actions</StyledTableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Item</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Title</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="right">MRP</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="right">Selling Price</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="center">Discount</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="center">Stock Status</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {!products || products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" className="py-12 text-slate-400">
+                  <TableCell colSpan={7} align="center" className="py-12 text-slate-400 dark:text-slate-500">
                     No products listed yet. Click "Add Product" to create your first listing!
                   </TableCell>
                 </TableRow>
@@ -147,24 +153,26 @@ export default function ProductTable() {
                   return (
                     <TableRow key={item.id} hover className="transition-colors">
                       <TableCell>
-                        <img
-                          src={item.images?.[0] || "https://placehold.co/80x80?text=Product"}
-                          alt={item.title}
-                          className="w-14 h-14 object-cover rounded-lg border border-slate-200"
-                        />
+                        <div className="w-14 h-14 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200/80 dark:border-slate-800 p-1 flex items-center justify-center">
+                          <img
+                            src={item.images?.[0] || "https://placehold.co/80x80?text=Product"}
+                            alt={item.title}
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
                       </TableCell>
                       <TableCell>
-                        <p className="font-semibold text-sm text-slate-800 line-clamp-1">
+                        <p className="font-bold text-sm text-slate-900 dark:text-slate-100 line-clamp-1">
                           {item.title}
                         </p>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                           Color: {item.color || "Standard"} • Sizes: {item.sizes || "Free Size"}
                         </p>
                       </TableCell>
                       <TableCell align="right" className="text-slate-400 line-through text-sm">
                         {formatINR(item.mrpPrice)}
                       </TableCell>
-                      <TableCell align="right" className="font-bold text-slate-900 text-sm">
+                      <TableCell align="right" className="font-bold text-teal-700 dark:text-teal-400 text-sm">
                         {formatINR(item.sellingPrice)}
                       </TableCell>
                       <TableCell align="center">
@@ -182,11 +190,11 @@ export default function ProductTable() {
                           size="small"
                           color={isInStock ? "primary" : "error"}
                           onClick={() => handleEditStock(item)}
-                          className="cursor-pointer font-medium text-xs"
+                          className="cursor-pointer font-bold text-xs"
                         />
                       </TableCell>
                       <TableCell align="right">
-                        <Box className="flex justify-end items-center gap-1">
+                        <div className="flex justify-end items-center gap-1">
                           <IconButton
                             size="small"
                             color="primary"
@@ -203,7 +211,7 @@ export default function ProductTable() {
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
-                        </Box>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -215,7 +223,7 @@ export default function ProductTable() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialog} onClose={() => setDeleteDialog(false)}>
+      <Dialog open={deleteDialog} onClose={() => setDeleteDialog(false)} PaperProps={{ sx: { borderRadius: "16px" } }}>
         <DialogTitle className="font-bold">Delete Product Listing</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -223,18 +231,18 @@ export default function ProductTable() {
             <strong>{selectedProduct?.title}</strong>? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialog(false)} color="inherit">
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setDeleteDialog(false)} color="inherit" sx={{ borderRadius: "10px" }}>
             Cancel
           </Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">
+          <Button onClick={confirmDelete} color="error" variant="contained" sx={{ borderRadius: "10px", fontWeight: 700 }}>
             Delete
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Quick Stock Update Dialog */}
-      <Dialog open={stockDialog} onClose={() => setStockDialog(false)}>
+      <Dialog open={stockDialog} onClose={() => setStockDialog(false)} PaperProps={{ sx: { borderRadius: "16px" } }}>
         <DialogTitle className="font-bold">Update Inventory Quantity</DialogTitle>
         <DialogContent>
           <DialogContentText className="mb-4">
@@ -250,15 +258,15 @@ export default function ProductTable() {
             inputProps={{ min: 0 }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setStockDialog(false)} color="inherit">
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setStockDialog(false)} color="inherit" sx={{ borderRadius: "10px" }}>
             Cancel
           </Button>
-          <Button onClick={confirmStockUpdate} color="primary" variant="contained">
+          <Button onClick={confirmStockUpdate} color="primary" variant="contained" sx={{ borderRadius: "10px", fontWeight: 700 }}>
             Save Stock
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   );
 }

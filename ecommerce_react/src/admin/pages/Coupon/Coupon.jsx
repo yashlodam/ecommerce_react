@@ -1,135 +1,197 @@
-import React, { useState } from 'react'
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
-import DeleteIcon from '@mui/icons-material/Delete';
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogContent,
+  CircularProgress,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
+import { useAppDispatch, useAppSelector } from "../../../State/Store";
+import { fetchAllCoupons, deleteCoupon } from "../../../State/customer/CouponSlice";
+import AddNewCouponForm from "./AddNewCouponForm";
+import EmptyState from "../../../common/EmptyState";
 
-const accountS = [
-  {
-    status: "PENDING_VERIFICATION",
-    title: "Pending Verification",
-    description: "Account is awaiting verification."
-  },
-  {
-    status: "ACTIVE",
-    title: "Active",
-    description: "Account is active and can access all features."
-  },
-  {
-    status: "SUSPENDED",
-    title: "Suspended",
-    description: "Account is temporarily suspended due to policy violations or review."
-  },
-  {
-    status: "DEACTIVATED",
-    title: "Deactivated",
-    description: "Account has been deactivated by the user or administrator."
-  },
-  {
-    status: "BANNED",
-    title: "Banned",
-    description: "Account has been permanently banned from the platform."
-  },
-  {
-    status: "CLOSED",
-    title: "Closed",
-    description: "Account has been permanently closed and can no longer be used."
-  }
-];
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
-  '&:last-child td, &:last-child th': {
-    border: 0,
-  },
-}));
-
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
+function formatINR(val) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(val || 0);
 }
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-
 
 function Coupon() {
+  const dispatch = useAppDispatch();
+  const { coupon } = useAppSelector((store) => store);
+  const [openAddModal, setOpenAddModal] = useState(false);
 
-  const [accountStatus,setAccountStatus] = useState("ACTIVE")
+  useEffect(() => {
+    dispatch(fetchAllCoupons());
+  }, [dispatch]);
 
-  const handleChange = (e)=>{
-    setAccountStatus(e.target.value)
-  }
+  const coupons = coupon?.coupons || [];
+  const isLoading = coupon?.loading;
 
-  
+  const handleDeleteCoupon = (couponId) => {
+    if (window.confirm("Are you sure you want to delete this coupon?")) {
+      dispatch(deleteCoupon(couponId));
+    }
+  };
 
   return (
-    <>
-    
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }} aria-label="customized table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell>Coupon Code</StyledTableCell>
-            <StyledTableCell>Start Date</StyledTableCell>
-            <StyledTableCell>End Date</StyledTableCell>
-            <StyledTableCell align="right">Minimum Order Value</StyledTableCell>
-            <StyledTableCell align="right">Discount</StyledTableCell>
-            <StyledTableCell align="right">Status</StyledTableCell>
-             <StyledTableCell align="right">Delete</StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <StyledTableRow key={row.name}>
-              <StyledTableCell component="th" scope="row">
-                {row.name}
-              </StyledTableCell>
-              <StyledTableCell >{row.calories}</StyledTableCell>
-              <StyledTableCell align="right">{row.fat}</StyledTableCell>
-              <StyledTableCell align="right">{row.carbs}</StyledTableCell>
-              <StyledTableCell align="right">{row.protein}</StyledTableCell>
-              <StyledTableCell align="right">{row.protein}</StyledTableCell>
-              <StyledTableCell align="right">
-                <Button>
-                  <DeleteIcon/>
-                </Button>
-              </StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    </>
-  )
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80 dark:border-slate-800">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            Promotional Coupons
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Manage marketplace discount codes, minimum order requirements, and validity dates.
+          </p>
+        </div>
+
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => setOpenAddModal(true)}
+          sx={{
+            borderRadius: "12px",
+            fontWeight: 700,
+            textTransform: "none",
+            px: 2.5,
+          }}
+        >
+          Add Coupon
+        </Button>
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+          <CircularProgress color="primary" />
+        </div>
+      ) : coupons.length === 0 ? (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-8 transition-colors">
+          <EmptyState
+            icon={LocalOfferOutlinedIcon}
+            title="No coupons created"
+            description="Create promotional coupon vouchers to incentivize customers at checkout."
+            actionText="Create First Coupon"
+            onAction={() => setOpenAddModal(true)}
+          />
+        </div>
+      ) : (
+        <TableContainer
+          component={Paper}
+          elevation={0}
+          sx={{
+            borderRadius: "20px",
+            border: "1px solid",
+            borderColor: "divider",
+            overflow: "hidden",
+            bgcolor: "background.paper",
+          }}
+        >
+          <Table sx={{ minWidth: 750 }}>
+            <TableHead className="bg-slate-50 dark:bg-slate-950/60">
+              <TableRow>
+                <TableCell sx={{ fontWeight: 700 }}>Code</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Discount (%)</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Valid Period</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="right">Min Order Value</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="center">Status</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="right">Action</TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {coupons.map((c) => {
+                const isExpired =
+                  c.validityEndDate && new Date(c.validityEndDate) < new Date();
+
+                return (
+                  <TableRow key={c.id} hover className="transition-colors">
+                    <TableCell>
+                      <span className="font-mono font-bold text-sm bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-800 px-3 py-1 rounded-lg">
+                        {c.code}
+                      </span>
+                    </TableCell>
+
+                    <TableCell>
+                      <span className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+                        {c.discountPercentage}% OFF
+                      </span>
+                    </TableCell>
+
+                    <TableCell className="text-xs text-slate-600 dark:text-slate-300">
+                      {c.validityStartDate
+                        ? new Date(c.validityStartDate).toLocaleDateString("en-IN")
+                        : "Now"}{" "}
+                      —{" "}
+                      {c.validityEndDate
+                        ? new Date(c.validityEndDate).toLocaleDateString("en-IN")
+                        : "Ongoing"}
+                    </TableCell>
+
+                    <TableCell align="right" className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      {formatINR(c.minimumOrderValue)}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Chip
+                        label={isExpired ? "Expired" : "Active"}
+                        size="small"
+                        color={isExpired ? "error" : "success"}
+                        className="font-bold text-xs"
+                      />
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteCoupon(c.id)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      {/* Add Coupon Dialog */}
+      <Dialog
+        open={openAddModal}
+        onClose={() => setOpenAddModal(false)}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: { borderRadius: "20px", bgcolor: "background.paper" },
+        }}
+      >
+        <DialogContent sx={{ p: 0 }}>
+          <AddNewCouponForm
+            handleClose={() => setOpenAddModal(false)}
+            onSuccess={() => dispatch(fetchAllCoupons())}
+          />
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }
 
-export default Coupon
+export default Coupon;

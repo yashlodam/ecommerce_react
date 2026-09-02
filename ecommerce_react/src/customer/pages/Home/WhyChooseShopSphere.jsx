@@ -4,61 +4,61 @@ import { ShieldCheck, Truck, RefreshCcw, Headphones } from "lucide-react";
 function WhyChooseShopSphere() {
   const features = [
     {
-      icon: <Truck size={26} />,
-      title: "Fast delivery",
-      description: "Quick and reliable delivery across India.",
+      icon: <Truck size={24} />,
+      title: "Fast Delivery",
+      description: "Quick and reliable express fulfillment across 19,000+ pin codes in India.",
     },
     {
-      icon: <ShieldCheck size={26} />,
-      title: "Secure payments",
-      description: "100% secure payment methods and transactions.",
+      icon: <ShieldCheck size={24} />,
+      title: "Secure Payments",
+      description: "100% secure payment methods with instant UPI, Cards & EMI protection.",
     },
     {
-      icon: <RefreshCcw size={26} />,
-      title: "Easy returns",
-      description: "Hassle-free returns and refund process.",
+      icon: <RefreshCcw size={24} />,
+      title: "Easy Returns",
+      description: "Hassle-free 7-day doorstep return pickup and direct refund process.",
     },
     {
-      icon: <Headphones size={26} />,
-      title: "24/7 support",
-      description: "Dedicated support whenever you need help.",
+      icon: <Headphones size={24} />,
+      title: "24/7 Support",
+      description: "Dedicated marketplace customer support whenever you need assistance.",
     },
   ];
 
   return (
-    <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
-      <div className="rounded-[32px] border border-slate-200/80 bg-white/85 p-6 shadow-[0_30px_90px_-35px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:p-8 md:p-10">
-        <div className="mb-8 text-center sm:mb-10 md:mb-12">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-600">Trusted experience</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
-            Why customers choose ShopSphere
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-slate-600 sm:text-base">
-            We make shopping feel simple, secure, and genuinely delightful from start to finish.
-          </p>
-        </div>
+    <section className="overflow-hidden rounded-[32px] border border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 p-4 sm:p-6 lg:p-7 shadow-sm transition-colors">
+      <div className="mb-6 text-center border-b border-slate-100 dark:border-slate-800 pb-5">
+        <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-teal-600 dark:text-teal-400">
+          Trusted Marketplace
+        </p>
+        <h2 className="mt-0.5 text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          Why Customers Choose ShopSphere
+        </h2>
+        <p className="mx-auto mt-1 max-w-lg text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          We make multi-vendor shopping feel secure, authentic, and delightfully seamless.
+        </p>
+      </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-5 md:gap-6">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="group relative rounded-[24px] border border-slate-200/70 bg-slate-50 p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:bg-white hover:shadow-[0_24px_70px_-34px_rgba(37,99,235,0.4)] sm:p-6"
-            >
-              <div className="mb-4 flex justify-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600/10 text-blue-600 transition-all duration-300 group-hover:bg-blue-600 group-hover:text-white">
-                  {feature.icon}
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {features.map((feature, index) => (
+          <div
+            key={index}
+            className="group rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-teal-500/60 dark:hover:border-teal-500/60 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md"
+          >
+            <div className="mb-3.5 flex justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 dark:bg-teal-950/60 border border-teal-100 dark:border-teal-800/80 text-teal-600 dark:text-teal-400 transition-all duration-300 group-hover:bg-teal-600 group-hover:text-white">
+                {feature.icon}
               </div>
-
-              <h3 className="text-base font-semibold text-slate-900 sm:text-lg">
-                {feature.title}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-slate-500">
-                {feature.description}
-              </p>
             </div>
-          ))}
-        </div>
+
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              {feature.title}
+            </h3>
+            <p className="mt-1.5 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+              {feature.description}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );

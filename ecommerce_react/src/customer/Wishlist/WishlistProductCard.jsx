@@ -1,49 +1,59 @@
 import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import { IconButton, Tooltip } from "@mui/material";
 import { useAppDispatch } from "../../State/Store";
 import { addProductToWishlist } from "../../State/customer/WishlistSlice";
 import { useNavigate } from "react-router-dom";
 
-function WishlistProductCard({ item,
-  setOpenSuccess,
-  setSuccessMessage, }) {
-     
-    const dispatch = useAppDispatch()
-    const navigate = useNavigate();
-    
-    const handleWishlist = async (e) => {
-  e.stopPropagation();
+function formatINR(val) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(val || 0);
+}
 
-  try {
-    await dispatch(
-      addProductToWishlist({
-        productId: item.id,
-        jwt: localStorage.getItem("jwt"),
-      })
-    ).unwrap();
+function WishlistProductCard({ item, setOpenSuccess, setSuccessMessage }) {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-    setSuccessMessage("Item removed from your wishlist.");
-    setOpenSuccess(true);
-  } catch (error) {
-    console.error(error);
-  }
-};
+  const handleWishlist = async (e) => {
+    e.stopPropagation();
+    try {
+      await dispatch(
+        addProductToWishlist({
+          productId: item.id,
+          jwt: localStorage.getItem("jwt"),
+        })
+      ).unwrap();
+
+      if (setSuccessMessage && setOpenSuccess) {
+        setSuccessMessage("Item removed from your wishlist.");
+        setOpenSuccess(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const categoryPath = item.category?.categoryId || "catalog";
 
   return (
-    <div onClick={()=> navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)}  className="group w-full max-w-xs mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative cursor-pointer">
-
+    <div
+      onClick={() => navigate(`/product-details/${categoryPath}/${item.id}`)}
+      className="group w-full bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 overflow-hidden hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 relative cursor-pointer flex flex-col justify-between"
+    >
       {/* Remove Button */}
       <div onClick={handleWishlist} className="absolute top-3 right-3 z-10">
         <Tooltip title="Remove from Wishlist">
           <IconButton
             size="small"
             sx={{
-              bgcolor: "white",
+              bgcolor: "background.paper",
+              boxShadow: 1,
               "&:hover": {
-                bgcolor: "#fee2e2",
-                color: "#dc2626",
+                bgcolor: "error.light",
+                color: "error.main",
               },
             }}
           >
@@ -54,46 +64,43 @@ function WishlistProductCard({ item,
 
       {/* Discount Badge */}
       {item.discountPercent > 0 && (
-        <div className="absolute top-3 left-3 bg-green-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
+        <div className="absolute top-3 left-3 bg-teal-600 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-md z-10">
           {item.discountPercent}% OFF
         </div>
       )}
 
-
       {/* Product Image */}
-<div className="w-full h-64 sm:h-72 md:h-80 lg:h-72 xl:h-80 bg-white flex items-center justify-center p-4">
-  <img
-    src={item.images[0]}
-    alt={item.title}
-    className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
-  />
-</div>
+      <div className="w-full h-64 sm:h-72 bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
+        <img
+          src={item.images?.[0] || "https://placehold.co/200x200?text=Wishlist"}
+          alt={item.title}
+          className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      </div>
 
       {/* Product Details */}
-      <div className="p-4">
-        <h2 className="font-semibold text-gray-900 line-clamp-2 h-12">
-          {item.title}
-        </h2>
+      <div className="p-4 flex-1 flex flex-col justify-between space-y-2">
+        <div>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400">
+            {item.category?.name || "General"}
+          </span>
+          <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 line-clamp-2 mt-0.5 group-hover:text-teal-600 transition-colors">
+            {item.title}
+          </h3>
+        </div>
 
-        {item.color && (
-          <p className="text-sm text-gray-500 mt-1">
-            Color: {item.color}
-          </p>
-        )}
-
-        <div className="flex items-center gap-2 mt-3 flex-wrap">
-          <span className="text-xl font-bold text-gray-900">
-            ₹{item.sellingPrice}
+        <div className="flex items-baseline gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <span className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
+            {formatINR(item.sellingPrice)}
           </span>
 
           {item.mrpPrice > item.sellingPrice && (
-            <span className="text-gray-400 line-through">
-              ₹{item.mrpPrice}
+            <span className="text-xs text-slate-400 dark:text-slate-500 line-through">
+              {formatINR(item.mrpPrice)}
             </span>
           )}
         </div>
-
-        
       </div>
     </div>
   );

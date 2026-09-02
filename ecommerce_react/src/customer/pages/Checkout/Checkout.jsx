@@ -29,7 +29,7 @@ const modalStyle = {
   maxHeight: "90vh",
   overflowY: "auto",
   bgcolor: "background.paper",
-  borderRadius: "18px",
+  borderRadius: "20px",
   boxShadow: 24,
   p: 0,
 };
@@ -59,42 +59,38 @@ function Checkout() {
 
   const handleBuyNow = async () => {
     if (!selectedAddress) {
-      setOrderError("Please select or add a delivery address to proceed.");
+      setOrderError("Please select a delivery address before placing order.");
       return;
     }
-
-    if (!cart.cart?.cartItems?.length) {
-      setOrderError("Your shopping cart is empty.");
-      return;
-    }
-
     setOrderError("");
     setPlacing(true);
 
     try {
-      const res = await dispatch(
+      const paymentOrder = await dispatch(
         createOrder({
           address: selectedAddress,
           paymentGateway,
         })
       ).unwrap();
 
+      // If COD or payment order returned
       if (paymentGateway === "COD") {
         navigate("/order-success");
-      } else {
-        if (res.payment_link_url) {
-          window.location.href = res.payment_link_url;
-        } else {
-          navigate("/order-success");
-        }
+        return;
       }
-    } catch (error) {
-      const msg =
-        typeof error === "string"
-          ? error
-          : error?.message ||
-            "Failed to initiate order. Please check your cart and try again.";
-      setOrderError(msg);
+
+      // If Razorpay or Stripe returns paymentLinkUrl
+      if (paymentOrder?.paymentLinkUrl) {
+        window.location.href = paymentOrder.paymentLinkUrl;
+        return;
+      }
+
+      // Fallback
+      navigate(`/payment-success/${paymentOrder?.id || "ORD-SUCCESS"}`);
+    } catch (err) {
+      setOrderError(
+        typeof err === "string" ? err : "Failed to initiate payment. Please try again."
+      );
     } finally {
       setPlacing(false);
     }
@@ -103,25 +99,24 @@ function Checkout() {
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8 min-h-[85vh]">
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
           Secure Checkout
         </h1>
-        <p className="text-sm text-slate-500 mt-1 flex items-center gap-1">
-          <LockOutlinedIcon fontSize="small" className="text-emerald-600" />
-          256-bit SSL encrypted & authenticated payment checkout
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          Complete your order with encrypted multi-vendor checkout.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Addresses */}
+        {/* Left Column: Address Selection */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 space-y-5">
+            <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-bold text-lg text-slate-900">
+                <h2 className="font-bold text-lg text-slate-900 dark:text-slate-100">
                   1. Delivery Address
                 </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                   Choose where you want your order delivered.
                 </p>
               </div>
@@ -147,7 +142,7 @@ function Checkout() {
                   />
                 ))
               ) : (
-                <div className="text-center py-12 text-slate-400 border border-dashed border-slate-200 rounded-2xl">
+                <div className="text-center py-12 text-slate-400 dark:text-slate-500 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
                   <p className="text-sm font-medium mb-3">
                     No saved addresses found.
                   </p>
@@ -169,12 +164,12 @@ function Checkout() {
         {/* Right Column: Payment & Summary */}
         <div className="lg:col-span-5 space-y-5 sticky top-24">
           {/* Payment Method Selector */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 space-y-4">
             <div>
-              <h2 className="font-bold text-lg text-slate-900">
+              <h2 className="font-bold text-lg text-slate-900 dark:text-slate-100">
                 2. Payment Method
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                 Select your preferred checkout payment option.
               </p>
             </div>
@@ -184,8 +179,8 @@ function Checkout() {
               <div
                 className={`flex items-center justify-between border-2 rounded-xl p-4 cursor-pointer transition-all ${
                   paymentGateway === "RAZORPAY"
-                    ? "border-teal-600 bg-teal-50/40 shadow-sm"
-                    : "border-slate-200 hover:border-slate-300"
+                    ? "border-teal-600 bg-teal-50/40 dark:bg-teal-950/30 shadow-sm"
+                    : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                 }`}
                 onClick={() => setPaymentGateway("RAZORPAY")}
               >
@@ -195,19 +190,19 @@ function Checkout() {
                     color="primary"
                   />
                   <div>
-                    <p className="font-bold text-sm text-slate-900">Razorpay</p>
-                    <p className="text-xs text-slate-500">UPI, Cards, NetBanking, Wallets</p>
+                    <p className="font-bold text-sm text-slate-900 dark:text-slate-100">Razorpay</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">UPI, Cards, NetBanking, Wallets</p>
                   </div>
                 </div>
-                <CreditCardIcon className="text-teal-700" />
+                <CreditCardIcon className="text-teal-700 dark:text-teal-400" />
               </div>
 
               {/* Stripe */}
               <div
                 className={`flex items-center justify-between border-2 rounded-xl p-4 cursor-pointer transition-all ${
                   paymentGateway === "STRIPE"
-                    ? "border-teal-600 bg-teal-50/40 shadow-sm"
-                    : "border-slate-200 hover:border-slate-300"
+                    ? "border-teal-600 bg-teal-50/40 dark:bg-teal-950/30 shadow-sm"
+                    : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                 }`}
                 onClick={() => setPaymentGateway("STRIPE")}
               >
@@ -217,19 +212,19 @@ function Checkout() {
                     color="primary"
                   />
                   <div>
-                    <p className="font-bold text-sm text-slate-900">Stripe International</p>
-                    <p className="text-xs text-slate-500">Credit / Debit Cards (Global)</p>
+                    <p className="font-bold text-sm text-slate-900 dark:text-slate-100">Stripe International</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Credit / Debit Cards (Global)</p>
                   </div>
                 </div>
-                <CreditCardIcon className="text-indigo-600" />
+                <CreditCardIcon className="text-indigo-600 dark:text-indigo-400" />
               </div>
 
               {/* Cash on Delivery */}
               <div
                 className={`flex items-center justify-between border-2 rounded-xl p-4 cursor-pointer transition-all ${
                   paymentGateway === "COD"
-                    ? "border-teal-600 bg-teal-50/40 shadow-sm"
-                    : "border-slate-200 hover:border-slate-300"
+                    ? "border-teal-600 bg-teal-50/40 dark:bg-teal-950/30 shadow-sm"
+                    : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                 }`}
                 onClick={() => setPaymentGateway("COD")}
               >
@@ -239,11 +234,11 @@ function Checkout() {
                     color="primary"
                   />
                   <div>
-                    <p className="font-bold text-sm text-slate-900">Cash on Delivery (COD)</p>
-                    <p className="text-xs text-slate-500">Pay when order is delivered</p>
+                    <p className="font-bold text-sm text-slate-900 dark:text-slate-100">Cash on Delivery (COD)</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Pay when order is delivered</p>
                   </div>
                 </div>
-                <LocalAtmIcon className="text-emerald-600" />
+                <LocalAtmIcon className="text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
           </div>

@@ -1,4 +1,5 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import ThemeToggle from "../../../common/ThemeToggle";
 import MenuIcon from "@mui/icons-material/Menu";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -29,38 +30,6 @@ import { fetchUserCart } from "../../../State/customer/CartSlice";
 import { searchProduct } from "../../../State/customer/ProductSlice";
 
 const ACCENT = "#00927c";
-const ACCENT_DARK = "#007563";
-
-const primaryBtnSx = {
-  bgcolor: ACCENT,
-  textTransform: "none",
-  fontWeight: 700,
-  borderRadius: "999px",
-  boxShadow: "none",
-  px: 2.2,
-  py: 1,
-  "&:hover": { bgcolor: ACCENT_DARK, boxShadow: "none" },
-  "&:active": { bgcolor: ACCENT_DARK },
-};
-
-const outlinedBtnSx = {
-  borderColor: ACCENT,
-  color: ACCENT,
-  textTransform: "none",
-  fontWeight: 700,
-  borderRadius: "999px",
-  px: 2.2,
-  py: 1,
-  "&:hover": { borderColor: ACCENT_DARK, color: ACCENT_DARK, bgcolor: "rgba(0,146,124,0.06)" },
-};
-
-const iconBtnSx = {
-  borderRadius: "999px",
-  bgcolor: "rgba(15, 23, 42, 0.04)",
-  color: "#334155",
-  transition: "all 0.2s ease",
-  "&:hover": { bgcolor: "rgba(0, 146, 124, 0.08)", color: ACCENT },
-};
 
 function Navbar() {
   const theme = useTheme();
@@ -69,8 +38,6 @@ function Navbar() {
 
   const { cart } = useAppSelector((store) => store);
   const { isLoggedIn, user, role } = useAppSelector((store) => store.auth);
-
-  
   const { product } = useAppSelector((store) => store);
 
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -80,19 +47,18 @@ function Navbar() {
   const [query, setQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
 
-
   const dispatch = useAppDispatch();
   const searchRef = useRef(null);
   const searchResults = product?.searchProducts ?? [];
   const isSearching = product?.loading && query.trim().length > 1;
 
   useEffect(() => {
-    if (isLoggedIn && role == "ROLE_CUSTOMER") {
+    if (isLoggedIn && role === "ROLE_CUSTOMER") {
       const jwt = localStorage.getItem("jwt");
       dispatch(fetchUserProfile(jwt));
       dispatch(fetchUserCart(jwt));
     }
-  }, [dispatch, isLoggedIn]);
+  }, [dispatch, isLoggedIn, role]);
 
   const closeDrawer = () => setOpenDrawer(false);
 
@@ -107,16 +73,13 @@ function Navbar() {
 
   useEffect(() => {
     const trimmed = query.trim();
-
     if (trimmed.length > 1) {
       const timer = setTimeout(() => {
         dispatch(searchProduct(trimmed));
         setShowSearch(true);
       }, 350);
-
       return () => clearTimeout(timer);
     }
-
     setShowSearch(false);
     return undefined;
   }, [query, dispatch]);
@@ -127,20 +90,28 @@ function Navbar() {
         setShowSearch(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
     <>
+      {/* Mobile Navigation Drawer */}
       <Drawer
         anchor="left"
         open={openDrawer}
         onClose={closeDrawer}
-        PaperProps={{ sx: { width: 300, borderTopRightRadius: 24, borderBottomRightRadius: 24 } }}
+        PaperProps={{
+          sx: {
+            width: 300,
+            borderTopRightRadius: 24,
+            borderBottomRightRadius: 24,
+            bgcolor: "background.paper",
+            backgroundImage: "none",
+          },
+        }}
       >
-        <div className="flex h-full flex-col">
+        <div className="flex h-full flex-col bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors">
           <div
             role="button"
             tabIndex={0}
@@ -155,20 +126,20 @@ function Navbar() {
               sx={{
                 width: 48,
                 height: 48,
-                bgcolor: ACCENT,
-                fontWeight: "bold"
+                bgcolor: "#00796b",
+                fontWeight: 700,
+                color: "#ffffff",
               }}
             >
-              {user?.fullName?.charAt(0)?.toUpperCase()}
+              {user?.fullName?.charAt(0)?.toUpperCase() || "U"}
             </Avatar>
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-base font-semibold">
-                {isLoggedIn ? user?.fullName : "Welcome"}
+              <p className="truncate text-base font-bold">
+                {isLoggedIn ? user?.fullName : "Welcome Shopper"}
               </p>
-
               <p className="truncate text-xs text-white/80">
-                {isLoggedIn ? user?.email : "Sign in to continue"}
+                {isLoggedIn ? user?.email : "Sign in for personalized perks"}
               </p>
             </div>
             <IconButton
@@ -177,22 +148,35 @@ function Navbar() {
                 closeDrawer();
               }}
               size="small"
-              sx={{ color: "white", alignSelf: "flex-start" }}
+              sx={{ color: "white" }}
               aria-label="Close menu"
             >
               <CloseIcon fontSize="small" />
             </IconButton>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
-            <div className="py-2">
-              <DrawerRow icon={<ReceiptLongOutlinedIcon fontSize="small" />} label="My Orders" onClick={() => { navigate("/account/orders"); closeDrawer(); }} />
-              
-              <DrawerRow icon={<ShoppingCartOutlinedIcon fontSize="small" />} label="Cart" onClick={() => { navigate("/cart"); closeDrawer(); }} />
-              <DrawerRow icon={<FavoriteBorderOutlinedIcon fontSize="small" />} label="Wishlist" onClick={() => { navigate("/wishlist"); closeDrawer(); }} />
+          <div className="flex-1 overflow-y-auto py-2">
+            <div className="border-b border-slate-100 dark:border-slate-800 pb-2">
+              <DrawerRow
+                icon={<ReceiptLongOutlinedIcon fontSize="small" />}
+                label="My Orders"
+                onClick={() => { navigate("/account/orders"); closeDrawer(); }}
+              />
+              <DrawerRow
+                icon={<ShoppingCartOutlinedIcon fontSize="small" />}
+                label={`Cart (${cart.cart?.totalItem || 0})`}
+                onClick={() => { navigate("/cart"); closeDrawer(); }}
+              />
+              <DrawerRow
+                icon={<FavoriteBorderOutlinedIcon fontSize="small" />}
+                label="My Wishlist"
+                onClick={() => { navigate("/wishlist"); closeDrawer(); }}
+              />
             </div>
 
-            <p className="px-5 pb-1 pt-3 text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Shop by category</p>
+            <p className="px-5 pb-1 pt-4 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">
+              Browse Categories
+            </p>
             <div className="pb-2">
               {mainCategory.map((item) => (
                 <DrawerRow
@@ -207,30 +191,51 @@ function Navbar() {
             </div>
           </div>
 
-          <div className="border-t border-slate-200 p-4">
-            <Button fullWidth variant="outlined" startIcon={<StoreIcon />} sx={{ ...outlinedBtnSx, py: 1.2 }} onClick={() => { navigate("/become-seller"); closeDrawer(); }}>
+          <div className="border-t border-slate-100 dark:border-slate-800 p-4">
+            <Button
+              fullWidth
+              variant="outlined"
+              color="primary"
+              startIcon={<StoreIcon />}
+              sx={{
+                py: 1.2,
+                borderRadius: "14px",
+                fontWeight: 700,
+                textTransform: "none",
+              }}
+              onClick={() => { navigate("/become-seller"); closeDrawer(); }}
+            >
               Become a Seller
             </Button>
           </div>
         </div>
       </Drawer>
 
-      <Box className="sticky top-0 left-0 right-0 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl" sx={{ zIndex: 20 }}>
-        <div className="flex h-17.25 items-center justify-between gap-2 px-3 sm:px-5 lg:px-20">
+      {/* Main Sticky Navbar */}
+      <Box className="sticky top-0 left-0 right-0 border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl transition-colors z-40">
+        <div className="flex h-16 sm:h-18 items-center justify-between gap-3 px-3 sm:px-6 lg:px-16 max-w-[1700px] mx-auto">
+          {/* Logo & Category Navigation */}
           <div className="flex min-w-0 items-center gap-2 lg:gap-8">
-            <div className="flex min-w-0 items-center gap-1">
+            <div className="flex min-w-0 items-center gap-1.5">
               {!isLarge && (
-                <IconButton onClick={() => setOpenDrawer(true)} aria-label="Open menu" sx={iconBtnSx}>
+                <IconButton
+                  onClick={() => setOpenDrawer(true)}
+                  aria-label="Open menu"
+                  className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
+                >
                   <MenuIcon />
                 </IconButton>
               )}
-              <h1 onClick={() => navigate("/")} className="logo cursor-pointer truncate text-lg font-semibold md:text-2xl" style={{ color: ACCENT }}>
+              <span
+                onClick={() => navigate("/")}
+                className="logo cursor-pointer truncate text-xl md:text-2xl font-bold tracking-tight text-teal-600 dark:text-teal-400 select-none"
+              >
                 ShopSphere
-              </h1>
+              </span>
             </div>
 
             {isLarge && (
-              <ul className="flex items-center gap-1 text-sm font-medium text-slate-700">
+              <ul className="flex items-center gap-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
                 {mainCategory.map((item, index) => (
                   <li
                     key={item.categoryId ?? index}
@@ -239,7 +244,7 @@ function Navbar() {
                       setSelectedCategory(item.categoryId);
                       setShowCategorySheet(true);
                     }}
-                    className="flex h-17.25 cursor-pointer items-center rounded-full px-4 transition-all duration-200 hover:bg-slate-100 hover:text-primary"
+                    className="flex h-16 items-center rounded-full px-4 transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer select-none"
                   >
                     {item.name}
                   </li>
@@ -248,12 +253,13 @@ function Navbar() {
             )}
           </div>
 
+          {/* Desktop Search Bar */}
           {isLarge && (
-            <div ref={searchRef} className="relative mx-4 hidden flex-1 md:flex max-w-xl">
-              <div className="relative flex w-full items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 shadow-sm transition-all duration-200 focus-within:border-teal-500 focus-within:bg-white">
+            <div ref={searchRef} className="relative mx-4 hidden flex-1 md:flex max-w-lg lg:max-w-xl">
+              <div className="relative flex w-full items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-800/80 px-3.5 py-1.5 shadow-xs transition-all duration-200 focus-within:border-teal-500 focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:ring-2 focus-within:ring-teal-500/20">
                 <SearchIcon
                   onClick={() => handleSearch(query)}
-                  sx={{ cursor: "pointer", color: "#64748b" }}
+                  className="text-slate-400 hover:text-teal-600 cursor-pointer transition-colors"
                   fontSize="small"
                 />
                 <InputBase
@@ -270,41 +276,40 @@ function Navbar() {
                       handleSearch(query);
                     }
                   }}
-                  placeholder="Search products, brands and more"
-                  className="ml-1 flex-1"
-                  sx={{ fontSize: 14, color: "#0f172a" }}
+                  placeholder="Search 10,000+ products, brands & categories..."
+                  className="ml-1 flex-1 text-slate-900 dark:text-slate-100"
+                  sx={{ fontSize: 14 }}
                 />
                 <Button
                   variant="contained"
                   onClick={() => handleSearch(query)}
                   disabled={!query.trim()}
+                  color="primary"
                   sx={{
-                    minWidth: 88,
+                    minWidth: 80,
                     borderRadius: "999px",
                     textTransform: "none",
                     fontWeight: 700,
-                    px: 1.8,
-                    py: 0.8,
-                    bgcolor: ACCENT,
-                    boxShadow: "none",
-                    "&:hover": { bgcolor: ACCENT_DARK, boxShadow: "none" },
-                    "&:disabled": { bgcolor: "#cbd5e1", color: "#64748b" },
+                    px: 2,
+                    py: 0.6,
+                    fontSize: "13px",
                   }}
                 >
                   Search
                 </Button>
               </div>
 
+              {/* Desktop Live Search Popup */}
               {showSearch && (
-                <div className="absolute left-0 right-0 top-[calc(100%+0.65rem)] z-60 max-h-96 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl">
+                <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-50 max-h-96 overflow-y-auto rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl transition-colors">
                   {isSearching ? (
-                    <div className="flex items-center justify-center gap-2 px-4 py-5 text-sm text-slate-500">
-                      <CircularProgress size={16} sx={{ color: ACCENT }} />
-                      <span>Searching...</span>
+                    <div className="flex items-center justify-center gap-2 px-4 py-6 text-sm text-slate-500 dark:text-slate-400">
+                      <CircularProgress size={16} color="primary" />
+                      <span>Searching catalog matches...</span>
                     </div>
                   ) : searchResults.length === 0 ? (
-                    <div className="px-4 py-5 text-center text-sm text-slate-500">
-                      No products found for this search.
+                    <div className="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                      No products found for "{query}".
                     </div>
                   ) : (
                     searchResults.map((item) => (
@@ -315,12 +320,22 @@ function Navbar() {
                           setQuery("");
                           setShowSearch(false);
                         }}
-                        className="flex cursor-pointer items-center gap-3 px-3 py-3 transition-colors hover:bg-slate-50"
+                        className="flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800/50 last:border-b-0"
                       >
-                        <img src={item.images?.[0]} alt={item.title} className="h-14 w-14 rounded-lg object-contain" />
+                        <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-950 p-1 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-slate-800">
+                          <img
+                            src={item.images?.[0] || "https://placehold.co/60x60"}
+                            alt={item.title}
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
                         <div className="min-w-0 flex-1">
-                          <h4 className="truncate text-sm font-semibold text-slate-800">{item.title}</h4>
-                          <p className="mt-1 text-sm font-semibold text-teal-600">₹{item.sellingPrice}</p>
+                          <h4 className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
+                            {item.title}
+                          </h4>
+                          <p className="mt-0.5 text-xs font-bold text-teal-600 dark:text-teal-400">
+                            ₹{Number(item.sellingPrice || 0).toLocaleString("en-IN")}
+                          </p>
                         </div>
                       </div>
                     ))
@@ -330,15 +345,26 @@ function Navbar() {
             </div>
           )}
 
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3">
+          {/* Right Action Icons & Auth */}
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:gap-3">
+            <ThemeToggle size="small" />
+
             {!isLarge && (
               <>
-                <IconButton onClick={() => setMobileSearchOpen((value) => !value)} aria-label="Search" sx={iconBtnSx}>
-                  <SearchIcon />
+                <IconButton
+                  onClick={() => setMobileSearchOpen((value) => !value)}
+                  aria-label="Search"
+                  className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
+                >
+                  <SearchIcon fontSize="small" />
                 </IconButton>
-                <IconButton onClick={() => navigate("/cart")} aria-label="Cart" sx={iconBtnSx}>
+                <IconButton
+                  onClick={() => navigate("/cart")}
+                  aria-label="Cart"
+                  className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
+                >
                   <Badge badgeContent={cart.cart?.totalItem || 0} color="error" overlap="circular" max={99}>
-                    <AddShoppingCartIcon sx={{ fontSize: 24, color: "#334155" }} />
+                    <AddShoppingCartIcon sx={{ fontSize: 22 }} />
                   </Badge>
                 </IconButton>
               </>
@@ -346,29 +372,75 @@ function Navbar() {
 
             {isLarge && (
               <>
+                <IconButton
+                  onClick={() => navigate("/wishlist")}
+                  aria-label="Wishlist"
+                  className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
+                >
+                  <FavoriteBorderIcon sx={{ fontSize: 22 }} />
+                </IconButton>
+
+                <IconButton
+                  onClick={() => navigate("/cart")}
+                  aria-label="Cart"
+                  className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
+                >
+                  <Badge badgeContent={cart.cart?.totalItem || 0} color="error" overlap="circular" max={99}>
+                    <AddShoppingCartIcon sx={{ fontSize: 22 }} />
+                  </Badge>
+                </IconButton>
+
                 {isLoggedIn && role === "ROLE_CUSTOMER" ? (
-                  <IconButton onClick={() => navigate("/account/orders")} aria-label="Account" sx={iconBtnSx}>
-                    <Avatar sx={{ width: 30, height: 30, bgcolor: ACCENT, fontWeight: "bold", fontSize: 16 }}>
-                      {user?.fullName?.charAt(0).toUpperCase()}
+                  <IconButton
+                    onClick={() => navigate("/account/orders")}
+                    aria-label="Account"
+                    className="hover:scale-105 transition-transform"
+                  >
+                    <Avatar
+                      sx={{
+                        width: 34,
+                        height: 34,
+                        bgcolor: ACCENT,
+                        fontWeight: 700,
+                        fontSize: 14,
+                        color: "#fff",
+                      }}
+                    >
+                      {user?.fullName?.charAt(0).toUpperCase() || "U"}
                     </Avatar>
                   </IconButton>
                 ) : (
-                  <Button onClick={() => navigate("/login")} variant="contained" sx={primaryBtnSx}>
+                  <Button
+                    onClick={() => navigate("/login")}
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                      borderRadius: "999px",
+                      px: 2.5,
+                      py: 0.75,
+                      fontWeight: 700,
+                      textTransform: "none",
+                      fontSize: "14px",
+                    }}
+                  >
                     Login
                   </Button>
                 )}
 
-                <IconButton onClick={() => navigate("/wishlist")} aria-label="Wishlist" sx={iconBtnSx}>
-                  <FavoriteBorderIcon sx={{ fontSize: 24 }} />
-                </IconButton>
-
-                <IconButton onClick={() => navigate("/cart")} aria-label="Cart" sx={iconBtnSx}>
-                  <Badge badgeContent={cart.cart?.totalItem || 0} color="error" overlap="circular" max={99}>
-                    <AddShoppingCartIcon sx={{ fontSize: 24, color: "#334155" }} />
-                  </Badge>
-                </IconButton>
-
-                <Button onClick={() => navigate("/become-seller")} startIcon={<StoreIcon />} variant="outlined" sx={outlinedBtnSx}>
+                <Button
+                  onClick={() => navigate("/become-seller")}
+                  startIcon={<StoreIcon />}
+                  variant="outlined"
+                  color="primary"
+                  sx={{
+                    borderRadius: "999px",
+                    px: 2,
+                    py: 0.7,
+                    fontWeight: 700,
+                    textTransform: "none",
+                    fontSize: "13px",
+                  }}
+                >
                   Become Seller
                 </Button>
               </>
@@ -376,11 +448,12 @@ function Navbar() {
           </div>
         </div>
 
+        {/* Mobile Search Collapse Bar */}
         {!isLarge && (
           <Collapse in={mobileSearchOpen}>
-            <div className="border-t border-slate-200 bg-white px-3 py-2">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2 shadow-sm focus-within:border-teal-500 focus-within:bg-white">
-                <div className="flex w-full items-center gap-2 rounded-full px-2 py-1.5">
+            <div className="border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-2.5 transition-colors">
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-1.5 shadow-sm focus-within:border-teal-500 focus-within:bg-white dark:focus-within:bg-slate-900">
+                <div className="flex w-full items-center gap-2 px-2 py-1">
                   <SearchIcon
                     onClick={() => handleSearch(query)}
                     fontSize="small"
@@ -391,9 +464,7 @@ function Navbar() {
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     onFocus={() => {
-                      if (searchResults.length > 0) {
-                        setShowSearch(true);
-                      }
+                      if (searchResults.length > 0) setShowSearch(true);
                     }}
                     onKeyDown={(event) => {
                       if (event.key === "Enter") {
@@ -401,26 +472,22 @@ function Navbar() {
                         handleSearch(query);
                       }
                     }}
-                    placeholder="Search products, brands and more"
-                    className="ml-1 flex-1 text-sm"
-                    sx={{ fontSize: 14 }}
+                    placeholder="Search products..."
+                    className="ml-1 flex-1 text-sm text-slate-900 dark:text-slate-100"
                   />
                   <Button
                     variant="contained"
                     size="small"
+                    color="primary"
                     onClick={() => handleSearch(query)}
                     disabled={!query.trim()}
                     sx={{
-                      minWidth: 76,
+                      minWidth: 70,
                       borderRadius: "999px",
                       textTransform: "none",
                       fontWeight: 700,
-                      px: 1.4,
-                      py: 0.6,
-                      bgcolor: ACCENT,
-                      boxShadow: "none",
-                      "&:hover": { bgcolor: ACCENT_DARK, boxShadow: "none" },
-                      "&:disabled": { bgcolor: "#cbd5e1", color: "#64748b" },
+                      px: 1.5,
+                      py: 0.5,
                     }}
                   >
                     Search
@@ -428,15 +495,15 @@ function Navbar() {
                 </div>
 
                 {showSearch && (
-                  <div className="mt-2 max-h-72 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-lg">
+                  <div className="mt-2 max-h-72 overflow-y-auto rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg">
                     {isSearching ? (
-                      <div className="flex items-center justify-center gap-2 px-4 py-4 text-sm text-slate-500">
-                        <CircularProgress size={16} sx={{ color: ACCENT }} />
+                      <div className="flex items-center justify-center gap-2 px-4 py-4 text-xs text-slate-500">
+                        <CircularProgress size={14} color="primary" />
                         <span>Searching...</span>
                       </div>
                     ) : searchResults.length === 0 ? (
-                      <div className="px-4 py-4 text-center text-sm text-slate-500">
-                        No products found for this search.
+                      <div className="px-4 py-4 text-center text-xs text-slate-500">
+                        No products found.
                       </div>
                     ) : (
                       searchResults.map((item) => (
@@ -448,12 +515,12 @@ function Navbar() {
                             setShowSearch(false);
                             setMobileSearchOpen(false);
                           }}
-                          className="flex cursor-pointer items-center gap-3 px-3 py-3 transition-colors hover:bg-slate-50"
+                          className="flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
                         >
-                          <img src={item.images?.[0]} alt={item.title} className="h-12 w-12 rounded-lg object-contain" />
+                          <img src={item.images?.[0]} alt={item.title} className="h-10 w-10 rounded-lg object-contain" />
                           <div className="min-w-0 flex-1">
-                            <h4 className="truncate text-sm font-semibold text-slate-800">{item.title}</h4>
-                            <p className="mt-1 text-sm font-semibold text-teal-600">₹{item.sellingPrice}</p>
+                            <h4 className="truncate text-xs font-bold text-slate-900 dark:text-slate-100">{item.title}</h4>
+                            <p className="mt-0.5 text-xs font-bold text-teal-600 dark:text-teal-400">₹{item.sellingPrice}</p>
                           </div>
                         </div>
                       ))
@@ -465,8 +532,13 @@ function Navbar() {
           </Collapse>
         )}
 
+        {/* Multilevel Category Flyout */}
         {isLarge && showCategorySheet && (
-          <div onMouseLeave={() => setShowCategorySheet(false)} onMouseOver={() => setShowCategorySheet(true)} className="categorySheet absolute left-20 right-20 top-[4.41rem] shadow-lg">
+          <div
+            onMouseLeave={() => setShowCategorySheet(false)}
+            onMouseOver={() => setShowCategorySheet(true)}
+            className="categorySheet absolute left-16 right-16 top-[4.05rem] shadow-2xl z-50 animate-fade-in"
+          >
             <CategorySheet selectedCategory={selectedCategory} setShowSheet={setShowCategorySheet} />
           </div>
         )}
@@ -484,13 +556,13 @@ function DrawerRow({ icon, label, onClick }) {
       onKeyDown={(event) => {
         if (event.key === "Enter") onClick();
       }}
-      className="flex cursor-pointer items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-slate-50 active:bg-slate-100"
+      className="flex cursor-pointer items-center justify-between gap-3 px-5 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-300"
     >
-      <span className="flex items-center gap-3 text-[15px] text-slate-700">
-        {icon && <span className="flex text-slate-500">{icon}</span>}
+      <span className="flex items-center gap-3 text-sm font-semibold">
+        {icon && <span className="flex text-slate-400 dark:text-slate-500">{icon}</span>}
         {label}
       </span>
-      <ChevronRightIcon fontSize="small" className="text-slate-400" />
+      <ChevronRightIcon fontSize="small" className="text-slate-400 dark:text-slate-600" />
     </div>
   );
 }

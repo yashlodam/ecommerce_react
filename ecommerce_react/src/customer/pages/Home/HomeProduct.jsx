@@ -48,17 +48,17 @@ function HomeProducts() {
       {sections.map((section) => (
         <section
           key={section.category}
-          className="overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/95 p-4 shadow-[0_26px_90px_-38px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:p-6 lg:p-7"
+          className="overflow-hidden rounded-[30px] border border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 p-4 shadow-sm backdrop-blur-sm sm:p-6 lg:p-7 transition-colors"
         >
           <div className="mb-5 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-2xl">
-              <p className="mb-2 inline-flex rounded-full bg-blue-50/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-blue-700">
-                Curated picks
+              <p className="mb-2 inline-flex rounded-full bg-teal-50 dark:bg-teal-950/50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.3em] text-teal-700 dark:text-teal-400 border border-teal-100 dark:border-teal-800">
+                Curated Picks
               </p>
-              <h2 className="text-xl font-semibold tracking-[-0.02em] text-slate-900 sm:text-2xl lg:text-[28px]">
+              <h2 className="text-xl sm:text-2xl lg:text-[28px] font-bold tracking-tight text-slate-900 dark:text-slate-100">
                 {section.title}
               </h2>
-              <p className="mt-1 text-sm leading-6 text-slate-600 sm:text-base">
+              <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                 {section.subtitle}
               </p>
             </div>
@@ -74,10 +74,10 @@ function HomeProducts() {
                 py: 0.95,
                 fontWeight: 600,
                 boxShadow: "none",
-                background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
+                background: "linear-gradient(135deg, #009688 0%, #00796b 100%)",
                 "&:hover": {
-                  background: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
-                  boxShadow: "0 14px 28px rgba(37,99,235,0.24)",
+                  background: "linear-gradient(135deg, #00796b 0%, #004d40 100%)",
+                  boxShadow: "0 8px 20px rgba(0, 150, 136, 0.3)",
                 },
               }}
             >
@@ -129,7 +129,7 @@ function HomeProducts() {
           background: rgba(255, 255, 255, 0.96);
           border-radius: 999px;
           border: 1px solid #e2e8f0;
-          color: #2563eb;
+          color: #009688;
           box-shadow: 0 14px 35px rgba(15, 23, 42, 0.14);
           backdrop-filter: blur(10px);
           transition: all 0.3s ease;
@@ -137,10 +137,10 @@ function HomeProducts() {
 
         .home-product-swiper .swiper-button-next:hover,
         .home-product-swiper .swiper-button-prev:hover {
-          background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+          background: linear-gradient(135deg, #009688 0%, #00796b 100%);
           color: white;
           transform: translateY(-2px) scale(1.03);
-          box-shadow: 0 16px 32px rgba(37, 99, 235, 0.24);
+          box-shadow: 0 16px 32px rgba(0, 150, 136, 0.24);
         }
 
         .home-product-swiper .swiper-button-next::after,

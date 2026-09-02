@@ -11,13 +11,19 @@ export default function EmptyState({
 }) {
   return (
     <Box className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="w-20 h-20 rounded-2xl bg-teal-50 flex items-center justify-center text-teal-600 mb-4 shadow-inner">
+      <div className="w-20 h-20 rounded-2xl bg-teal-50 dark:bg-teal-950/50 border border-teal-100 dark:border-teal-900/50 flex items-center justify-center text-teal-600 dark:text-teal-400 mb-4 shadow-sm">
         <Icon sx={{ fontSize: 38 }} />
       </div>
-      <Typography variant="h6" className="font-bold text-slate-800 mb-1">
+      <Typography
+        variant="h6"
+        className="font-bold text-slate-800 dark:text-slate-100 mb-1"
+      >
         {title}
       </Typography>
-      <Typography variant="body2" className="text-slate-500 max-w-md mb-6">
+      <Typography
+        variant="body2"
+        className="text-slate-500 dark:text-slate-400 max-w-md mb-6"
+      >
         {description}
       </Typography>
       {actionText && onAction && (

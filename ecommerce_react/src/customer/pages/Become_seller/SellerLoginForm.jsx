@@ -2,41 +2,17 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import InputAdornment from "@mui/material/InputAdornment";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import { useFormik } from "formik";
-import { sendLoginSignupOtp,signin } from "../../../State/AuthSlice";
+import { sendLoginSignupOtp, signin } from "../../../State/AuthSlice";
 import { useAppDispatch } from "../../../State/Store";
 import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
 
 const RESEND_COOLDOWN_SECONDS = 30;
-
-const inputStyle = {
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "16px",
-    backgroundColor: "#fafafa",
-    "& fieldset": { borderColor: "#e5e7eb" },
-    "&:hover fieldset": { borderColor: "#14b8a6" },
-    "&.Mui-focused fieldset": { borderWidth: "2px", borderColor: "#14b8a6" },
-  },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#14b8a6" },
-};
-
-const gradientButtonSx = {
-  py: 1.7,
-  borderRadius: "16px",
-  textTransform: "none",
-  fontWeight: 700,
-  fontSize: "15px",
-  background: "linear-gradient(135deg,#14b8a6,#0f766e)",
-  "&:hover": { background: "linear-gradient(135deg,#0f766e,#115e59)" },
-  "&.Mui-disabled": { background: "#a7d8d2", color: "#fff" },
-};
-
 const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 function SellerLoginForm() {
@@ -61,7 +37,7 @@ function SellerLoginForm() {
     if (!values.email) {
       errors.email = "Email is required";
     } else if (!EMAIL_REGEX.test(values.email)) {
-      errors.email = "Enter a valid email";
+      errors.email = "Enter a valid email address";
     }
     if (otpSentRef.current) {
       if (!values.otp) {
@@ -81,23 +57,19 @@ function SellerLoginForm() {
       setSuccess("");
       setVerifying(true);
       try {
-       const result = await dispatch(
-  signin({
-    email: `seller_${values.email.trim()}`,
-    otp: values.otp.trim(),
-  })
-).unwrap();
+        const result = await dispatch(
+          signin({
+            email: `seller_${values.email.trim()}`,
+            otp: values.otp.trim(),
+          })
+        ).unwrap();
 
-setSuccess(result?.message || "Login successful.");
-
-const jwt = localStorage.getItem("jwt");
-console.log(jwt);
-
-if (jwt) {
-  await dispatch(fetchSellerProfile(jwt));
-}
-
-navigate("/seller");
+        setSuccess(result?.message || "Login successful.");
+        const jwt = localStorage.getItem("jwt");
+        if (jwt) {
+          await dispatch(fetchSellerProfile(jwt));
+        }
+        navigate("/seller");
       } catch (err) {
         const message =
           typeof err === "string"
@@ -165,56 +137,37 @@ navigate("/seller");
   };
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: { xs: "100%", sm: 480 },
-        mx: "auto",
-        mt: { xs: 3, md: 5 },
-        p: { xs: 3, sm: 4, md: 5 },
-        borderRadius: "28px",
-        background: "#ffffff",
-        border: "1px solid #f1f5f9",
-        boxShadow: `0 4px 12px rgba(0,0,0,.04), 0 12px 32px rgba(0,0,0,.08)`,
-      }}
-    >
-      <div className="text-center mb-8">
-        <div
-          className="mx-auto mb-5 flex items-center justify-center rounded-full"
-          style={{
-            width: 72,
-            height: 72,
-            background: "linear-gradient(135deg,#14b8a6,#0f766e)",
-          }}
-        >
-          <EmailOutlinedIcon sx={{ color: "white", fontSize: 34 }} />
+    <div>
+      <div className="text-center mb-6">
+        <div className="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-950/50 border border-teal-100 dark:border-teal-800 flex items-center justify-center mx-auto mb-3 text-teal-600 dark:text-teal-400">
+          <EmailOutlinedIcon sx={{ fontSize: 24 }} />
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-          Seller Login
-        </h1>
-        <p className="text-gray-500 mt-3 text-sm md:text-base">
-          Secure access using Email OTP verification
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+          Seller Portal Login
+        </h2>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          Access your seller dashboard with verified email OTP
         </p>
       </div>
 
       {success && (
-        <Alert severity="success" sx={{ borderRadius: 2, mb: 2 }}>
+        <Alert severity="success" className="mb-4 rounded-xl text-xs font-semibold">
           {success}
         </Alert>
       )}
       {error && (
-        <Alert severity="error" sx={{ borderRadius: 2, mb: 2 }}>
+        <Alert severity="error" className="mb-4 rounded-xl text-xs font-semibold">
           {error}
         </Alert>
       )}
 
       <form onSubmit={formik.handleSubmit} noValidate>
-        {/* 🔥 Changed from space-y-5 to space-y-4 for a tighter, cleaner gap */}
         <div className="space-y-4">
           <TextField
             fullWidth
             name="email"
-            label="Email Address"
+            label="Seller Email Address"
+            placeholder="seller@business.com"
             type="email"
             autoFocus={!otpSent}
             disabled={otpSent}
@@ -223,22 +176,35 @@ navigate("/seller");
             onBlur={formik.handleBlur}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helperText={formik.touched.email && formik.errors.email}
-            sx={inputStyle}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmailOutlinedIcon color={otpSent ? "disabled" : "primary"} />
+                </InputAdornment>
+              ),
+            }}
           />
 
           {!otpSent ? (
             <Button
               fullWidth
               variant="contained"
+              color="primary"
               size="large"
               disabled={sendingOtp}
               onClick={handleSendOtp}
-              sx={gradientButtonSx}
+              sx={{
+                py: 1.5,
+                borderRadius: "14px",
+                fontWeight: 700,
+                textTransform: "none",
+                fontSize: "15px",
+              }}
             >
               {sendingOtp ? (
-                <CircularProgress size={22} sx={{ color: "#fff" }} />
+                <CircularProgress size={20} color="inherit" />
               ) : (
-                "Send OTP"
+                "Send Seller OTP"
               )}
             </Button>
           ) : (
@@ -248,20 +214,17 @@ navigate("/seller");
                   variant="text"
                   size="small"
                   onClick={handleChangeEmail}
-                  sx={{
-                    textTransform: "none",
-                    fontWeight: 500,
-                    color: "#0f766e",
-                  }}
+                  sx={{ textTransform: "none", fontWeight: 600, fontSize: "12px" }}
                 >
-                  Change email
+                  Change Email
                 </Button>
               </div>
 
               <TextField
                 fullWidth
                 name="otp"
-                label="Enter OTP"
+                label="Enter 6-Digit OTP"
+                placeholder="000000"
                 autoFocus
                 value={formik.values.otp}
                 onChange={handleOtpChange}
@@ -276,51 +239,52 @@ navigate("/seller");
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LockOutlinedIcon sx={{ color: "#64748b" }} />
+                      <LockOutlinedIcon color="primary" />
                     </InputAdornment>
                   ),
                 }}
-                sx={inputStyle}
               />
 
               <Button
                 fullWidth
                 type="submit"
                 variant="contained"
+                color="primary"
                 size="large"
                 disabled={verifying}
                 sx={{
-                  ...gradientButtonSx,
-                  mt: 3,
+                  py: 1.5,
+                  borderRadius: "14px",
+                  fontWeight: 700,
+                  textTransform: "none",
+                  fontSize: "15px",
                 }}
               >
                 {verifying ? (
-                  <CircularProgress size={22} sx={{ color: "#fff" }} />
+                  <CircularProgress size={20} color="inherit" />
                 ) : (
-                  "Verify & Login"
+                  "Verify & Access Dashboard"
                 )}
               </Button>
 
-              <Button
-                fullWidth
-                variant="text"
-                disabled={cooldown > 0 || sendingOtp}
-                onClick={handleSendOtp}
-                sx={{
-                  textTransform: "none",
-                  fontWeight: 600,
-                  color: "#0f766e",
-                }}
-              >
-                {cooldown > 0
-                  ? `Resend OTP in ${cooldown}s`
-                  : "Resend OTP"}
-              </Button>
+              <div className="text-center pt-1">
+                <Button
+                  variant="text"
+                  size="small"
+                  disabled={cooldown > 0 || sendingOtp}
+                  onClick={handleSendOtp}
+                  sx={{ textTransform: "none", fontWeight: 600, fontSize: "13px" }}
+                >
+                  {cooldown > 0
+                    ? `Resend OTP in ${cooldown}s`
+                    : "Resend Verification Code"}
+                </Button>
+              </div>
             </>
           )}
         </div>
       </form>
-    </Box>
+    </div>
   );
 }
 

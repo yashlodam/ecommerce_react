@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Box,
   Paper,
   Table,
   TableBody,
@@ -8,7 +7,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   Chip,
   Button,
   TextField,
@@ -20,7 +18,6 @@ import {
   DialogContentText,
   DialogActions,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -32,10 +29,8 @@ import {
   unbanUser,
   deleteUser,
 } from "../../../State/admin/adminFetchSlice";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  fontWeight: 600,
-}));
+import EmptyState from "../../../common/EmptyState";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 
 function UsersTable() {
   const dispatch = useAppDispatch();
@@ -77,15 +72,15 @@ function UsersTable() {
   );
 
   return (
-    <Box>
-      <Box className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200/80 dark:border-slate-800">
         <div>
-          <Typography variant="h5" className="font-bold text-gray-800">
-            User Management
-          </Typography>
-          <Typography variant="body2" className="text-gray-500">
-            View, govern, ban, and manage platform customer and admin accounts.
-          </Typography>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            User Accounts & Governance
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Audit, govern, ban, and manage platform customer and administrative accounts.
+          </p>
         </div>
 
         <TextField
@@ -96,92 +91,103 @@ function UsersTable() {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon className="text-gray-400" />
+                <SearchIcon fontSize="small" className="text-slate-400" />
               </InputAdornment>
             ),
           }}
-          className="w-full sm:w-72 bg-white"
+          className="w-full sm:w-72"
         />
-      </Box>
+      </div>
 
       {loading ? (
-        <Box className="flex justify-center items-center py-20">
-          <CircularProgress />
-        </Box>
+        <div className="flex justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+          <CircularProgress color="primary" />
+        </div>
+      ) : filteredUsers.length === 0 ? (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-8 transition-colors">
+          <EmptyState
+            icon={PeopleAltOutlinedIcon}
+            title="No users found"
+            description="No customer accounts match your search parameters."
+          />
+        </div>
       ) : (
-        <TableContainer component={Paper} elevation={1} className="rounded-xl overflow-hidden border border-gray-100">
+        <TableContainer
+          component={Paper}
+          elevation={0}
+          sx={{
+            borderRadius: "20px",
+            border: "1px solid",
+            borderColor: "divider",
+            overflow: "hidden",
+            bgcolor: "background.paper",
+          }}
+        >
           <Table sx={{ minWidth: 650 }}>
-            <TableHead className="bg-gray-50">
+            <TableHead className="bg-slate-50 dark:bg-slate-950/60">
               <TableRow>
-                <StyledTableCell>User ID</StyledTableCell>
-                <StyledTableCell>Full Name</StyledTableCell>
-                <StyledTableCell>Email</StyledTableCell>
-                <StyledTableCell>Mobile</StyledTableCell>
-                <StyledTableCell>Role</StyledTableCell>
-                <StyledTableCell>Status</StyledTableCell>
-                <StyledTableCell align="right">Actions</StyledTableCell>
+                <TableCell sx={{ fontWeight: 700 }}>User ID</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Full Name</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Email Address</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Mobile</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Role</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredUsers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} align="center" className="py-10 text-gray-500">
-                    No users found matching your search.
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id} hover className="transition-colors">
+                  <TableCell className="font-mono text-xs text-slate-400">#{user.id}</TableCell>
+                  <TableCell className="font-bold text-slate-900 dark:text-slate-100">{user.fullName || "—"}</TableCell>
+                  <TableCell className="text-slate-600 dark:text-slate-400 text-sm">{user.email}</TableCell>
+                  <TableCell className="text-slate-600 dark:text-slate-400 text-sm">{user.mobile || "—"}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={user.role}
+                      size="small"
+                      color={user.role === "ROLE_ADMIN" ? "primary" : "default"}
+                      variant="outlined"
+                      className="font-bold text-xs"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={user.enabled ? "Active" : "Banned"}
+                      size="small"
+                      color={user.enabled ? "success" : "error"}
+                      className="font-bold text-xs"
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <div className="flex justify-end items-center gap-2">
+                      {user.role !== "ROLE_ADMIN" && (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color={user.enabled ? "error" : "success"}
+                          startIcon={user.enabled ? <BlockIcon fontSize="small" /> : <CheckCircleIcon fontSize="small" />}
+                          onClick={() => handleToggleBan(user)}
+                          sx={{ borderRadius: "10px", textTransform: "none", fontWeight: 700, fontSize: "12px" }}
+                        >
+                          {user.enabled ? "Ban User" : "Unban"}
+                        </Button>
+                      )}
+                      {user.role !== "ROLE_ADMIN" && (
+                        <Button
+                          size="small"
+                          variant="text"
+                          color="error"
+                          onClick={() => handleDeleteClick(user)}
+                          sx={{ minWidth: 32 }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
-              ) : (
-                filteredUsers.map((user) => (
-                  <TableRow key={user.id} hover className="transition-colors">
-                    <TableCell className="font-mono text-xs text-gray-500">#{user.id}</TableCell>
-                    <TableCell className="font-medium text-gray-900">{user.fullName || "—"}</TableCell>
-                    <TableCell className="text-gray-600">{user.email}</TableCell>
-                    <TableCell className="text-gray-600">{user.mobile || "—"}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={user.role}
-                        size="small"
-                        color={user.role === "ROLE_ADMIN" ? "secondary" : "default"}
-                        variant="outlined"
-                        className="font-semibold"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={user.enabled ? "Active" : "Banned"}
-                        size="small"
-                        color={user.enabled ? "success" : "error"}
-                        className="font-semibold text-xs"
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      <Box className="flex justify-end items-center gap-2">
-                        {user.role !== "ROLE_ADMIN" && (
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            color={user.enabled ? "error" : "success"}
-                            startIcon={user.enabled ? <BlockIcon /> : <CheckCircleIcon />}
-                            onClick={() => handleToggleBan(user)}
-                            className="text-xs normal-case"
-                          >
-                            {user.enabled ? "Ban User" : "Unban"}
-                          </Button>
-                        )}
-                        {user.role !== "ROLE_ADMIN" && (
-                          <Button
-                            size="small"
-                            variant="text"
-                            color="error"
-                            onClick={() => handleDeleteClick(user)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </Button>
-                        )}
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -191,24 +197,25 @@ function UsersTable() {
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
+        PaperProps={{ sx: { borderRadius: "16px" } }}
       >
         <DialogTitle className="font-bold">Delete User Account</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete user account{" "}
+            Are you sure you want to permanently delete user account{" "}
             <strong>{selectedUser?.email}</strong>? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} color="inherit">
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="inherit" sx={{ borderRadius: "10px" }}>
             Cancel
           </Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+          <Button onClick={handleConfirmDelete} color="error" variant="contained" sx={{ borderRadius: "10px", fontWeight: 700 }}>
             Delete
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   );
 }
 

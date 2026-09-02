@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { menLevelTwo } from "../../../data/category/level two/menLevelTwo";
 import { womenLevelTwo } from "../../../data/category/level two/womensLevelTwo";
 import { electronicsLevelTwo } from "../../../data/category/level two/electronicsLevelTwo";
@@ -31,48 +31,41 @@ const categoryThree = {
 };
 
 function CategorySheet({ selectedCategory, setShowSheet }) {
-
   const navigate = useNavigate();
 
   const childCategory = (category, parentCategoryId) => {
     if (!Array.isArray(category)) return [];
-    
-
     return category.filter(
       (child) => child.parentCategoryId === parentCategoryId
-      
     );
-    
   };
 
   return (
     <Box
-      sx={{
-        zIndex: 2,
-      }}
-      className="shadow-lg lg:h-[500px] overflow-y-auto bg-white"
+      className="shadow-2xl max-h-[480px] overflow-y-auto rounded-3xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200/80 dark:border-slate-800 transition-colors p-6"
     >
-      <div className="flex gap-8 text-sm flex-wrap">
-        {categoryTwo[selectedCategory]?.map((item, index) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 text-sm">
+        {categoryTwo[selectedCategory]?.map((item) => (
           <div
             key={item.categoryId}
-            className={`p-8 lg:w-[20%] ${
-              index % 2 === 0 ? "bg-slate-50" : "bg-white"
-            }`}
+            className="rounded-2xl p-4 bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80"
           >
-            <p className="text-primary mb-5 font-semibold">
+            <p className="text-teal-600 dark:text-teal-400 mb-3.5 font-bold text-xs uppercase tracking-wider">
               {item.name}
             </p>
 
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {childCategory(
                 categoryThree[selectedCategory],
                 item.categoryId
               ).map((child) => (
                 <li
-                onClick={()=> navigate("/products/"+child.categoryId)}
                   key={child.categoryId}
-                  className="font-semibold text-sm hover:text-primary cursor-pointer"
+                  onClick={() => {
+                    navigate(`/products/${child.categoryId}`);
+                    setShowSheet(false);
+                  }}
+                  className="cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 transition-colors py-1 block truncate"
                 >
                   {child.name}
                 </li>

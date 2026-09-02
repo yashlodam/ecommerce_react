@@ -1,25 +1,25 @@
-import React from 'react'
-import SellerDrawerList from '../../components/SellerDrawerList'
-import SellerRoute from '../../../Routes/SellerRoute'
-import SellerStatusGuard from './SellerStatusGuard'
+import React from "react";
+import SellerDrawerList from "../../components/SellerDrawerList";
+import SellerRoute from "../../../Routes/SellerRoute";
+import SellerStatusGuard from "./SellerStatusGuard";
 
 function SellerDashboard() {
-  const toggleDrawer = () => {}
+  const toggleDrawer = () => {};
 
   return (
     <SellerStatusGuard>
-      <div>
-        <div className='lg:flex lg:h-[90vh]'>
-          <section className='hidden lg:block h-full'>
-            <SellerDrawerList toggleDrawer={toggleDrawer}/>
+      <div className="min-h-[calc(100vh-64px)] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+        <div className="lg:flex min-h-[calc(100vh-64px)]">
+          <section className="hidden lg:block shrink-0">
+            <SellerDrawerList toggleDrawer={toggleDrawer} />
           </section>
-          <section className='p-6 lg:p-10 w-full lg:w-[80%] overflow-y-auto'>
-            <SellerRoute/>
+          <section className="p-4 sm:p-6 lg:p-8 w-full flex-1 overflow-y-auto max-w-[1600px] mx-auto">
+            <SellerRoute />
           </section>
         </div>
       </div>
     </SellerStatusGuard>
-  )
+  );
 }
 
-export default SellerDashboard
+export default SellerDashboard;

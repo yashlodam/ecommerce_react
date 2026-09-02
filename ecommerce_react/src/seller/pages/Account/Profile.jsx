@@ -1,117 +1,118 @@
-import React from "react";
-import EditIcon from "@mui/icons-material/Edit";
-import IconButton from "@mui/material/IconButton";
-import { useAppSelector } from "../../../State/Store";
+import React, { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../../State/Store";
+import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
+import StatusBadge from "../../../common/StatusBadge";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PersonIcon from "@mui/icons-material/Person";
 
 function Profile() {
-  
-  const {seller} = useAppSelector((store) => store);
+  const dispatch = useAppDispatch();
+  const { sellers } = useAppSelector((store) => store);
+  const profile = sellers?.profile;
 
-  console.log(seller)
+  useEffect(() => {
+    dispatch(fetchSellerProfile(localStorage.getItem("jwt") || ""));
+  }, [dispatch]);
 
-  const SectionCard = ({ title, children }) => (
-    <div className="bg-white rounded-lg shadow-sm border mb-6">
-      <div className="flex items-center justify-between p-5">
-        <h2 className="text-xl font-semibold text-gray-700">{title}</h2>
-
-        <IconButton
-          sx={{
-            backgroundColor: "#009688",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#00796b",
-            },
-          }}
-        >
-          <EditIcon />
-        </IconButton>
+  const SectionCard = ({ title, icon: Icon, children }) => (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 mb-6 overflow-hidden transition-colors">
+      <div className="flex items-center gap-3 p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
+        <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center text-teal-600 dark:text-teal-400">
+          <Icon sx={{ fontSize: 20 }} />
+        </div>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">{title}</h2>
       </div>
-
-      <div className="border-t">{children}</div>
+      <div>{children}</div>
     </div>
   );
 
   const Row = ({ label, value }) => (
-    <div className="grid grid-cols-3 border-b last:border-b-0">
-      <div className="p-4 text-gray-600 font-medium bg-gray-50">
+    <div className="grid grid-cols-1 sm:grid-cols-3 border-b border-slate-100 dark:border-slate-800 last:border-b-0">
+      <div className="p-4 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-semibold bg-slate-50/40 dark:bg-slate-950/20">
         {label}
       </div>
-
-      <div className="col-span-2 p-4 font-semibold text-gray-800">
-        {value}
+      <div className="sm:col-span-2 p-4 text-sm font-bold text-slate-900 dark:text-slate-100">
+        {value || "—"}
       </div>
     </div>
   );
 
   return (
-   <div className="p-5 lg:p-10 bg-gray-100 min-h-screen">
-  {/* Personal Details */}
-  <SectionCard title="Personal Details">
-    <div className="p-6 flex justify-center lg:justify-start">
-      <img
-        src="https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=300"
-        alt="seller"
-        className="w-28 h-28 rounded-full object-cover border"
-      />
+    <div className="space-y-6 max-w-4xl">
+      <div className="pb-4 border-b border-slate-200/80 dark:border-slate-800">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+          Seller Store Profile
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          Review GSTIN registration, registered store identity, bank settlement accounts, and warehouse pickup address.
+        </p>
+      </div>
+
+      {/* Personal Identity */}
+      <SectionCard title="Contact & Personal Information" icon={PersonIcon}>
+        <Row label="Seller Name" value={profile?.sellerName} />
+        <Row label="Seller Email" value={profile?.email} />
+        <Row label="Contact Mobile" value={profile?.mobile} />
+      </SectionCard>
+
+      {/* Business Details */}
+      <SectionCard title="Business & Marketplace Registration" icon={StorefrontIcon}>
+        <Row
+          label="Store / Brand Name"
+          value={profile?.businessDetails?.businessName || profile?.businesssDetails?.businessName}
+        />
+        <Row
+          label="GSTIN Number"
+          value={profile?.gstin || profile?.businessDetails?.businessRegistrationNumber}
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-3 border-b border-slate-100 dark:border-slate-800 last:border-b-0">
+          <div className="p-4 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-semibold bg-slate-50/40 dark:bg-slate-950/20">
+            Account Status
+          </div>
+          <div className="sm:col-span-2 p-4 flex items-center gap-2">
+            <StatusBadge status={profile?.accountStatus || "ACTIVE"} />
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Bank Details */}
+      <SectionCard title="Settlement Bank Account" icon={AccountBalanceIcon}>
+        <Row
+          label="Account Holder Name"
+          value={profile?.bankDetails?.accountHolderName}
+        />
+        <Row
+          label="Account Number"
+          value={profile?.bankDetails?.accountNumber ? `•••• •••• ${profile.bankDetails.accountNumber.slice(-4)}` : "—"}
+        />
+        <Row
+          label="IFSC Code"
+          value={profile?.bankDetails?.ifscCode}
+        />
+      </SectionCard>
+
+      {/* Pickup Address */}
+      <SectionCard title="Warehouse Pickup Location" icon={LocationOnIcon}>
+        <Row
+          label="Street Address"
+          value={profile?.pickupAddress?.address}
+        />
+        <Row
+          label="City & State"
+          value={profile?.pickupAddress?.city ? `${profile.pickupAddress.city}, ${profile.pickupAddress.state}` : "—"}
+        />
+        <Row
+          label="PIN Code"
+          value={profile?.pickupAddress?.pinCode || profile?.pickupAddress?.pincode}
+        />
+        <Row
+          label="Pickup Contact Phone"
+          value={profile?.pickupAddress?.mobile}
+        />
+      </SectionCard>
     </div>
-
-    <Row label="Seller Name" value={seller.profile?.sellerName} />
-    <Row label="Seller Email" value={seller.profile?.email} />
-    <Row label="Seller Mobile" value={seller.profile?.mobile} />
-  </SectionCard>
-
-  {/* Business Details */}
-  <SectionCard title="Business Details">
-    <Row
-      label="Business Name/Brand Name"
-      value={seller.profile?.businessDetails?.businessName}
-    />
-    <Row
-      label="GSTIN"
-      value={seller.profile?.businessDetails?.businessRegistrationNumber}
-    />
-    <Row
-      label="Account Status"
-      value={seller.profile?.accountStatus}
-    />
-  </SectionCard>
-
-  {/* Bank Details */}
-  <SectionCard title="Bank Details">
-    <Row
-      label="Account Holder Name"
-      value={seller.profile?.bankDetails?.accountHolderName}
-    />
-    <Row
-      label="Account Number"
-      value={seller.profile?.bankDetails?.accountNumber}
-    />
-    <Row
-      label="IFSC CODE"
-      value={seller.profile?.bankDetails?.ifscCode}
-    />
-  </SectionCard>
-
-  {/* Pickup Address */}
-  <SectionCard title="Pickup Address">
-    <Row
-      label="Address"
-      value={seller.profile?.pickupAddress?.address}
-    />
-    <Row
-      label="City"
-      value={seller.profile?.pickupAddress?.city}
-    />
-    <Row
-      label="State"
-      value={seller.profile?.pickupAddress?.state}
-    />
-    <Row
-      label="Mobile"
-      value={seller.profile?.pickupAddress?.mobile}
-    />
-  </SectionCard>
-</div>
   );
 }
 

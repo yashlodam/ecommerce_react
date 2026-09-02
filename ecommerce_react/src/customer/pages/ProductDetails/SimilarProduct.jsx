@@ -1,28 +1,33 @@
-import React, { useEffect } from 'react'
-import SimilarProductCard from './SimilarProductCard'
-import { useParams } from 'react-router-dom'
-import { store, useAppSelector } from '../../../State/Store';
-import { useDispatch } from 'react-redux';
-import { fetchAllProducts } from '../../../State/customer/ProductSlice';
+import React, { useEffect } from "react";
+import SimilarProductCard from "./SimilarProductCard";
+import { useParams } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../../State/Store";
+import { fetchAllProducts } from "../../../State/customer/ProductSlice";
 
 function SimilarProduct() {
+  const { categoryId, productId } = useParams();
+  const dispatch = useAppDispatch();
+  const { product } = useAppSelector((store) => store);
 
-  const {categoryId} = useParams();
-  console.log(categoryId);
-  
-  const dispatch = useDispatch()
+  useEffect(() => {
+    if (categoryId) {
+      dispatch(fetchAllProducts({ category: categoryId }));
+    }
+  }, [categoryId, dispatch]);
 
-  const {product} = useAppSelector((store)=> store);
+  const items = (product?.products || [])
+    .filter((p) => p.id !== Number(productId))
+    .slice(0, 5);
 
-  useEffect(()=>{
-    dispatch(fetchAllProducts({category:categoryId}))
-  },[categoryId])
-  console.log(product?.products)
+  if (items.length === 0) return null;
+
   return (
-    <div className='grid lg:grid-col-6 md:grid-cols-4 sm:grid-cols-2 grid-cols-1 justify-between gap-4 gap-y-8'>
-        {product.products.map((item)=> <SimilarProductCard item={item}/>)}
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
+      {items.map((item) => (
+        <SimilarProductCard key={item.id} item={item} />
+      ))}
     </div>
-  )
+  );
 }
 
-export default SimilarProduct
+export default SimilarProduct;

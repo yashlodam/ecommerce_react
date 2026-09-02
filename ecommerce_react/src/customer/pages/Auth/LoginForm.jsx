@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
@@ -7,7 +7,6 @@ import {
   CircularProgress,
   IconButton,
   InputAdornment,
-  Paper,
   TextField,
   Typography,
   LinearProgress,
@@ -25,7 +24,7 @@ import { sendLoginSignupOtp, signin } from "../../../State/AuthSlice";
 import { useAppDispatch } from "../../../State/Store";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const OTP_EXPIRY_SECONDS = 600; // Must match backend OTP_EXPIRY_MINUTES (10 min)
+const OTP_EXPIRY_SECONDS = 600; // 10 min
 
 function LoginForm() {
   const dispatch = useAppDispatch();
@@ -41,7 +40,6 @@ function LoginForm() {
   const [countdown, setCountdown] = useState(OTP_EXPIRY_SECONDS);
   const [otpExpired, setOtpExpired] = useState(false);
 
-  // ─── OTP Countdown Timer ─────────────────────────────────────────────────────
   useEffect(() => {
     if (!otpSent) return;
 
@@ -96,8 +94,6 @@ function LoginForm() {
         ).unwrap();
 
         setSuccessMessage("Login successful!");
-
-        // Redirect to the page the user was trying to reach, or role-based default
         const from = location.state?.from?.pathname;
 
         if (response.role === "ROLE_ADMIN") {
@@ -140,74 +136,36 @@ function LoginForm() {
     }
   };
 
-  const textFieldStyles = {
-    "& .MuiOutlinedInput-root": {
-      borderRadius: "16px",
-      backgroundColor: "#f8fafc",
-      "&:hover": { backgroundColor: "#f1f5f9" },
-      "&.Mui-focused": {
-        backgroundColor: "#ffffff",
-        boxShadow: "0 0 0 4px rgba(25, 118, 210, 0.1)",
-      },
-    },
-    "& .MuiOutlinedInput-notchedOutline": { borderColor: "#e2e8f0" },
-  };
-
-  const primaryButtonStyles = {
-    height: 54,
-    borderRadius: "16px",
-    textTransform: "none",
-    fontWeight: 700,
-    fontSize: "1rem",
-    boxShadow: "none",
-    "&:hover": {
-      transform: "translateY(-2px)",
-      boxShadow: "0 8px 25px rgba(25,118,210,0.25)",
-    },
-  };
-
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        width: "100%",
-        maxWidth: 420,
-        mx: "auto",
-        p: { xs: 4, sm: 5 },
-        borderRadius: "24px",
-        border: "1px solid #f1f5f9",
-        background: "#ffffff",
-        boxShadow: "0 20px 40px -15px rgba(0,0,0,0.05)",
-      }}
-    >
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" align="center" fontWeight={800} gutterBottom>
+    <div>
+      <div className="mb-6 text-center">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
           Welcome Back
-        </Typography>
-        <Typography align="center" color="text.secondary" variant="body2" sx={{ fontSize: "15px" }}>
-          Login to continue shopping
-        </Typography>
-      </Box>
+        </h2>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Sign in via secure OTP to continue shopping
+        </p>
+      </div>
 
       <Collapse in={Boolean(successMessage)}>
-        <Alert severity="success" sx={{ mb: 2, borderRadius: "12px" }}>
+        <Alert severity="success" className="mb-4 rounded-xl text-xs font-semibold">
           {successMessage}
         </Alert>
       </Collapse>
 
       <Collapse in={Boolean(errorMessage)}>
-        <Alert severity="error" sx={{ mb: 3, borderRadius: "12px" }}>
+        <Alert severity="error" className="mb-4 rounded-xl text-xs font-semibold">
           {errorMessage}
         </Alert>
       </Collapse>
 
       <form onSubmit={formik.handleSubmit}>
-        <Box display="flex" flexDirection="column" gap={3}>
+        <div className="space-y-4">
           <TextField
             fullWidth
             name="email"
             label="Email Address"
-            placeholder="Enter your email"
+            placeholder="name@example.com"
             value={formik.values.email}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -221,13 +179,13 @@ function LoginForm() {
                 </InputAdornment>
               ),
             }}
-            sx={textFieldStyles}
           />
 
           {!otpSent ? (
             <Button
               fullWidth
               variant="contained"
+              color="primary"
               onClick={handleSendOtp}
               disabled={loading}
               startIcon={
@@ -237,17 +195,23 @@ function LoginForm() {
                   <SendRoundedIcon />
                 )
               }
-              sx={{ ...primaryButtonStyles, mt: 2 }}
+              sx={{
+                py: 1.5,
+                borderRadius: "14px",
+                fontWeight: 700,
+                textTransform: "none",
+                fontSize: "15px",
+              }}
             >
-              {loading ? "Sending OTP..." : "Send OTP"}
+              {loading ? "Sending OTP..." : "Send Login OTP"}
             </Button>
           ) : (
-            <Box display="flex" flexDirection="column" gap={2}>
+            <div className="space-y-3">
               <TextField
                 fullWidth
                 name="otp"
-                label="Enter OTP"
-                placeholder="6-digit OTP"
+                label="Enter 6-Digit OTP"
+                placeholder="000000"
                 type={showOtp ? "text" : "password"}
                 value={formik.values.otp}
                 onChange={formik.handleChange}
@@ -276,37 +240,31 @@ function LoginForm() {
                     </InputAdornment>
                   ),
                 }}
-                sx={textFieldStyles}
               />
 
               {/* Countdown timer */}
               {!otpExpired && (
-                <Box>
-                  <Box display="flex" justifyContent="space-between" mb={0.5}>
-                    <Typography variant="caption" color="text.secondary">
-                      OTP expires in
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      fontWeight={700}
-                      color={`${timerColor}.main`}
-                    >
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-500 dark:text-slate-400">OTP Expires In</span>
+                    <span className="font-bold text-teal-600 dark:text-teal-400">
                       {formatTime(countdown)}
-                    </Typography>
-                  </Box>
+                    </span>
+                  </div>
                   <LinearProgress
                     variant="determinate"
                     value={(countdown / OTP_EXPIRY_SECONDS) * 100}
                     color={timerColor}
-                    sx={{ borderRadius: 4, height: 5 }}
+                    sx={{ borderRadius: 4, height: 4 }}
                   />
-                </Box>
+                </div>
               )}
 
               <Button
                 fullWidth
                 type="submit"
                 variant="contained"
+                color="primary"
                 disabled={loginLoading || otpExpired}
                 startIcon={
                   loginLoading ? (
@@ -315,39 +273,43 @@ function LoginForm() {
                     <LoginRoundedIcon />
                   )
                 }
-                sx={primaryButtonStyles}
-              >
-                {loginLoading ? "Verifying..." : "Login"}
-              </Button>
-
-              {/* Resend OTP */}
-              <Button
-                variant="text"
-                disabled={loading || loginLoading}
-                onClick={handleSendOtp}
-                startIcon={
-                  loading ? (
-                    <CircularProgress size={14} />
-                  ) : (
-                    <RefreshIcon fontSize="small" />
-                  )
-                }
                 sx={{
-                  width: "fit-content",
-                  mx: "auto",
+                  py: 1.5,
+                  borderRadius: "14px",
+                  fontWeight: 700,
                   textTransform: "none",
-                  fontWeight: 600,
-                  color: otpExpired ? "error.main" : "text.secondary",
-                  "&:hover": { color: "primary.main", background: "transparent" },
+                  fontSize: "15px",
                 }}
               >
-                {otpExpired ? "Request New OTP" : "Resend OTP"}
+                {loginLoading ? "Verifying..." : "Verify & Sign In"}
               </Button>
-            </Box>
+
+              <div className="text-center pt-1">
+                <Button
+                  variant="text"
+                  disabled={loading || loginLoading}
+                  onClick={handleSendOtp}
+                  startIcon={
+                    loading ? (
+                      <CircularProgress size={14} />
+                    ) : (
+                      <RefreshIcon fontSize="small" />
+                    )
+                  }
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: 600,
+                    fontSize: "13px",
+                  }}
+                >
+                  {otpExpired ? "Request New OTP" : "Resend OTP"}
+                </Button>
+              </div>
+            </div>
           )}
-        </Box>
+        </div>
       </form>
-    </Paper>
+    </div>
   );
 }
 

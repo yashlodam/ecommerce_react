@@ -11,7 +11,6 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Cell,
 } from "recharts";
 import {
   IndianRupee,
@@ -21,9 +20,6 @@ import {
   Truck,
   CheckCircle2,
   XCircle,
-  TrendingUp,
-  TrendingDown,
-  ChevronRight,
   Receipt,
   Store,
 } from "lucide-react";
@@ -34,12 +30,12 @@ import { fetchSellerProduct } from "../../../State/seller/sellerProductSlice";
 import { fetchSellerReport } from "../../../State/seller/sellerSlice";
 
 const statusMeta = {
-  PENDING: { icon: Clock, color: "#f59e0b", bg: "#fef3c7", label: "Pending" },
-  PLACED: { icon: Clock, color: "#3b82f6", bg: "#dbeafe", label: "Placed" },
-  CONFIRMED: { icon: CheckCircle2, color: "#6366f1", bg: "#e0e7ff", label: "Confirmed" },
-  SHIPPED: { icon: Truck, color: "#0ea5e9", bg: "#e0f2fe", label: "Shipped" },
-  DELIVERED: { icon: CheckCircle2, color: "#009688", bg: "#ccfbf1", label: "Delivered" },
-  CANCELLED: { icon: XCircle, color: "#ef4444", bg: "#fee2e2", label: "Cancelled" },
+  PENDING: { icon: Clock, color: "#f59e0b", bg: "rgba(245, 158, 11, 0.15)", label: "Pending" },
+  PLACED: { icon: Clock, color: "#3b82f6", bg: "rgba(59, 130, 246, 0.15)", label: "Placed" },
+  CONFIRMED: { icon: CheckCircle2, color: "#6366f1", bg: "rgba(99, 102, 241, 0.15)", label: "Confirmed" },
+  SHIPPED: { icon: Truck, color: "#0ea5e9", bg: "rgba(14, 165, 233, 0.15)", label: "Shipped" },
+  DELIVERED: { icon: CheckCircle2, color: "#10b981", bg: "rgba(16, 185, 129, 0.15)", label: "Delivered" },
+  CANCELLED: { icon: XCircle, color: "#ef4444", bg: "rgba(239, 68, 68, 0.15)", label: "Cancelled" },
 };
 
 function formatINR(value) {
@@ -50,33 +46,29 @@ function formatINR(value) {
   }).format(value || 0);
 }
 
-function Skeleton({ className }) {
-  return <div className={`animate-pulse rounded-lg bg-slate-200 ${className}`} />;
-}
-
 function StatCard({ label, value, icon: Icon, subtitle, loading }) {
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
-        <Skeleton className="h-4 w-24 mb-4" />
-        <Skeleton className="h-8 w-32" />
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-6 border border-slate-200/80 dark:border-slate-800 animate-pulse">
+        <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded mb-4" />
+        <div className="h-8 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
       </div>
     );
   }
 
   return (
-    <div className="group bg-white rounded-xl shadow-sm p-6 border border-slate-100 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+    <div className="group bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-6 border border-slate-200/80 dark:border-slate-800 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
       <div className="flex items-start justify-between">
-        <p className="text-slate-500 text-sm font-medium">{label}</p>
-        <div className="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 group-hover:bg-teal-100 transition-colors">
-          <Icon size={18} />
+        <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-semibold">{label}</p>
+        <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform">
+          <Icon size={20} />
         </div>
       </div>
 
-      <h2 className="text-3xl font-bold mt-3 text-slate-800 tabular-nums">{value}</h2>
+      <h3 className="text-2xl sm:text-3xl font-extrabold mt-3 text-slate-900 dark:text-slate-100 tabular-nums">{value}</h3>
 
       {subtitle && (
-        <p className="mt-2 text-xs text-slate-400 font-medium">{subtitle}</p>
+        <p className="mt-2 text-xs text-slate-400 dark:text-slate-500 font-medium">{subtitle}</p>
       )}
     </div>
   );
@@ -85,10 +77,10 @@ function StatCard({ label, value, icon: Icon, subtitle, loading }) {
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-slate-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg">
-      <p className="font-semibold mb-1">{label}</p>
+    <div className="bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 shadow-xl border border-slate-800">
+      <p className="font-bold mb-1">{label}</p>
       {payload.map((p) => (
-        <p key={p.dataKey} className="text-slate-200">
+        <p key={p.dataKey} className="text-teal-300 font-semibold">
           {p.dataKey === "sales" ? formatINR(p.value) : `${p.value} items`}
         </p>
       ))}
@@ -116,13 +108,11 @@ export default function Dashboard() {
   const rawProducts = products || [];
   const rawTransactions = transaction?.transactions || [];
 
-  // Calculate real-time revenue: report.totalEarnings || sum of order selling prices
   const totalRevenue = useMemo(() => {
     if (report?.totalEarnings && report.totalEarnings > 0) return report.totalEarnings;
     return rawOrders.reduce((sum, o) => sum + (o.totalSellingPrice || 0), 0);
   }, [report, rawOrders]);
 
-  // Real-time order status counts
   const orderStatusCounts = useMemo(() => {
     const counts = {
       PLACED: 0,
@@ -145,7 +135,6 @@ export default function Dashboard() {
     ];
   }, [rawOrders]);
 
-  // Filtered orders list for recent table
   const recentOrders = useMemo(() => {
     const list = statusFilter
       ? rawOrders.filter((o) => o.orderStatus === statusFilter)
@@ -153,17 +142,15 @@ export default function Dashboard() {
     return list.slice(0, 6);
   }, [rawOrders, statusFilter]);
 
-  // Real-time product inventory distribution
   const topProducts = useMemo(() => {
     if (rawProducts.length === 0) return [];
     return rawProducts.slice(0, 5).map((p) => ({
-      name: p.title?.length > 20 ? p.title.substring(0, 18) + "..." : p.title,
+      name: p.title?.length > 18 ? p.title.substring(0, 16) + "..." : p.title,
       stock: p.quantity || 0,
       price: p.sellingPrice || 0,
     }));
   }, [rawProducts]);
 
-  // Generate dynamic sales trend from orders
   const chartData = useMemo(() => {
     if (rawOrders.length === 0) {
       return [
@@ -183,15 +170,15 @@ export default function Dashboard() {
   }, [rawOrders, totalRevenue]);
 
   return (
-    <div className="p-4 lg:p-8 bg-slate-50 min-h-screen">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-slate-800">
-            Welcome back, {profile?.sellerName || "Seller"}!
+          <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-slate-100">
+            Welcome back, {profile?.sellerName || "Store Owner"}!
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Real-time analytics and inventory health for {profile?.businesssDetails?.businessName || "your marketplace store"}.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Real-time analytics and inventory health for <strong className="text-slate-700 dark:text-slate-300">{profile?.businesssDetails?.businessName || profile?.businessDetails?.businessName || "your marketplace store"}</strong>.
           </p>
         </div>
       </div>
@@ -225,11 +212,11 @@ export default function Dashboard() {
       </div>
 
       {/* Sales Overview Chart */}
-      <div className="bg-white rounded-xl shadow-sm mt-8 p-6 border border-slate-100">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-6 border border-slate-200/80 dark:border-slate-800 transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
           <div>
-            <h2 className="text-lg font-bold text-slate-800">Revenue Performance</h2>
-            <p className="text-xs text-slate-400">Monthly gross sales derived from real vendor orders</p>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Revenue Performance</h2>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Monthly gross sales derived from real vendor orders</p>
           </div>
         </div>
 
@@ -237,13 +224,13 @@ export default function Dashboard() {
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="salesFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#009688" stopOpacity={0.28} />
+                <stop offset="0%" stopColor="#009688" stopOpacity={0.35} />
                 <stop offset="100%" stopColor="#009688" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-            <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} vertical={false} />
+            <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Area
               type="monotone"
@@ -258,24 +245,24 @@ export default function Dashboard() {
       </div>
 
       {/* Products & Recent Orders Grid */}
-      <div className="grid lg:grid-cols-2 gap-6 mt-8">
+      <div className="grid lg:grid-cols-2 gap-6">
         {/* Top Products by Available Stock */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
-          <h2 className="text-lg font-bold mb-4 text-slate-800">Catalog Stock Overview</h2>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-6 border border-slate-200/80 dark:border-slate-800 transition-colors">
+          <h2 className="text-lg font-bold mb-4 text-slate-900 dark:text-slate-100">Catalog Stock Overview</h2>
           {topProducts.length === 0 ? (
-            <div className="text-center py-12 text-slate-400 text-sm">
+            <div className="text-center py-12 text-slate-400 dark:text-slate-500 text-sm">
               No products found in your catalog. Add products to start selling!
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={topProducts} layout="vertical" margin={{ left: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                 <YAxis
                   type="category"
                   dataKey="name"
                   width={130}
-                  tick={{ fontSize: 12, fill: "#334155" }}
+                  tick={{ fontSize: 12, fill: "#94a3b8" }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -287,13 +274,13 @@ export default function Dashboard() {
         </div>
 
         {/* Real-time Recent Orders */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-6 border border-slate-200/80 dark:border-slate-800 transition-colors">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-800">Recent Customer Orders</h2>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Recent Customer Orders</h2>
             {statusFilter && (
               <button
                 onClick={() => setStatusFilter(null)}
-                className="text-xs font-semibold text-teal-600 hover:underline"
+                className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
               >
                 Clear filter
               </button>
@@ -302,7 +289,7 @@ export default function Dashboard() {
 
           <div className="space-y-3">
             {recentOrders.length === 0 ? (
-              <p className="text-sm text-slate-400 text-center py-10">
+              <p className="text-sm text-slate-400 dark:text-slate-500 text-center py-10">
                 No orders found for this filter.
               </p>
             ) : (
@@ -314,27 +301,27 @@ export default function Dashboard() {
                 return (
                   <div
                     key={order.id}
-                    className="border border-slate-100 rounded-lg p-3.5 flex justify-between items-center transition-colors hover:border-teal-200 hover:bg-teal-50/20"
+                    className="border border-slate-200/80 dark:border-slate-800 rounded-xl p-3.5 flex justify-between items-center transition-colors hover:border-teal-500/50 hover:bg-teal-50/10"
                   >
                     <div>
-                      <p className="font-semibold text-sm text-slate-800">
+                      <p className="font-bold text-sm text-slate-900 dark:text-slate-100">
                         {order.orderId || `#ORD-${order.id}`}
                       </p>
-                      <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         {order.orderItems?.length || 1} items • {order.paymentStatus || "PENDING"}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <p className="font-semibold text-sm text-slate-800">
+                        <p className="font-bold text-sm text-slate-900 dark:text-slate-100">
                           {formatINR(order.totalSellingPrice)}
                         </p>
                         <div
-                          className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full mt-0.5"
+                          className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full mt-0.5"
                           style={{ color: meta.color, backgroundColor: meta.bg }}
                         >
-                          <StatusIcon size={11} />
+                          <StatusIcon size={12} />
                           {meta.label}
                         </div>
                       </div>
@@ -348,7 +335,7 @@ export default function Dashboard() {
       </div>
 
       {/* Real-Time Order Status Filter Pills */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {orderStatusCounts.map((item) => {
           const meta = statusMeta[item.key] || statusMeta.PLACED;
           const StatusIcon = meta.icon;
@@ -358,20 +345,20 @@ export default function Dashboard() {
             <button
               key={item.key}
               onClick={() => setStatusFilter(isActive ? null : item.key)}
-              className={`bg-white rounded-xl shadow-sm p-4 text-center border transition-all cursor-pointer ${
+              className={`bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 text-center border transition-all cursor-pointer ${
                 isActive
-                  ? "border-teal-500 ring-2 ring-teal-100 shadow-md"
-                  : "border-slate-100 hover:border-teal-200 hover:-translate-y-0.5"
+                  ? "border-teal-500 ring-2 ring-teal-500/40 shadow-md"
+                  : "border-slate-200/80 dark:border-slate-800 hover:border-teal-400 hover:-translate-y-0.5"
               }`}
             >
               <div
-                className="w-8 h-8 rounded-lg mx-auto flex items-center justify-center mb-1.5"
+                className="w-9 h-9 rounded-xl mx-auto flex items-center justify-center mb-2"
                 style={{ color: meta.color, backgroundColor: meta.bg }}
               >
-                <StatusIcon size={16} />
+                <StatusIcon size={18} />
               </div>
-              <h3 className="text-slate-500 text-xs font-medium">{item.title}</h3>
-              <p className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">
+              <h3 className="text-slate-500 dark:text-slate-400 text-xs font-semibold">{item.title}</h3>
+              <p className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 mt-0.5 tabular-nums">
                 {item.count}
               </p>
             </button>

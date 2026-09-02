@@ -3,8 +3,7 @@ import { api } from "../../config/Api";
 
 const API_URL = "/api/coupons";
 
-// JWT is auto-attached by the api interceptor
-
+// ================= Apply Coupon (Customer) =================
 export const applyCoupon = createAsyncThunk(
   "coupon/applyCoupon",
   async ({ apply, code, orderValue }, { rejectWithValue }) => {
@@ -16,6 +15,51 @@ export const applyCoupon = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Invalid coupon code"
+      );
+    }
+  }
+);
+
+// ================= Fetch All Coupons (Admin) =================
+export const fetchAllCoupons = createAsyncThunk(
+  "coupon/fetchAllCoupons",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_URL}/admin/all`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch coupons"
+      );
+    }
+  }
+);
+
+// ================= Create Coupon (Admin) =================
+export const createCoupon = createAsyncThunk(
+  "coupon/createCoupon",
+  async (couponData, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`${API_URL}/admin/create`, couponData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to create coupon"
+      );
+    }
+  }
+);
+
+// ================= Delete Coupon (Admin) =================
+export const deleteCoupon = createAsyncThunk(
+  "coupon/deleteCoupon",
+  async (couponId, { rejectWithValue }) => {
+    try {
+      await api.delete(`${API_URL}/admin/delete/${couponId}`);
+      return couponId;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete coupon"
       );
     }
   }
@@ -44,6 +88,7 @@ const couponSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Apply Coupon
       .addCase(applyCoupon.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -58,6 +103,29 @@ const couponSlice = createSlice({
         state.loading = false;
         state.couponApplied = false;
         state.error = action.payload;
+      })
+
+      // Fetch All Coupons
+      .addCase(fetchAllCoupons.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchAllCoupons.fulfilled, (state, action) => {
+        state.loading = false;
+        state.coupons = action.payload;
+      })
+      .addCase(fetchAllCoupons.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Create Coupon
+      .addCase(createCoupon.fulfilled, (state, action) => {
+        state.coupons.push(action.payload);
+      })
+
+      // Delete Coupon
+      .addCase(deleteCoupon.fulfilled, (state, action) => {
+        state.coupons = state.coupons.filter((c) => c.id !== action.payload);
       });
   },
 });

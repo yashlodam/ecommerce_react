@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
@@ -58,16 +57,16 @@ function Cart() {
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8 min-h-[80vh]">
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
           Shopping Cart ({cartItems.length} {cartItems.length === 1 ? "item" : "items"})
         </h1>
-        <p className="text-sm text-slate-500 mt-0.5">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
           Review your selected items before proceeding to secure checkout.
         </p>
       </div>
 
       {cartItems.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8">
           <EmptyState
             icon={ShoppingBagOutlinedIcon}
             title="Your Cart is Empty"
@@ -88,10 +87,10 @@ function Cart() {
           {/* Checkout & Coupon Sidebar */}
           <div className="lg:col-span-4 sticky top-24 space-y-4">
             {/* Coupon Card */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-4">
               <div className="flex items-center gap-2">
-                <LocalOfferIcon className="text-teal-600" fontSize="small" />
-                <h3 className="font-bold text-slate-900 text-sm">
+                <LocalOfferIcon className="text-teal-600 dark:text-teal-400" fontSize="small" />
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
                   Apply Discount Coupon
                 </h3>
               </div>
@@ -108,8 +107,8 @@ function Cart() {
                   disabled={couponApplied}
                   className={`flex-1 border uppercase font-mono rounded-xl px-3.5 py-2 text-sm outline-none transition-all ${
                     couponApplied
-                      ? "bg-emerald-50 border-emerald-400 text-emerald-700 font-bold"
-                      : "border-slate-200 focus:border-teal-500 bg-slate-50 focus:bg-white"
+                      ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-400 text-emerald-700 dark:text-emerald-300 font-bold"
+                      : "border-slate-200 dark:border-slate-700 focus:border-teal-500 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                   }`}
                 />
                 {!couponApplied ? (
@@ -141,8 +140,8 @@ function Cart() {
               )}
 
               {couponApplied && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
-                  <p className="text-xs font-bold text-emerald-800">
+                <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl p-3">
+                  <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
                     ✓ Coupon code applied to cart
                   </p>
                 </div>

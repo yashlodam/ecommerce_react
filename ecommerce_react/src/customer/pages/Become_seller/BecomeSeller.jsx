@@ -4,123 +4,170 @@ import SellerLoginForm from "./SellerLoginForm";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import ShieldCheckIcon from "@mui/icons-material/GppGoodOutlined";
 
 function BecomeSeller() {
   const [isLogin, setIsLogin] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-const [snackbarMessage, setSnackbarMessage] = useState("");
-const [snackbarSeverity, setSnackbarSeverity] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const handleShowPage = () => {
     setIsLogin(!isLogin);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
-      <div className="container mx-auto px-4 py-6 md:py-10">
-        <div className="grid lg:grid-cols-3 gap-8 items-center min-h-[90vh]">
-          
-          {/* Left Section */}
-          <section className="lg:col-span-1">
-            <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-5 md:p-8">
+    <div className="min-h-[90vh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8 md:py-12">
+        <div className="grid lg:grid-cols-12 gap-8 items-start">
+          {/* Left / Form Section */}
+          <section className="lg:col-span-5 order-2 lg:order-1">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 transition-colors">
               {!isLogin ? (
                 <SellerAccountForm
-  onRegisterSuccess={() => {
-    setSnackbarSeverity("success");
-    setSnackbarMessage(
-      "Seller account created successfully. Please sign in to continue."
-    );
-    setOpenSnackbar(true);
-
-    setTimeout(() => {
-      setIsLogin(true);
-    }, 2000);
-  }}
-/>
+                  onRegisterSuccess={() => {
+                    setSnackbarSeverity("success");
+                    setSnackbarMessage(
+                      "Seller account created successfully! Please sign in with your email OTP."
+                    );
+                    setOpenSnackbar(true);
+                    setTimeout(() => {
+                      setIsLogin(true);
+                    }, 2000);
+                  }}
+                />
               ) : (
                 <SellerLoginForm />
               )}
 
-              <div className="mt-8 pt-6 border-t border-slate-100">
-                <p className="text-center text-sm text-gray-500 mb-4">
+              <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                <p className="text-center text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-3">
                   {isLogin
-                    ? "Don't have a seller account?"
-                    : "Already have a seller account?"}
+                    ? "New to ShopSphere selling?"
+                    : "Already registered as a marketplace vendor?"}
                 </p>
 
                 <Button
                   onClick={handleShowPage}
                   fullWidth
                   variant="outlined"
+                  color="primary"
                   sx={{
-                    py: "12px",
+                    py: 1.4,
                     borderRadius: "14px",
                     textTransform: "none",
-                    fontWeight: 600,
+                    fontWeight: 700,
                   }}
                 >
-                  {isLogin ? "Create Seller Account" : "Login"}
+                  {isLogin ? "Register New Seller Store" : "Sign In to Seller Portal"}
                 </Button>
               </div>
             </div>
           </section>
 
-          {/* Right Section */}
-          <section className="flex flex-col lg:col-span-2 justify-center items-center">
-            <div className="max-w-3xl text-center">
-              <div className="space-y-5 mb-10">
-                <h1 className="text-5xl font-bold text-slate-800 leading-tight">
-                  Join the Marketplace
-                  <span className="block text-teal-600">
-                    Revolution
-                  </span>
-                </h1>
+          {/* Right / Value Proposition Section */}
+          <section className="lg:col-span-7 order-1 lg:order-2 space-y-8">
+            <div className="space-y-4">
+              <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-800">
+                Seller Partner Program
+              </span>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-slate-100 leading-tight">
+                Scale Your Business on{" "}
+                <span className="text-teal-600 dark:text-teal-400">ShopSphere</span>
+              </h1>
+              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
+                Connect directly with thousands of verified shoppers nationwide. Manage listings, track fulfillment, and receive automated settlement payouts with zero setup fees.
+              </p>
+            </div>
 
-                <p className="text-xl text-slate-600">
-                  Reach thousands of customers, grow your
-                  business, and manage everything from a
-                  single seller dashboard.
+            {/* Metrics */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-teal-600 dark:text-teal-400">
+                  10.4K+
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">
+                  Active Buyers
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 mb-10">
-                <div className="bg-white rounded-2xl p-5 shadow-md">
-                  <h2 className="text-3xl font-bold text-teal-600">
-                    10K+
-                  </h2>
-                  <p className="text-gray-500 text-sm mt-2">
-                    Active Buyers
-                  </p>
-                </div>
-
-                <div className="bg-white rounded-2xl p-5 shadow-md">
-                  <h2 className="text-3xl font-bold text-teal-600">
-                    24/7
-                  </h2>
-                  <p className="text-gray-500 text-sm mt-2">
-                    Seller Support
-                  </p>
-                </div>
-
-                <div className="bg-white rounded-2xl p-5 shadow-md">
-                  <h2 className="text-3xl font-bold text-teal-600">
-                    99%
-                  </h2>
-                  <p className="text-gray-500 text-sm mt-2">
-                    Secure Payments
-                  </p>
-                </div>
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-teal-600 dark:text-teal-400">
+                  24/7
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">
+                  Partner Support
+                </p>
               </div>
 
-              <img
-                src="./images/becomeSeller.png"
-                alt="Become Seller"
-                className="w-full max-w-2xl mx-auto drop-shadow-2xl"
-              />
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center">
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-teal-600 dark:text-teal-400">
+                  100%
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">
+                  Direct Payouts
+                </p>
+              </div>
+            </div>
+
+            {/* Feature Highlights */}
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+              <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-slate-100">
+                Why Top Indian Vendors Choose ShopSphere
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-teal-50 dark:bg-teal-950/50 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
+                    <StorefrontIcon sx={{ fontSize: 18 }} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">Dedicated Storefront & Brand Identity</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Your store logo, policies, and branded listings showcased to high-intent shoppers.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                    <ShieldCheckIcon sx={{ fontSize: 18 }} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">Automated Razorpay & Bank Settlement</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Funds settled directly to your registered bank IFSC account upon delivery confirmation.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <SupportAgentIcon sx={{ fontSize: 18 }} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100">Priority Merchant Helpdesk</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">24-hour SLA ticket resolution for shipping logistics and inventory management.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </div>
       </div>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          severity={snackbarSeverity}
+          variant="filled"
+          sx={{ width: "100%" }}
+          onClose={() => setOpenSnackbar(false)}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

@@ -77,7 +77,7 @@ function CartItem({ item }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative">
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
@@ -97,15 +97,8 @@ function CartItem({ item }) {
       {/* Remove Item Button */}
       <IconButton
         onClick={handleRemoveItem}
-        className="!absolute top-3 right-3 z-10"
+        className="!absolute top-3 right-3 z-10 text-slate-400 hover:text-red-500"
         size="small"
-        sx={{
-          backgroundColor: "#f8fafc",
-          "&:hover": {
-            backgroundColor: "#fee2e2",
-            color: "#dc2626",
-          },
-        }}
       >
         <CloseIcon fontSize="small" />
       </IconButton>
@@ -119,7 +112,7 @@ function CartItem({ item }) {
           )
         }
       >
-        <div className="shrink-0 w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 flex items-center justify-center">
+        <div className="shrink-0 w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-2">
           <img
             className="w-full h-full object-contain"
             src={product?.images?.[0] || "https://placehold.co/120x120?text=Item"}
@@ -128,21 +121,21 @@ function CartItem({ item }) {
         </div>
 
         <div className="flex-1 space-y-1.5 pr-8 min-w-0">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full inline-block">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/50 px-2.5 py-0.5 rounded-full inline-block">
             {product?.seller?.businesssDetails?.businessName ||
               product?.brand ||
               "Verified Seller"}
           </span>
 
-          <h3 className="font-bold text-base text-slate-900 leading-snug line-clamp-2">
+          <h3 className="font-bold text-base text-slate-900 dark:text-slate-100 leading-snug line-clamp-2">
             {product?.title}
           </h3>
 
-          <p className="text-xs text-slate-400">
-            Color: <span className="text-slate-600 font-medium">{product?.color || "Standard"}</span> • Size: <span className="text-slate-600 font-medium">{item?.size || "Standard"}</span>
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            Color: <span className="text-slate-600 dark:text-slate-300 font-medium">{product?.color || "Standard"}</span> • Size: <span className="text-slate-600 dark:text-slate-300 font-medium">{item?.size || "Standard"}</span>
           </p>
 
-          <p className="text-xs text-emerald-600 font-semibold">
+          <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
             ✓ In Stock • Eligible for Fast Shipping
           </p>
         </div>
@@ -151,8 +144,8 @@ function CartItem({ item }) {
       <Divider />
 
       {/* Quantity & Price Controls */}
-      <div className="px-4 sm:px-5 py-3.5 flex justify-between items-center bg-slate-50">
-        <div className="flex items-center gap-2 sm:gap-3 bg-white border border-slate-200 rounded-xl p-1">
+      <div className="px-4 sm:px-5 py-3.5 flex justify-between items-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex items-center gap-2 sm:gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
           <Button
             size="small"
             onClick={() => handleUpdateQuantity(item.quantity - 1)}
@@ -167,7 +160,7 @@ function CartItem({ item }) {
             <RemoveIcon fontSize="small" />
           </Button>
 
-          <span className="font-bold text-sm min-w-[24px] text-center text-slate-800">
+          <span className="font-bold text-sm min-w-[24px] text-center text-slate-800 dark:text-slate-200">
             {item.quantity}
           </span>
 
@@ -188,11 +181,11 @@ function CartItem({ item }) {
 
         {/* Price Section */}
         <div className="text-right">
-          <p className="text-base sm:text-lg font-extrabold text-slate-900">
+          <p className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100">
             {formatINR(item.sellingPrice)}
           </p>
           {item.mrpPrice > item.sellingPrice && (
-            <p className="text-xs text-slate-400 line-through">
+            <p className="text-xs text-slate-400 dark:text-slate-500 line-through">
               {formatINR(item.mrpPrice)}
             </p>
           )}

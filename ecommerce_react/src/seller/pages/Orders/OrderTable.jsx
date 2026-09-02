@@ -38,32 +38,6 @@ function formatINR(val) {
   }).format(val || 0);
 }
 
-const StyledTableCell = styled(TableCell)(() => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#0f172a",
-    color: "#f8fafc",
-    fontWeight: 700,
-    fontSize: 13,
-    letterSpacing: "0.05em",
-    textTransform: "uppercase",
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(even)": {
-    backgroundColor: "#f8fafc",
-  },
-  "&:hover": {
-    backgroundColor: "#f1f5f9",
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
-
 export default function OrderTable() {
   const dispatch = useAppDispatch();
   const { sellerOrder } = useAppSelector((store) => store);
@@ -118,9 +92,18 @@ export default function OrderTable() {
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <div className="pb-4 border-b border-slate-200/80 dark:border-slate-800">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+          Order Fulfillment
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          Process customer orders, update delivery milestones, and track status transitions.
+        </p>
+      </div>
+
       {/* Controls & Search */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors">
         <Tabs
           value={selectedTab}
           onChange={(e, val) => setSelectedTab(val)}
@@ -154,11 +137,11 @@ export default function OrderTable() {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center py-20 bg-white rounded-2xl border border-slate-200">
+        <div className="flex justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
           <CircularProgress color="primary" />
         </div>
       ) : filteredOrders.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-8 transition-colors">
           <EmptyState
             icon={ShoppingBagOutlinedIcon}
             title="No orders found"
@@ -172,52 +155,59 @@ export default function OrderTable() {
       ) : (
         <TableContainer
           component={Paper}
-          className="rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+          elevation={0}
+          sx={{
+            borderRadius: "20px",
+            border: "1px solid",
+            borderColor: "divider",
+            overflow: "hidden",
+            bgcolor: "background.paper",
+          }}
         >
           <Table sx={{ minWidth: 900 }}>
-            <TableHead>
+            <TableHead className="bg-slate-50 dark:bg-slate-950/60">
               <TableRow>
-                <StyledTableCell>Order ID</StyledTableCell>
-                <StyledTableCell>Ordered Products</StyledTableCell>
-                <StyledTableCell>Customer & Address</StyledTableCell>
-                <StyledTableCell align="center">Status</StyledTableCell>
-                <StyledTableCell align="center">Action</StyledTableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Order ID</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Ordered Products</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Customer & Address</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="center">Status</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="center">Action</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
               {filteredOrders.map((item) => (
-                <StyledTableRow key={item.id}>
-                  <StyledTableCell>
-                    <div className="font-bold text-slate-900">#{item.id}</div>
-                    <div className="text-xs text-slate-400">
+                <TableRow key={item.id} hover className="transition-colors">
+                  <TableCell>
+                    <div className="font-bold text-slate-900 dark:text-slate-100">#{item.id}</div>
+                    <div className="text-xs text-slate-400 dark:text-slate-500">
                       {item.orderDate
                         ? new Date(item.orderDate).toLocaleDateString("en-IN")
                         : "Recent"}
                     </div>
-                  </StyledTableCell>
+                  </TableCell>
 
-                  <StyledTableCell>
+                  <TableCell>
                     <div className="space-y-3">
                       {item.orderItems?.map((orderItem) => (
                         <div key={orderItem.id} className="flex gap-3 items-center">
-                          <div className="w-14 h-14 rounded-lg overflow-hidden bg-slate-50 border border-slate-200 shrink-0 flex items-center justify-center">
+                          <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 shrink-0 flex items-center justify-center p-1">
                             <img
                               src={orderItem.product?.images?.[0] || "https://placehold.co/80x80"}
                               alt={orderItem.product?.title || "Item"}
-                              className="w-full h-full object-contain"
+                              className="max-w-full max-h-full object-contain"
                             />
                           </div>
 
                           <div className="min-w-0">
-                            <h4 className="font-semibold text-slate-900 text-sm truncate max-w-xs">
+                            <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm truncate max-w-xs">
                               {orderItem.product?.title}
                             </h4>
-                            <p className="text-xs text-slate-500 font-medium">
+                            <p className="text-xs text-teal-700 dark:text-teal-400 font-bold">
                               {formatINR(orderItem.sellingPrice)} × {orderItem.quantity}
                             </p>
                             {orderItem.size && (
-                              <span className="text-[11px] text-slate-400">
+                              <span className="text-[11px] text-slate-400 dark:text-slate-500">
                                 Size: {orderItem.size}
                               </span>
                             )}
@@ -225,37 +215,42 @@ export default function OrderTable() {
                         </div>
                       ))}
                     </div>
-                  </StyledTableCell>
+                  </TableCell>
 
-                  <StyledTableCell>
-                    <div className="text-xs text-slate-700 space-y-0.5">
-                      <p className="font-bold text-slate-900">
+                  <TableCell>
+                    <div className="text-xs text-slate-700 dark:text-slate-300 space-y-0.5">
+                      <p className="font-bold text-slate-900 dark:text-slate-100">
                         {item.shippingAddress?.name || "Customer"}
                       </p>
-                      <p className="text-slate-500">
+                      <p className="text-slate-500 dark:text-slate-400">
                         {item.shippingAddress?.address}, {item.shippingAddress?.city}
                       </p>
-                      <p className="text-slate-500">
+                      <p className="text-slate-500 dark:text-slate-400">
                         {item.shippingAddress?.state} - {item.shippingAddress?.pinCode}
                       </p>
-                      <p className="text-teal-700 font-medium pt-0.5">
+                      <p className="text-teal-700 dark:text-teal-400 font-medium pt-0.5">
                         📞 {item.shippingAddress?.mobile}
                       </p>
                     </div>
-                  </StyledTableCell>
+                  </TableCell>
 
-                  <StyledTableCell align="center">
+                  <TableCell align="center">
                     <StatusBadge status={item.orderStatus} />
-                  </StyledTableCell>
+                  </TableCell>
 
-                  <StyledTableCell align="center">
+                  <TableCell align="center">
                     <Button
                       variant="outlined"
                       color="primary"
                       size="small"
                       endIcon={<ExpandMoreIcon />}
                       onClick={(e) => handleClick(e, item.id)}
-                      className="font-bold text-xs rounded-xl"
+                      sx={{
+                        borderRadius: "10px",
+                        fontWeight: 700,
+                        textTransform: "none",
+                        fontSize: "12px",
+                      }}
                     >
                       Update
                     </Button>
@@ -266,7 +261,7 @@ export default function OrderTable() {
                       onClose={() => handleClose(item.id)}
                       TransitionComponent={Fade}
                       PaperProps={{
-                        sx: { borderRadius: "12px", minWidth: 140, boxShadow: 3 },
+                        sx: { borderRadius: "14px", minWidth: 140, boxShadow: 4 },
                       }}
                     >
                       <MenuItem onClick={() => handleStatusChange(item.id, "PLACED")}>
@@ -283,13 +278,13 @@ export default function OrderTable() {
                       </MenuItem>
                       <MenuItem
                         onClick={() => handleStatusChange(item.id, "CANCELLED")}
-                        className="text-red-600 font-semibold"
+                        sx={{ color: "error.main", fontWeight: 700 }}
                       >
                         Cancelled
                       </MenuItem>
                     </Menu>
-                  </StyledTableCell>
-                </StyledTableRow>
+                  </TableCell>
+                </TableRow>
               ))}
             </TableBody>
           </Table>

@@ -7,58 +7,64 @@ import { useNavigate } from "react-router-dom";
 function DealCard({ item }) {
   const navigate = useNavigate();
 
-  console.log("DealCard item:", item);
-
   const handleClick = () => {
-    navigate(`/products/${item.category.categoryId}`);
+    navigate(`/products/${item.category?.categoryId || "deals"}`);
   };
 
   return (
     <article
       onClick={handleClick}
-      className="group relative h-full w-full cursor-pointer overflow-hidden rounded-[26px] border border-slate-200/80 bg-white shadow-[0_24px_70px_-30px_rgba(15,23,42,0.35)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_80px_-28px_rgba(15,23,42,0.42)]"
+      className="group relative h-full w-full cursor-pointer overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-teal-500/60 dark:hover:border-teal-500/60 flex flex-col justify-between"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(37,99,235,0.14),_transparent_35%),linear-gradient(135deg,_rgba(255,255,255,0.82),_rgba(248,250,252,0.95))] opacity-0 transition duration-300 group-hover:opacity-100" />
-
-      <div className="relative flex h-60 items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(37,99,235,0.16),_transparent_60%),linear-gradient(135deg,_#f8fbff_0%,_#eef4ff_100%)] p-5 sm:h-64">
-        <div className="absolute left-3 top-3 rounded-full bg-slate-950/90 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white shadow-lg backdrop-blur">
+      <div className="relative flex h-48 sm:h-52 items-center justify-center overflow-hidden bg-slate-50 dark:bg-slate-950 p-4">
+        {/* Discount Badge */}
+        <div className="absolute left-3 top-3 rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider shadow-sm">
           {item.discount}% OFF
         </div>
 
-        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-rose-500 px-3 py-1.5 text-[11px] font-semibold text-white shadow-lg">
-          <FlashOnRoundedIcon sx={{ fontSize: 14 }} />
-          Deal
-        </div>
-
-        <div className="absolute bottom-3 left-3 right-3 rounded-2xl border border-white/70 bg-white/70 px-3 py-2 text-xs font-medium text-slate-600 shadow-sm backdrop-blur">
-          Limited-time offer • Premium selection
+        {/* Flash Sale Tag */}
+        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-amber-400 text-slate-950 px-2.5 py-0.5 text-[11px] font-extrabold shadow-sm">
+          <FlashOnRoundedIcon sx={{ fontSize: 13 }} />
+          Flash Deal
         </div>
 
         <img
-          src={item.category.image}
-          alt=""
-          className="relative z-10 h-40 w-40 object-contain transition-all duration-500 group-hover:scale-110 group-hover:-rotate-1 sm:h-44 sm:w-44"
+          src={item.category?.image || "https://placehold.co/200x200?text=Deal"}
+          alt={item.category?.name || "Deal"}
+          className="relative z-10 h-32 w-32 sm:h-36 sm:w-36 object-contain transition-transform duration-500 group-hover:scale-110"
+          loading="lazy"
         />
       </div>
 
-      <div className="relative p-5">
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-700">
-          <LocalOfferRoundedIcon sx={{ fontSize: 15 }} />
-          Featured collection
+      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+        <div>
+          <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-teal-600 dark:text-teal-400">
+            <LocalOfferRoundedIcon sx={{ fontSize: 13 }} />
+            Limited Offer
+          </div>
+
+          <h3 className="mt-1 text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 leading-snug line-clamp-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+            {item.category?.name}
+          </h3>
         </div>
 
-        <h3 className="mt-3 min-h-[56px] text-lg font-semibold leading-7 text-slate-900 line-clamp-2">
-          {item.category?.name}
-        </h3>
+        {/* Progress meter */}
+        <div className="space-y-1">
+          <div className="flex justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            <span>Claimed: 85%</span>
+            <span className="text-amber-600 dark:text-amber-400 font-bold">Almost Gone</span>
+          </div>
+          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div className="w-[85%] h-full bg-gradient-to-r from-teal-500 to-amber-500 rounded-full" />
+          </div>
+        </div>
 
-        <p className="mt-2 text-sm leading-6 text-slate-500">
-          Curated savings crafted for premium value, refined style, and everyday confidence.
-        </p>
-
-        <div className="mt-5 flex items-end justify-between gap-3">
+        <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
           <div>
-            <p className="text-lg font-bold text-emerald-600">Save {item.discount}%</p>
-            <p className="text-xs text-slate-500">Limited time offer</p>
+            <p className="text-[11px] text-slate-400">Save Today</p>
+            <p className="text-sm font-extrabold text-teal-700 dark:text-teal-400">
+              Min {item.discount}% Off
+            </p>
           </div>
 
           <button
@@ -66,15 +72,13 @@ function DealCard({ item }) {
               e.stopPropagation();
               handleClick();
             }}
-            className="flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:gap-3 hover:bg-slate-800"
+            className="flex items-center gap-1 rounded-xl bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
-            Shop
-            <ArrowForwardRoundedIcon sx={{ fontSize: 18 }} />
+            Claim
+            <ArrowForwardRoundedIcon sx={{ fontSize: 14 }} />
           </button>
         </div>
       </div>
-
-      <div className="h-1 origin-left scale-x-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 transition-transform duration-500 group-hover:scale-x-100" />
     </article>
   );
 }

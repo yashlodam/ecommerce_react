@@ -1,8 +1,5 @@
 import React, { useEffect } from "react";
-import { ThemeProvider } from "@emotion/react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-
-import customeTheme from "./Theme/customeTheme";
 import ScrollToTop from "./ScrollToTop";
 
 // Layouts
@@ -74,8 +71,7 @@ function App() {
   }, [dispatch]);
 
   return (
-    <ThemeProvider theme={customeTheme}>
-      <div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
         {/* Show the correct navbar based on current section */}
         {isAdmin ? (
           <AdminNavbar />
@@ -171,7 +167,6 @@ function App() {
           />
         </Routes>
       </div>
-    </ThemeProvider>
   );
 }
 

@@ -7,163 +7,106 @@ import { useNavigate } from "react-router-dom";
 import WishlistProductCard from "./WishlistProductCard";
 import { useAppDispatch, useAppSelector } from "../../State/Store";
 import { getWishlistByUserId } from "../../State/customer/WishlistSlice";
+import EmptyState from "../../common/EmptyState";
+import { SkeletonGrid } from "../../common/SkeletonCard";
 
 function Wishlist() {
-
-  //wishlist sections
-
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const { wishlist } = useAppSelector((store) => store);
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     dispatch(getWishlistByUserId(localStorage.getItem("jwt")));
   }, [dispatch]);
 
   const products = wishlist.wishlist?.products || [];
-  const [openSuccess, setOpenSuccess] = useState(false);
-const [successMessage, setSuccessMessage] = useState("");
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-    
+    <div className="min-h-[85vh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8">
         {/* Header */}
-<div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <div className="flex items-center gap-4">
-      <div className="w-14 h-14 rounded-xl bg-pink-50 flex items-center justify-center">
-        <FavoriteIcon
-          sx={{
-            color: "#ec4899",
-            fontSize: 32,
-          }}
-        />
-      </div>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 p-6 mb-8 transition-colors">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-100 dark:border-rose-900/50 flex items-center justify-center">
+                <FavoriteIcon sx={{ color: "#e11d48", fontSize: 26 }} />
+              </div>
 
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          My Wishlist
-        </h1>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  My Wishlist
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                  Save your favourite items and access them anytime.
+                </p>
+              </div>
+            </div>
 
-        <p className="text-gray-500 mt-1">
-          Save your favourite products and purchase them anytime.
-        </p>
-      </div>
-    </div>
-
-    <div className="bg-pink-50 border border-pink-100 rounded-xl px-6 py-3 text-center">
-      <p className="text-sm text-gray-500">
-        Total Items
-      </p>
-
-      <h2 className="text-2xl font-bold text-pink-600">
-        {products.length}
-      </h2>
-    </div>
-  </div>
-</div>
-
- <Snackbar
-  open={openSuccess}
-  autoHideDuration={3000}
-  onClose={() => setOpenSuccess(false)}
-  anchorOrigin={{ vertical: "top", horizontal: "right" }}
-  sx={{
-    mt: 6,
-    ml: 3,
-  }}
->
-  <Alert
-    severity="success"
-    variant="filled"
-    sx={{ width: "100%" }}
-  >
-    {successMessage}
-  </Alert>
-</Snackbar>
-
-        {/* Loading */}
-        {wishlist.loading && (
-          <div className="flex flex-col items-center justify-center py-28">
-            <CircularProgress color="error" />
-
-            <p className="mt-5 text-gray-500">
-              Loading your wishlist...
-            </p>
-          </div>
-        )}
-
-        {/* Empty Wishlist */}
-        {!wishlist.loading && products.length === 0 && (
-          <div className="bg-white rounded-3xl shadow-sm mt-10 p-8 sm:p-14 text-center">
-
-            <FavoriteBorderIcon
-              sx={{
-                fontSize: 90,
-                color: "#d1d5db",
-              }}
-            />
-
-            <h2 className="text-2xl sm:text-3xl font-bold mt-6 text-gray-800">
-              Your Wishlist is Empty
-            </h2>
-
-            <p className="text-gray-500 mt-3 max-w-md mx-auto">
-              Looks like you haven't added any products yet.
-              Browse our collection and save your favourite items.
-            </p>
-
-            <Button
-              variant="contained"
-              startIcon={<ShoppingBagOutlinedIcon />}
-              sx={{
-                mt: 5,
-                textTransform: "none",
-                bgcolor: "#ec4899",
-                px: 4,
-                py: 1.5,
-                borderRadius: 3,
-                "&:hover": {
-                  bgcolor: "#db2777",
-                },
-              }}
-              onClick={() => navigate("/")}
-            >
-              Continue Shopping
-            </Button>
-
-          </div>
-        )}
-
-       
-
-        {/* Wishlist Products */}
-        {!wishlist.loading && products.length > 0 && (
-          <div className="mt-10">
-
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
-                Saved Products
+            <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-900/40 rounded-xl px-5 py-2.5 text-center self-start sm:self-auto">
+              <p className="text-xs text-rose-600 dark:text-rose-400 font-semibold">
+                Saved Items
+              </p>
+              <h2 className="text-xl font-extrabold text-rose-700 dark:text-rose-300">
+                {products.length}
               </h2>
+            </div>
+          </div>
+        </div>
 
-              <span className="text-sm text-gray-500">
-                {products.length} Items
-              </span>
+        <Snackbar
+          open={openSuccess}
+          autoHideDuration={3000}
+          onClose={() => setOpenSuccess(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert
+            severity="success"
+            variant="filled"
+            sx={{ width: "100%" }}
+            onClose={() => setOpenSuccess(false)}
+          >
+            {successMessage}
+          </Alert>
+        </Snackbar>
+
+        {/* Loading Skeletons */}
+        {wishlist.loading && <SkeletonGrid count={4} />}
+
+        {/* Empty State */}
+        {!wishlist.loading && products.length === 0 && (
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-8 transition-colors">
+            <EmptyState
+              icon={FavoriteBorderIcon}
+              title="Your Wishlist is Empty"
+              description="Explore trending collections and tap the heart icon on any product to save it here for later!"
+              actionText="Explore Marketplace"
+              onAction={() => navigate("/")}
+            />
+          </div>
+        )}
+
+        {/* Wishlist Products Grid */}
+        {!wishlist.loading && products.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-200">
+                Saved Items ({products.length})
+              </h2>
             </div>
 
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
               {products.map((item) => (
                 <WishlistProductCard
-  key={item.id}
-  item={item}
-  setOpenSuccess={setOpenSuccess}
-  setSuccessMessage={setSuccessMessage}
-/>
-                
+                  key={item.id}
+                  item={item}
+                  setOpenSuccess={setOpenSuccess}
+                  setSuccessMessage={setSuccessMessage}
+                />
               ))}
             </div>
-
           </div>
         )}
       </div>

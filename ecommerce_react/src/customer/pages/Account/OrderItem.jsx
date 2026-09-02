@@ -1,72 +1,91 @@
 import React from "react";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { useNavigate } from "react-router-dom";
+import StatusBadge from "../../../common/StatusBadge";
 
-function OrderItem({item,order}) {
-  console.log(item)
-  console.log(order)
+function formatINR(val) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(val || 0);
+}
+
+function OrderItem({ item, order }) {
   const navigate = useNavigate();
+
+  const sellerName =
+    item.product?.seller?.businessDetails?.businessName ||
+    item.product?.seller?.businesssDetails?.businessName ||
+    item.product?.brand ||
+    "Verified Marketplace Seller";
+
+  const arrivalDate = order.deliverDate
+    ? new Date(order.deliverDate).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "3-5 Business Days";
+
   return (
-    <div onClick={()=> navigate(`/account/order/${order.id}/${item.id}`)} className="border rounded-xl overflow-hidden bg-white hover:shadow-md transition-all duration-300">
-      
-      {/* Order Status */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b bg-gray-50">
-        <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white">
-          <LocalShippingIcon fontSize="small" />
+    <div
+      onClick={() => navigate(`/account/order/${order.id}/${item.id}`)}
+      className="border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 hover:shadow-lg hover:border-teal-500/50 transition-all duration-300 cursor-pointer"
+    >
+      {/* Order Status Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-teal-600 dark:bg-teal-500 flex items-center justify-center text-white shrink-0">
+            <LocalShippingIcon sx={{ fontSize: 16 }} />
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Order #{order.orderId || order.id}
+              </span>
+              <StatusBadge status={order.orderStatus} />
+            </div>
+          </div>
         </div>
 
-        <div>
-          <h3 className="font-bold text-green-600 uppercase tracking-wide">
-            {order.orderStatus}
-          </h3>
-         <p className="text-sm text-gray-500">
-  Arriving by{" "}
-  {new Date(order.deliverDate).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })}
-</p>
-        </div>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Estimated: <strong className="text-slate-700 dark:text-slate-200">{arrivalDate}</strong>
+        </p>
       </div>
 
-      {/* Product Info */}
-      <div className="p-5 bg-teal-50/40">
-        <div className="flex gap-4">
-          
+      {/* Product Information */}
+      <div className="p-5">
+        <div className="flex gap-4 items-start sm:items-center">
           {/* Image */}
-          <img
-            src={item.product.images[0]}
-            className="w-20 h-20 object-cover rounded-lg border"
-          />
+          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 p-2 shrink-0 flex items-center justify-center">
+            <img
+              src={item.product?.images?.[0] || "https://placehold.co/100x100?text=Item"}
+              alt={item.product?.title || "Product"}
+              className="max-w-full max-h-full object-contain"
+              loading="lazy"
+            />
+          </div>
 
           {/* Details */}
-          <div className="flex-1">
-            <h2 className="font-semibold text-gray-900 text-lg">
-              {item.product.seller.businesssDetails.businessName}
-            </h2>
+          <div className="flex-1 min-w-0 space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400">
+              {sellerName}
+            </span>
 
-            <p className="text-gray-600 text-sm mt-1 line-clamp-2">
-              {item.product.description}
-            </p>
+            <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 truncate">
+              {item.product?.title}
+            </h3>
 
-            <div className="flex flex-wrap gap-4 mt-3 text-sm">
-              <p>
-                <span className="font-semibold">Size:</span> {item.product.Sizes}
-              </p>
-
-              <p>
-                <span className="font-semibold">Color:</span> {item.product.color}
-              </p>
-
-              <p>
-                <span className="font-semibold">Qty:</span> {item.quantity}
-              </p>
+            <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400 pt-1">
+              <span>Size: <strong className="text-slate-800 dark:text-slate-200">{item.size || item.product?.sizes || "Standard"}</strong></span>
+              <span>Qty: <strong className="text-slate-800 dark:text-slate-200">{item.quantity}</strong></span>
+              <span>Total: <strong className="text-teal-700 dark:text-teal-400 font-extrabold">{formatINR(item.sellingPrice * (item.quantity || 1))}</strong></span>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 }
