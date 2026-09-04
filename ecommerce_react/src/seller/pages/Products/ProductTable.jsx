@@ -150,6 +150,7 @@ export default function ProductTable() {
               ) : (
                 products.map((item) => {
                   const isInStock = item.quantity > 0;
+                  const variantCount = item.variants?.length ?? 0;
                   return (
                     <TableRow key={item.id} hover className="transition-colors">
                       <TableCell>
@@ -165,9 +166,20 @@ export default function ProductTable() {
                         <p className="font-bold text-sm text-slate-900 dark:text-slate-100 line-clamp-1">
                           {item.title}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                          Color: {item.color || "Standard"} • Sizes: {item.sizes || "Free Size"}
-                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                            Color: {item.color || "Standard"}
+                          </span>
+                          {variantCount > 0 && (
+                            <Chip
+                              label={`${variantCount} variant${variantCount !== 1 ? "s" : ""}`}
+                              size="small"
+                              color="info"
+                              variant="outlined"
+                              sx={{ fontSize: "10px", height: "18px" }}
+                            />
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell align="right" className="text-slate-400 line-through text-sm">
                         {formatINR(item.mrpPrice)}
@@ -198,8 +210,8 @@ export default function ProductTable() {
                           <IconButton
                             size="small"
                             color="primary"
-                            onClick={() => handleEditStock(item)}
-                            title="Quick Edit Stock"
+                            onClick={() => navigate(`/seller/edit-product/${item.id}`)}
+                            title="Edit Product & Variants"
                           >
                             <EditIcon fontSize="small" />
                           </IconButton>
