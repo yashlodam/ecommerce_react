@@ -3,10 +3,12 @@ import HomeCategoryTable from './HomeCategoryTable'
 
 function GridTable() {
   return (
-    <div>
-      <HomeCategoryTable/>
-    </div>
-  )
+    <HomeCategoryTable
+      section="GRID"
+      title="Homepage Grid Showcase"
+      subtitle="Manage hero grid visual banners, promotional tiles, and navigation links."
+    />
+  );
 }
 
 export default GridTable

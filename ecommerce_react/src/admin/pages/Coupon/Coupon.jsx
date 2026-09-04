@@ -91,18 +91,81 @@ function Coupon() {
           />
         </div>
       ) : (
-        <TableContainer
-          component={Paper}
-          elevation={0}
-          sx={{
-            borderRadius: "20px",
-            border: "1px solid",
-            borderColor: "divider",
-            overflow: "hidden",
-            bgcolor: "background.paper",
-          }}
-        >
-          <Table sx={{ minWidth: 750 }}>
+        <>
+          {/* Mobile Card View (visible on xs/sm) */}
+          <div className="grid grid-cols-1 gap-4 md:hidden">
+            {coupons.map((c) => {
+              const isExpired =
+                c.validityEndDate && new Date(c.validityEndDate) < new Date();
+              return (
+                <div
+                  key={c.id}
+                  className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3 transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono font-bold text-sm bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-800 px-3 py-1 rounded-lg">
+                      {c.code}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Chip
+                        label={isExpired ? "Expired" : "Active"}
+                        size="small"
+                        color={isExpired ? "error" : "success"}
+                        className="font-bold text-xs"
+                      />
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteCoupon(c.id)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-500 dark:text-slate-400">Discount:</span>
+                    <span className="font-extrabold text-teal-600 dark:text-teal-400">
+                      {c.discountPercentage}% OFF
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <span>Min Order:</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">
+                      {formatINR(c.minimumOrderValue)}
+                    </span>
+                  </div>
+
+                  <div className="text-[11px] text-slate-400 dark:text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-800">
+                    Valid:{" "}
+                    {c.validityStartDate
+                      ? new Date(c.validityStartDate).toLocaleDateString("en-IN")
+                      : "Now"}{" "}
+                    —{" "}
+                    {c.validityEndDate
+                      ? new Date(c.validityEndDate).toLocaleDateString("en-IN")
+                      : "Ongoing"}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop Table View (hidden on mobile, visible on md+) */}
+          <TableContainer
+            component={Paper}
+            elevation={0}
+            className="hidden md:block"
+            sx={{
+              borderRadius: "20px",
+              border: "1px solid",
+              borderColor: "divider",
+              overflow: "hidden",
+              bgcolor: "background.paper",
+            }}
+          >
+            <Table sx={{ minWidth: 750 }}>
             <TableHead className="bg-slate-50 dark:bg-slate-950/60">
               <TableRow>
                 <TableCell sx={{ fontWeight: 700 }}>Code</TableCell>
@@ -170,7 +233,8 @@ function Coupon() {
               })}
             </TableBody>
           </Table>
-        </TableContainer>
+          </TableContainer>
+        </>
       )}
 
       {/* Add Coupon Dialog */}

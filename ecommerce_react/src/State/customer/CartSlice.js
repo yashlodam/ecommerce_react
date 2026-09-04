@@ -26,7 +26,9 @@ export const addItemToCart = createAsyncThunk(
   "cart/addItem",
   async (request, { dispatch, rejectWithValue }) => {
     try {
-      const response = await api.put("/api/cart/add", request);
+      // Support both direct payload and wrapped { request, jwt }
+      const payload = request?.request ? request.request : request;
+      const response = await api.put("/api/cart/add", payload);
       // Refresh cart after adding
       dispatch(fetchUserCart());
       return response.data;
@@ -40,9 +42,12 @@ export const addItemToCart = createAsyncThunk(
 
 export const deleteCartItem = createAsyncThunk(
   "cart/deleteItem",
-  async (cartItemId, { rejectWithValue }) => {
+  async (arg, { dispatch, rejectWithValue }) => {
     try {
+      // Support both direct id and object { cartItemId, jwt }
+      const cartItemId = typeof arg === "object" && arg !== null ? (arg.cartItemId || arg.id) : arg;
       await api.delete(`/api/cart/item/${cartItemId}`);
+      dispatch(fetchUserCart());
       return cartItemId;
     } catch (error) {
       return rejectWithValue(
@@ -54,12 +59,13 @@ export const deleteCartItem = createAsyncThunk(
 
 export const updateCartItem = createAsyncThunk(
   "cart/updateItem",
-  async ({ cartItemId, cartItem }, { rejectWithValue }) => {
+  async ({ cartItemId, cartItem }, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.put(
         `/api/cart/item/${cartItemId}`,
         cartItem
       );
+      dispatch(fetchUserCart());
       return response.data;
     } catch (error) {
       return rejectWithValue(

@@ -85,27 +85,32 @@ function SuspendedAccount() {
   };
 
   return (
-    <Box className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50 flex items-center justify-center p-5">
+    <Box className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50 dark:from-slate-950 dark:via-slate-900 dark:to-red-950 flex items-center justify-center p-4 sm:p-6 transition-colors">
       <Paper
         elevation={0}
-        className="max-w-2xl w-full rounded-3xl overflow-hidden shadow-2xl border border-slate-200"
+        className="max-w-2xl w-full rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors"
       >
         {/* Header */}
-        <div className="relative bg-gradient-to-r from-red-600 to-rose-600 px-10 py-10 text-white">
+        <div className="relative bg-gradient-to-r from-red-600 to-rose-600 px-6 sm:px-10 py-8 sm:py-10 text-white">
           <div className="absolute inset-0 opacity-10">
             <div className="w-full h-full bg-[radial-gradient(circle_at_top_right,white_2px,transparent_2px)] bg-[length:28px_28px]" />
           </div>
 
           <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-lg flex items-center justify-center shadow-xl">
-              <BlockRoundedIcon sx={{ fontSize: 46 }} />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 backdrop-blur-lg flex items-center justify-center shadow-xl">
+              <BlockRoundedIcon sx={{ fontSize: { xs: 34, sm: 46 } }} />
             </div>
 
-            <Typography variant="h4" fontWeight={700} mt={3}>
+            <Typography
+              variant="h4"
+              fontWeight={700}
+              mt={3}
+              sx={{ fontSize: { xs: "1.5rem", sm: "2.125rem" } }}
+            >
               Seller Account Suspended
             </Typography>
 
-            <Typography mt={1} sx={{ opacity: 0.9 }}>
+            <Typography mt={1} sx={{ opacity: 0.9, fontSize: { xs: "0.875rem", sm: "1rem" } }}>
               Your seller account has been temporarily suspended.
             </Typography>
 
@@ -128,7 +133,7 @@ function SuspendedAccount() {
         </div>
 
         {/* Body */}
-        <div className="p-10">
+        <div className="p-6 sm:p-10">
           {/* Review progress */}
           <Stepper activeStep={1} alternativeLabel sx={{ mb: 5 }}>
             {reviewSteps.map((label) => (
@@ -146,7 +151,7 @@ function SuspendedAccount() {
             During this suspension you cannot perform the following actions:
           </Typography>
 
-          <div className="grid md:grid-cols-2 gap-4 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-8">
             {[
               "Add New Products",
               "Edit Existing Products",
@@ -157,21 +162,21 @@ function SuspendedAccount() {
             ].map((item) => (
               <div
                 key={item}
-                className="flex items-center gap-3 rounded-xl bg-slate-50 hover:bg-red-50 transition-all duration-300 p-4"
+                className="flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all duration-200 p-3.5 sm:p-4"
               >
                 <ReportProblemRoundedIcon sx={{ color: "#DC2626" }} />
-                <Typography>{item}</Typography>
+                <Typography className="text-sm font-medium">{item}</Typography>
               </div>
             ))}
           </div>
 
           {/* Reason */}
-          <Paper variant="outlined" className="rounded-2xl mt-8 p-6 border-red-200 bg-red-50">
+          <Paper variant="outlined" className="rounded-2xl mt-8 p-5 sm:p-6 border-red-200 dark:border-red-900/40 bg-red-50/80 dark:bg-red-950/20">
             <div className="flex gap-4">
               <GavelRoundedIcon sx={{ color: "#DC2626", fontSize: 34 }} />
               <div>
                 <Typography fontWeight={700}>Possible Reasons</Typography>
-                <Typography mt={1} color="text.secondary" lineHeight={1.8}>
+                <Typography mt={1} color="text.secondary" lineHeight={1.8} className="text-xs sm:text-sm">
                   • Marketplace policy violation
                   <br />
                   • Incomplete business verification
@@ -201,13 +206,13 @@ function SuspendedAccount() {
                 onClick={item.onClick || undefined}
                 role={item.onClick ? "button" : undefined}
                 tabIndex={item.onClick ? 0 : undefined}
-                className={`flex items-center justify-between gap-3 rounded-lg px-2 py-2 -mx-2 ${
-                  item.onClick ? "cursor-pointer hover:bg-slate-50 transition-colors" : ""
+                className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 ${
+                  item.onClick ? "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" : ""
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <CheckCircleOutlineIcon sx={{ color: "#16A34A" }} />
-                  <Typography>{item.label}</Typography>
+                  <Typography className="text-sm">{item.label}</Typography>
                 </div>
                 {item.onClick && (
                   <ChevronRightRoundedIcon sx={{ color: "#94A3B8", fontSize: 20 }} />

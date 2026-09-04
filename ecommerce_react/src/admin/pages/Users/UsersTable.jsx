@@ -34,7 +34,9 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 
 function UsersTable() {
   const dispatch = useAppDispatch();
-  const { users, loading } = useAppSelector((store) => store.adminFetch);
+  const adminFetch = useAppSelector((store) => store.adminFetch);
+  const users = adminFetch?.users || [];
+  const loading = adminFetch?.loading || false;
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -112,17 +114,85 @@ function UsersTable() {
           />
         </div>
       ) : (
-        <TableContainer
-          component={Paper}
-          elevation={0}
-          sx={{
-            borderRadius: "20px",
-            border: "1px solid",
-            borderColor: "divider",
-            overflow: "hidden",
-            bgcolor: "background.paper",
-          }}
-        >
+        <>
+          {/* Mobile Cards (visible on xs/sm/md) */}
+          <div className="grid grid-cols-1 gap-4 lg:hidden">
+            {filteredUsers.map((user) => (
+              <div
+                key={user.id}
+                className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      {user.fullName || "User Account"}
+                    </h3>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
+                      {user.email}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Chip
+                      label={user.role}
+                      size="small"
+                      color={user.role === "ROLE_ADMIN" ? "primary" : "default"}
+                      variant="outlined"
+                      className="font-bold text-xs"
+                    />
+                    <Chip
+                      label={user.enabled ? "Active" : "Banned"}
+                      size="small"
+                      color={user.enabled ? "success" : "error"}
+                      className="font-bold text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <span>Phone: {user.mobile || "—"}</span>
+                  <span className="font-mono">ID: #{user.id}</span>
+                </div>
+
+                {user.role !== "ROLE_ADMIN" && (
+                  <div className="flex justify-end items-center gap-2 pt-1">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color={user.enabled ? "error" : "success"}
+                      startIcon={user.enabled ? <BlockIcon fontSize="small" /> : <CheckCircleIcon fontSize="small" />}
+                      onClick={() => handleToggleBan(user)}
+                      sx={{ borderRadius: "10px", textTransform: "none", fontWeight: 700, fontSize: "11px" }}
+                    >
+                      {user.enabled ? "Ban User" : "Unban"}
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="text"
+                      color="error"
+                      onClick={() => handleDeleteClick(user)}
+                      sx={{ borderRadius: "10px", textTransform: "none", fontSize: "11px" }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table (hidden on mobile, visible on lg+) */}
+          <TableContainer
+            component={Paper}
+            elevation={0}
+            className="hidden lg:block"
+            sx={{
+              borderRadius: "20px",
+              border: "1px solid",
+              borderColor: "divider",
+              overflow: "hidden",
+              bgcolor: "background.paper",
+            }}
+          >
           <Table sx={{ minWidth: 650 }}>
             <TableHead className="bg-slate-50 dark:bg-slate-950/60">
               <TableRow>
@@ -190,7 +260,8 @@ function UsersTable() {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+          </TableContainer>
+        </>
       )}
 
       {/* Delete Confirmation Dialog */}

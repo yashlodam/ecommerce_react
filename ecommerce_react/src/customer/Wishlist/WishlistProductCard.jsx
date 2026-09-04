@@ -2,7 +2,7 @@ import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { IconButton, Tooltip } from "@mui/material";
 import { useAppDispatch } from "../../State/Store";
-import { addProductToWishlist } from "../../State/customer/WishlistSlice";
+import { addProductToWishlist, removeProductFromWishlist } from "../../State/customer/WishlistSlice";
 import { useNavigate } from "react-router-dom";
 
 function formatINR(val) {
@@ -21,7 +21,7 @@ function WishlistProductCard({ item, setOpenSuccess, setSuccessMessage }) {
     e.stopPropagation();
     try {
       await dispatch(
-        addProductToWishlist({
+        removeProductFromWishlist({
           productId: item.id,
           jwt: localStorage.getItem("jwt"),
         })
@@ -32,7 +32,7 @@ function WishlistProductCard({ item, setOpenSuccess, setSuccessMessage }) {
         setOpenSuccess(true);
       }
     } catch (error) {
-      console.error(error);
+      console.error("Failed to remove from wishlist:", error);
     }
   };
 

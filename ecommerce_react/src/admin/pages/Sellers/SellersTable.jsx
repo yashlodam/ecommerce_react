@@ -43,7 +43,9 @@ const accountStatuses = [
 function SellersTable() {
   const [accountStatus, setAccountStatus] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
-  const { sellers, loading } = useAppSelector((store) => store.adminFetch);
+  const adminFetch = useAppSelector((store) => store.adminFetch);
+  const sellers = adminFetch?.sellers || [];
+  const loading = adminFetch?.loading || false;
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -152,17 +154,80 @@ function SellersTable() {
           />
         </div>
       ) : (
-        <TableContainer
-          component={Paper}
-          elevation={0}
-          sx={{
-            borderRadius: "20px",
-            border: "1px solid",
-            borderColor: "divider",
-            overflow: "hidden",
-            bgcolor: "background.paper",
-          }}
-        >
+        <>
+          {/* Mobile Cards (visible on xs/sm/md) */}
+          <div className="grid grid-cols-1 gap-4 lg:hidden">
+            {filteredSellers.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3 transition-colors"
+              >
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                  <div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                      {item.sellerName}
+                    </h3>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
+                      {item.email}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={item.accountStatus} />
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      endIcon={<ExpandMoreIcon />}
+                      onClick={(e) => handleClick(e, item.id)}
+                      sx={{
+                        borderRadius: "8px",
+                        fontWeight: 700,
+                        textTransform: "none",
+                        fontSize: "11px",
+                        py: 0.3,
+                        px: 1,
+                      }}
+                    >
+                      Status
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500">Store:</span>
+                    <p className="font-bold text-slate-800 dark:text-slate-200 truncate">
+                      {item.businessDetails?.businessName || item.businesssDetails?.businessName || "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 dark:text-slate-500">Phone:</span>
+                    <p className="font-medium text-slate-700 dark:text-slate-300">
+                      {item.mobile || "—"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800">
+                  GSTIN: <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">{item.GSTIN || item.gstin || "—"}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table (hidden on mobile, visible on lg+) */}
+          <TableContainer
+            component={Paper}
+            elevation={0}
+            className="hidden lg:block"
+            sx={{
+              borderRadius: "20px",
+              border: "1px solid",
+              borderColor: "divider",
+              overflow: "hidden",
+              bgcolor: "background.paper",
+            }}
+          >
           <Table sx={{ minWidth: 850 }}>
             <TableHead className="bg-slate-50 dark:bg-slate-950/60">
               <TableRow>
@@ -257,7 +322,8 @@ function SellersTable() {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+          </TableContainer>
+        </>
       )}
     </div>
   );

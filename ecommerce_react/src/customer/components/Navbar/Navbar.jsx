@@ -138,7 +138,7 @@ function Navbar() {
         }}
         PaperProps={{
           sx: {
-            width: 300,
+            width: "min(320px, 84vw)",
             borderTopRightRadius: 24,
             borderBottomRightRadius: 24,
             bgcolor: "background.paper",
@@ -331,25 +331,31 @@ function Navbar() {
 
       {/* Main Sticky Navbar */}
       <Box className="sticky top-0 left-0 right-0 border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl transition-colors z-40">
-        <div className="flex h-16 sm:h-18 items-center justify-between gap-3 px-3 sm:px-6 lg:px-16 max-w-[1700px] mx-auto">
+        <div className="flex h-16 sm:h-18 items-center justify-between gap-2 min-[360px]:gap-3 px-2.5 min-[360px]:px-4 sm:px-6 lg:px-16 max-w-[1700px] mx-auto">
           {/* Logo & Category Navigation */}
-          <div className="flex min-w-0 items-center gap-2 lg:gap-8">
-            <div className="flex min-w-0 items-center gap-1.5">
+          <div className="flex min-w-0 items-center gap-1.5 min-[360px]:gap-2 lg:gap-8">
+            <div className="flex min-w-0 items-center gap-1 min-[360px]:gap-1.5">
               {!isLarge && (
                 <IconButton
                   onClick={(e) => {
                     e.currentTarget.blur();
                     setOpenDrawer(true);
                   }}
-                  aria-label="Open menu"
+                  aria-label="Open navigation menu"
+                  sx={{
+                    width: { xs: 40, sm: 44 },
+                    height: { xs: 40, sm: 44 },
+                    minWidth: { xs: 40, sm: 44 },
+                    minHeight: { xs: 40, sm: 44 },
+                  }}
                   className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
                 >
-                  <MenuIcon />
+                  <MenuIcon sx={{ fontSize: { xs: 22, sm: 24 } }} />
                 </IconButton>
               )}
               <span
                 onClick={() => navigate("/")}
-                className="logo cursor-pointer truncate text-xl md:text-2xl font-bold tracking-tight text-teal-600 dark:text-teal-400 select-none"
+                className="logo cursor-pointer truncate text-lg min-[360px]:text-xl md:text-2xl font-black tracking-tight text-teal-600 dark:text-teal-400 select-none"
               >
                 ShopSphere
               </span>
@@ -467,25 +473,53 @@ function Navbar() {
           )}
 
           {/* Right Action Icons & Auth */}
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:gap-3">
+          <div className="flex shrink-0 items-center gap-1 min-[360px]:gap-1.5 sm:gap-2 lg:gap-3">
             <ThemeToggle size="small" />
 
             {!isLarge && (
               <>
                 <IconButton
                   onClick={() => setMobileSearchOpen((value) => !value)}
-                  aria-label="Search"
+                  aria-label="Search products"
+                  sx={{
+                    width: { xs: 40, sm: 44 },
+                    height: { xs: 40, sm: 44 },
+                    minWidth: { xs: 40, sm: 44 },
+                    minHeight: { xs: 40, sm: 44 },
+                  }}
                   className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
                 >
-                  <SearchIcon fontSize="small" />
+                  <SearchIcon sx={{ fontSize: { xs: 20, sm: 22 } }} />
                 </IconButton>
                 <IconButton
                   onClick={() => navigate("/cart")}
-                  aria-label="Cart"
+                  aria-label="Shopping Cart"
+                  sx={{
+                    width: { xs: 40, sm: 44 },
+                    height: { xs: 40, sm: 44 },
+                    minWidth: { xs: 40, sm: 44 },
+                    minHeight: { xs: 40, sm: 44 },
+                  }}
                   className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
                 >
-                  <Badge badgeContent={cart.cart?.totalItem || 0} color="error" overlap="circular" max={99}>
-                    <AddShoppingCartIcon sx={{ fontSize: 22 }} />
+                  <Badge
+                    badgeContent={cart.cart?.totalItem || 0}
+                    color="error"
+                    overlap="circular"
+                    max={99}
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        fontSize: "10px",
+                        height: "18px",
+                        minWidth: "18px",
+                        px: "4px",
+                        right: 1,
+                        top: 1,
+                        fontWeight: 700,
+                      },
+                    }}
+                  >
+                    <AddShoppingCartIcon sx={{ fontSize: { xs: 20, sm: 22 } }} />
                   </Badge>
                 </IconButton>
               </>
@@ -812,9 +846,12 @@ function DrawerRow({ icon, label, onClick }) {
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(event) => {
-        if (event.key === "Enter") onClick();
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onClick();
+        }
       }}
-      className="flex cursor-pointer items-center justify-between gap-3 px-5 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-300"
+      className="flex min-h-[44px] cursor-pointer items-center justify-between gap-3 px-5 py-2.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-300 focus-visible:outline-none focus-visible:bg-slate-100 dark:focus-visible:bg-slate-800 select-none"
     >
       <span className="flex items-center gap-3 text-sm font-semibold">
         {icon && <span className="flex text-slate-400 dark:text-slate-500">{icon}</span>}

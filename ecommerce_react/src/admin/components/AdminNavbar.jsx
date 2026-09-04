@@ -38,6 +38,9 @@ function AdminNavbar() {
         anchor="left"
         open={openDrawer}
         onClose={closeDrawer}
+        ModalProps={{
+          disableRestoreFocus: true,
+        }}
         PaperProps={{
           sx: {
             width: 290,
@@ -65,7 +68,10 @@ function AdminNavbar() {
           <div className="flex items-center gap-3">
             {!isLarge && (
               <IconButton
-                onClick={() => setOpenDrawer(true)}
+                onClick={(e) => {
+                  e.currentTarget.blur();
+                  setOpenDrawer(true);
+                }}
                 aria-label="Open menu"
                 size="small"
                 className="text-slate-700 dark:text-slate-200"

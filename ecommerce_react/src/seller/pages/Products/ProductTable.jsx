@@ -16,6 +16,9 @@ import {
   DialogContentText,
   DialogActions,
   TextField,
+  InputAdornment,
+  Tabs,
+  Tab,
   CircularProgress,
   Box,
   Typography,
@@ -23,6 +26,8 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from "@mui/icons-material/Search";
+import InventoryIcon from "@mui/icons-material/Inventory";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import {
@@ -30,6 +35,7 @@ import {
   deleteSellerProduct,
   updateSellerProduct,
 } from "../../../State/seller/sellerProductSlice";
+import EmptyState from "../../../common/EmptyState";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -42,13 +48,34 @@ function formatINR(val) {
 export default function ProductTable() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { products = [], loading = false } = useAppSelector((store) => store.sellerProduct || {});
+  const sellerProduct = useAppSelector((store) => store.sellerProduct);
+  const products = sellerProduct?.products || [];
+  const loading = sellerProduct?.loading || false;
   const productList = Array.isArray(products) ? products : [];
 
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [stockDialog, setStockDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [newStock, setNewStock] = useState(0);
+  const [filterTab, setFilterTab] = useState("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredProducts = productList.filter((item) => {
+    if (!item) return false;
+    const matchesTab =
+      filterTab === "ALL"
+        ? true
+        : filterTab === "IN_STOCK"
+        ? item.quantity > 0
+        : (item.quantity ?? 0) <= 0;
+    const q = searchQuery.trim().toLowerCase();
+    const matchesQuery =
+      !q ||
+      item.title?.toLowerCase().includes(q) ||
+      item.brand?.toLowerCase().includes(q) ||
+      item.color?.toLowerCase().includes(q);
+    return matchesTab && matchesQuery;
+  });
 
   useEffect(() => {
     dispatch(fetchSellerProduct());
@@ -113,43 +140,174 @@ export default function ProductTable() {
         </Button>
       </div>
 
+      {/* Controls: Search & Stock Filter */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors">
+        <Tabs
+          value={filterTab}
+          onChange={(e, val) => setFilterTab(val)}
+          variant="scrollable"
+          scrollButtons="auto"
+          textColor="primary"
+          indicatorColor="primary"
+        >
+          <Tab value="ALL" label={`All (${productList.length})`} className="font-bold text-xs" />
+          <Tab
+            value="IN_STOCK"
+            label={`In Stock (${productList.filter((p) => p.quantity > 0).length})`}
+            className="font-bold text-xs"
+          />
+          <Tab
+            value="OUT_OF_STOCK"
+            label={`Out of Stock (${productList.filter((p) => (p.quantity ?? 0) <= 0).length})`}
+            className="font-bold text-xs"
+          />
+        </Tabs>
+
+        <TextField
+          size="small"
+          placeholder="Search listings by title, color, brand..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon fontSize="small" className="text-slate-400" />
+              </InputAdornment>
+            ),
+          }}
+          className="min-w-[280px]"
+        />
+      </div>
+
       {loading ? (
-        <div className="flex justify-center items-center py-20">
+        <div className="flex justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
           <CircularProgress color="primary" />
         </div>
+      ) : filteredProducts.length === 0 ? (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-8 transition-colors">
+          <EmptyState
+            icon={InventoryIcon}
+            title="No products found"
+            description={
+              searchQuery || filterTab !== "ALL"
+                ? "No inventory items match your search or filter criteria."
+                : "You haven't listed any products yet. Click 'Add Product' to create your first catalog listing!"
+            }
+            actionText={!searchQuery && filterTab === "ALL" ? "Add First Product" : undefined}
+            onAction={() => navigate("/seller/add-product")}
+          />
+        </div>
       ) : (
-        <TableContainer
-          component={Paper}
-          elevation={0}
-          sx={{
-            borderRadius: "20px",
-            border: "1px solid",
-            borderColor: "divider",
-            overflow: "hidden",
-            bgcolor: "background.paper",
-          }}
-        >
-          <Table sx={{ minWidth: 700 }} aria-label="seller products table">
-            <TableHead className="bg-slate-50 dark:bg-slate-950/60">
-              <TableRow>
-                <TableCell sx={{ fontWeight: 700 }}>Item</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>Title</TableCell>
-                <TableCell sx={{ fontWeight: 700 }} align="right">MRP</TableCell>
-                <TableCell sx={{ fontWeight: 700 }} align="right">Selling Price</TableCell>
-                <TableCell sx={{ fontWeight: 700 }} align="center">Discount</TableCell>
-                <TableCell sx={{ fontWeight: 700 }} align="center">Stock Status</TableCell>
-                <TableCell sx={{ fontWeight: 700 }} align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {productList.length === 0 ? (
+        <>
+          {/* Mobile Cards (visible on xs/sm) */}
+          <div className="grid grid-cols-1 gap-4 md:hidden">
+            {filteredProducts.map((item) => {
+              const isInStock = item.quantity > 0;
+              const variantCount = item.variants?.length ?? 0;
+              return (
+                <div
+                  key={item.id}
+                  className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3"
+                >
+                  <div className="flex gap-3">
+                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200/80 dark:border-slate-800 p-1 shrink-0 flex items-center justify-center">
+                      <img
+                        src={item.images?.[0] || "https://placehold.co/80x80?text=Product"}
+                        alt={item.title}
+                        className="max-w-full max-h-full object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://placehold.co/80x80?text=Product";
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
+                        {item.title}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                          {item.brand || item.color || "Standard"}
+                        </span>
+                        {variantCount > 0 && (
+                          <Chip
+                            label={`${variantCount} var`}
+                            size="small"
+                            color="info"
+                            variant="outlined"
+                            sx={{ fontSize: "10px", height: "18px" }}
+                          />
+                        )}
+                      </div>
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="font-bold text-teal-600 dark:text-teal-400 text-sm">
+                          {formatINR(item.sellingPrice)}
+                        </span>
+                        {item.mrpPrice > item.sellingPrice && (
+                          <span className="text-xs text-slate-400 line-through">
+                            {formatINR(item.mrpPrice)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <Chip
+                      label={isInStock ? `${item.quantity} in stock` : "Out of Stock"}
+                      size="small"
+                      color={isInStock ? "primary" : "error"}
+                      onClick={() => handleEditStock(item)}
+                      className="cursor-pointer font-bold text-xs"
+                    />
+                    <div className="flex items-center gap-1">
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => navigate(`/seller/edit-product/${item.id}`)}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(item)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop & Tablet Table (visible on md+) */}
+          <TableContainer
+            component={Paper}
+            elevation={0}
+            className="hidden md:block"
+            sx={{
+              borderRadius: "20px",
+              border: "1px solid",
+              borderColor: "divider",
+              overflow: "hidden",
+              bgcolor: "background.paper",
+            }}
+          >
+            <Table sx={{ minWidth: 700 }} aria-label="seller products table">
+              <TableHead className="bg-slate-50 dark:bg-slate-950/60">
                 <TableRow>
-                  <TableCell colSpan={7} align="center" className="py-12 text-slate-400 dark:text-slate-500">
-                    No products listed yet. Click "Add Product" to create your first listing!
-                  </TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>Item</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>Title</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }} align="right">MRP</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }} align="right">Selling Price</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }} align="center">Discount</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }} align="center">Stock Status</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }} align="right">Actions</TableCell>
                 </TableRow>
-              ) : (
-                productList.map((item) => {
+              </TableHead>
+              <TableBody>
+                {filteredProducts.map((item) => {
                   const isInStock = item.quantity > 0;
                   const variantCount = item.variants?.length ?? 0;
                   return (
@@ -160,6 +318,9 @@ export default function ProductTable() {
                             src={item.images?.[0] || "https://placehold.co/80x80?text=Product"}
                             alt={item.title}
                             className="max-w-full max-h-full object-contain"
+                            onError={(e) => {
+                              e.currentTarget.src = "https://placehold.co/80x80?text=Product";
+                            }}
                           />
                         </div>
                       </TableCell>
@@ -228,11 +389,11 @@ export default function ProductTable() {
                       </TableCell>
                     </TableRow>
                   );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
       )}
 
       {/* Delete Confirmation Dialog */}

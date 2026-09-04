@@ -10,7 +10,9 @@ import PersonIcon from "@mui/icons-material/Person";
 
 function Profile() {
   const dispatch = useAppDispatch();
-  const { profile, loading } = useAppSelector((store) => store.seller || {});
+  const seller = useAppSelector((store) => store.seller);
+  const profile = seller?.profile;
+  const loading = seller?.loading;
 
   useEffect(() => {
     dispatch(fetchSellerProfile());

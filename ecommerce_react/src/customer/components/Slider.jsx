@@ -129,7 +129,7 @@ function Slider() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className="relative w-full overflow-hidden rounded-[28px] sm:rounded-[36px] bg-slate-950 border border-slate-200/80 dark:border-slate-800 shadow-xl select-none min-h-[440px] sm:min-h-[480px] md:min-h-[520px] lg:min-h-[560px] flex items-center transition-all duration-300 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
+      className="relative w-full overflow-hidden rounded-[24px] sm:rounded-[36px] bg-slate-950 border border-slate-200/80 dark:border-slate-800 shadow-xl select-none min-h-[420px] min-[375px]:min-h-[450px] sm:min-h-[490px] md:min-h-[520px] lg:min-h-[560px] flex items-center transition-all duration-300 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
     >
       {/* ============================================================
           LAYER 1: BACKGROUND PHOTOGRAPHY (VIBRANT & CLEARLY VISIBLE)
@@ -155,13 +155,13 @@ function Slider() {
 
             {/* ============================================================
                 LAYER 2: SMART DIRECTIONAL GRADIENT OVERLAY
-                Left side: Solid, readable dark backdrop for text.
-                Right side: Subtle & transparent so the product is crisp and recognizable.
+                Mobile (<640px): Soft bottom-up gradient keeping top imagery crisp & clear while maintaining high-contrast readable text.
+                Tablet/Desktop (>=640px): Directional left-to-right gradient keeping hero product fully visible on the right.
                 ============================================================ */}
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,15,25,0.45)_0%,rgba(11,15,25,0.85)_55%,rgba(11,15,25,0.96)_100%)] sm:bg-[linear-gradient(90deg,rgba(11,15,25,0.94)_0%,rgba(11,15,25,0.86)_38%,rgba(11,15,25,0.45)_65%,rgba(11,15,25,0.12)_90%,transparent_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(10,15,29,0.92)_0%,rgba(10,15,29,0.72)_48%,rgba(10,15,29,0.20)_75%,transparent_100%)] sm:bg-[linear-gradient(90deg,rgba(10,15,29,0.92)_0%,rgba(10,15,29,0.78)_42%,rgba(10,15,29,0.30)_72%,transparent_100%)]" />
 
             {/* Subtle bottom vignette to ensure indicator contrast */}
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-20 sm:h-24 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
           </div>
         );
       })}
@@ -170,7 +170,7 @@ function Slider() {
           LAYER 3: CONTENT LAYER (SAFE-AREA INSET & STABLE TYPOGRAPHY)
           Uses strict horizontal padding to prevent collision with arrow controls.
           ============================================================ */}
-      <div className="relative z-20 w-full max-w-[1540px] mx-auto px-12 sm:px-20 md:px-24 lg:px-28 py-12 sm:py-16 flex flex-col justify-center pointer-events-auto">
+      <div className="relative z-20 w-full max-w-[1540px] mx-auto px-11 min-[375px]:px-12 sm:px-18 md:px-24 lg:px-28 py-10 sm:py-14 md:py-16 flex flex-col justify-center pointer-events-auto">
         {HERO_SLIDES.map((slide, idx) => {
           const isActive = idx === current;
           if (!isActive) return null;
@@ -178,28 +178,28 @@ function Slider() {
           return (
             <div
               key={slide.id}
-              className="max-w-xl sm:max-w-2xl space-y-3.5 sm:space-y-4 md:space-y-5 animate-fade-in"
+              className="max-w-xl sm:max-w-2xl space-y-3 sm:space-y-4 md:space-y-5 animate-fade-in"
             >
               {/* Category Badge Tag */}
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-1 text-xs sm:text-sm font-bold text-white shadow-xs">
-                <SparklesIcon sx={{ fontSize: 15, color: "#5eead4" }} />
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-2.5 sm:px-3.5 py-0.5 sm:py-1 text-[11px] sm:text-xs md:text-sm font-bold text-white shadow-xs">
+                <SparklesIcon sx={{ fontSize: { xs: 13, sm: 15 }, color: "#5eead4" }} />
                 <span>{slide.tag}</span>
               </div>
 
               {/* Main Heading */}
-              <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-[52px] font-extrabold text-white tracking-tight leading-[1.12] sm:leading-[1.14]">
+              <h2 className="text-[clamp(1.25rem,4.2vw+0.25rem,2.75rem)] font-extrabold text-white tracking-tight leading-[1.18] sm:leading-[1.14]">
                 {slide.title}
               </h2>
 
               {/* Subtitle Description */}
-              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-200 font-normal leading-relaxed line-clamp-2 sm:line-clamp-3 max-w-lg">
+              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-200/90 font-normal leading-relaxed line-clamp-2 sm:line-clamp-3 max-w-lg">
                 {slide.subtitle}
               </p>
 
               {/* Promotion Pill & Action CTAs */}
-              <div className="pt-2 sm:pt-3 flex flex-wrap items-center gap-3 sm:gap-4">
-                <span className="inline-flex items-center gap-1.5 bg-amber-400 text-slate-950 text-xs sm:text-sm font-extrabold px-3.5 py-1.5 rounded-full shadow-md shrink-0">
-                  <LocalFireDepartmentIcon sx={{ fontSize: 17 }} />
+              <div className="pt-1.5 sm:pt-3 flex flex-wrap items-center gap-2 sm:gap-3.5">
+                <span className="inline-flex items-center gap-1 bg-amber-400 text-slate-950 text-[11px] sm:text-xs md:text-sm font-extrabold px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shadow-md shrink-0">
+                  <LocalFireDepartmentIcon sx={{ fontSize: { xs: 14, sm: 16 } }} />
                   {slide.discountText}
                 </span>
 
@@ -207,20 +207,20 @@ function Slider() {
                   variant="contained"
                   size="large"
                   onClick={() => navigate(`/products/${slide.categoryId}`)}
-                  endIcon={<ArrowForwardIcon sx={{ fontSize: 18 }} />}
+                  endIcon={<ArrowForwardIcon sx={{ fontSize: { xs: 15, sm: 18 } }} />}
                   sx={{
                     bgcolor: "#009688",
                     color: "#ffffff",
                     textTransform: "none",
                     fontWeight: 700,
-                    fontSize: { xs: "13px", sm: "14px", md: "15px" },
-                    borderRadius: "14px",
-                    px: { xs: 2.5, sm: 3.5 },
-                    py: { xs: 0.9, sm: 1.15 },
-                    boxShadow: "0 8px 24px rgba(0, 150, 136, 0.4)",
+                    fontSize: { xs: "12px", sm: "14px", md: "15px" },
+                    borderRadius: "12px",
+                    px: { xs: 2, sm: 3 },
+                    py: { xs: 0.75, sm: 1 },
+                    boxShadow: "0 6px 20px rgba(0, 150, 136, 0.4)",
                     "&:hover": {
                       bgcolor: "#00796b",
-                      boxShadow: "0 12px 32px rgba(0, 150, 136, 0.6)",
+                      boxShadow: "0 10px 28px rgba(0, 150, 136, 0.6)",
                     },
                   }}
                 >
@@ -240,18 +240,18 @@ function Slider() {
         type="button"
         onClick={prevSlide}
         aria-label="Previous promotional slide"
-        className="absolute left-2.5 sm:left-4 md:left-6 lg:left-7 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-full bg-slate-950/45 hover:bg-slate-950/80 text-white backdrop-blur-md border border-white/25 shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
+        className="absolute left-1.5 min-[375px]:left-2 sm:left-4 md:left-6 lg:left-7 top-1/2 -translate-y-1/2 z-30 w-8 h-8 min-[375px]:w-9 min-[375px]:h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-slate-950/50 hover:bg-slate-950/85 text-white backdrop-blur-md border border-white/20 shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
       >
-        <ChevronLeftIcon sx={{ fontSize: { xs: 22, sm: 26, md: 28 } }} />
+        <ChevronLeftIcon sx={{ fontSize: { xs: 18, sm: 24, md: 28 } }} />
       </button>
 
       <button
         type="button"
         onClick={nextSlide}
         aria-label="Next promotional slide"
-        className="absolute right-2.5 sm:right-4 md:right-6 lg:right-7 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-full bg-slate-950/45 hover:bg-slate-950/80 text-white backdrop-blur-md border border-white/25 shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
+        className="absolute right-1.5 min-[375px]:right-2 sm:right-4 md:right-6 lg:right-7 top-1/2 -translate-y-1/2 z-30 w-8 h-8 min-[375px]:w-9 min-[375px]:h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-slate-950/50 hover:bg-slate-950/85 text-white backdrop-blur-md border border-white/20 shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
       >
-        <ChevronRightIcon sx={{ fontSize: { xs: 22, sm: 26, md: 28 } }} />
+        <ChevronRightIcon sx={{ fontSize: { xs: 18, sm: 24, md: 28 } }} />
       </button>
 
       {/* ============================================================
@@ -260,7 +260,7 @@ function Slider() {
       <div
         role="tablist"
         aria-label="Carousel slide pagination"
-        className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-slate-950/50 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-lg"
+        className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 sm:gap-2 bg-slate-950/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 shadow-md"
       >
         {HERO_SLIDES.map((slide, index) => {
           const isSelected = current === index;
@@ -273,8 +273,8 @@ function Slider() {
               onClick={() => goTo(index)}
               className={`transition-all duration-300 rounded-full cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none ${
                 isSelected
-                  ? "w-7 sm:w-9 h-2 sm:h-2.5 bg-teal-400 shadow-sm"
-                  : "w-2 sm:w-2.5 h-2 sm:h-2.5 bg-white/40 hover:bg-white/75"
+                  ? "w-6 sm:w-8 h-1.5 sm:h-2 bg-teal-400 shadow-sm"
+                  : "w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/40 hover:bg-white/75"
               }`}
             />
           );

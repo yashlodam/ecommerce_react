@@ -35,6 +35,21 @@ export const addProductToWishlist = createAsyncThunk(
   }
 );
 
+export const removeProductFromWishlist = createAsyncThunk(
+  "wishlist/removeProductFromWishlist",
+  async (arg, { rejectWithValue }) => {
+    try {
+      const id = typeof arg === "object" && arg !== null ? arg.productId : arg;
+      const response = await api.delete(`/api/wishlist/product/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to remove product from wishlist"
+      );
+    }
+  }
+);
+
 const initialState = {
   wishlist: null,
   loading: false,
@@ -75,6 +90,19 @@ const wishlistSlice = createSlice({
         state.loading = false;
       })
       .addCase(addProductToWishlist.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(removeProductFromWishlist.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeProductFromWishlist.fulfilled, (state, action) => {
+        state.wishlist = action.payload;
+        state.loading = false;
+      })
+      .addCase(removeProductFromWishlist.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

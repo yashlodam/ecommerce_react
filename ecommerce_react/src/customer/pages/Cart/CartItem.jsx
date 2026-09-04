@@ -55,12 +55,7 @@ function CartItem({ item }) {
 
   const handleRemoveItem = async () => {
     try {
-      await dispatch(
-        deleteCartItem({
-          jwt: localStorage.getItem("jwt"),
-          cartItemId: item.id,
-        })
-      ).unwrap();
+      await dispatch(deleteCartItem(item.id)).unwrap();
 
       setSnackbar({
         open: true,

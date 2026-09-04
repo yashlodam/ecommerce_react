@@ -128,12 +128,7 @@ function ProductDetails() {
       size: selectedVariant?.variantName ?? currentProduct?.sizes ?? "Standard",
     };
 
-    dispatch(
-      addItemToCart({
-        jwt: localStorage.getItem("jwt"),
-        request: data,
-      })
-    )
+    dispatch(addItemToCart(data))
       .unwrap()
       .then(() => {
         setAlertMsg("Item added to cart successfully!");

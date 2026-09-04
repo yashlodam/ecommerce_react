@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -8,11 +9,16 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch } from "../../../State/Store";
 import { createCoupon } from "../../../State/customer/CouponSlice";
 
 function AddNewCouponForm({ handleClose, onSuccess }) {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const isModal = Boolean(handleClose);
 
   const formik = useFormik({
     initialValues: {
@@ -52,7 +58,11 @@ function AddNewCouponForm({ handleClose, onSuccess }) {
       try {
         await dispatch(createCoupon(formattedValues)).unwrap();
         if (onSuccess) onSuccess();
-        if (handleClose) handleClose();
+        if (handleClose) {
+          handleClose();
+        } else {
+          navigate("/admin/coupon");
+        }
       } catch (error) {
         console.error("Failed to create coupon:", error);
       } finally {
@@ -61,14 +71,37 @@ function AddNewCouponForm({ handleClose, onSuccess }) {
     },
   });
 
-  return (
-    <div className="p-6">
-      <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">
-        Create Promotional Coupon
-      </h2>
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
-        Generate discount vouchers for customer checkouts across the marketplace.
-      </p>
+  const formContent = (
+    <div className={isModal ? "p-6" : "p-6 sm:p-8"}>
+      {!isModal && (
+        <div className="mb-6">
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate("/admin/coupon")}
+            color="inherit"
+            sx={{ textTransform: "none", fontWeight: 600, mb: 2 }}
+          >
+            Back to Coupons
+          </Button>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            Create Promotional Coupon
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Generate discount vouchers for customer checkouts across the marketplace.
+          </p>
+        </div>
+      )}
+
+      {isModal && (
+        <>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">
+            Create Promotional Coupon
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
+            Generate discount vouchers for customer checkouts across the marketplace.
+          </p>
+        </>
+      )}
 
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Box component="form" onSubmit={formik.handleSubmit}>
@@ -149,15 +182,13 @@ function AddNewCouponForm({ handleClose, onSuccess }) {
             </Grid>
 
             <Grid item xs={12} className="flex justify-end gap-2 pt-2">
-              {handleClose && (
-                <Button
-                  onClick={handleClose}
-                  color="inherit"
-                  sx={{ borderRadius: "10px", textTransform: "none" }}
-                >
-                  Cancel
-                </Button>
-              )}
+              <Button
+                onClick={() => (handleClose ? handleClose() : navigate("/admin/coupon"))}
+                color="inherit"
+                sx={{ borderRadius: "10px", textTransform: "none" }}
+              >
+                Cancel
+              </Button>
               <Button
                 variant="contained"
                 color="primary"
@@ -178,6 +209,26 @@ function AddNewCouponForm({ handleClose, onSuccess }) {
       </LocalizationProvider>
     </div>
   );
+
+  if (!isModal) {
+    return (
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: "20px",
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
+          maxWidth: 700,
+          mx: "auto",
+        }}
+      >
+        {formContent}
+      </Paper>
+    );
+  }
+
+  return formContent;
 }
 
 export default AddNewCouponForm;

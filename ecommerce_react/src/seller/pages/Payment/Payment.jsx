@@ -14,9 +14,8 @@ function formatINR(val) {
 
 function Payment() {
   const dispatch = useAppDispatch();
-  const { transactions = [] } = useAppSelector(
-    (store) => store.transaction || {}
-  );
+  const transactionState = useAppSelector((store) => store.transaction);
+  const transactions = transactionState?.transactions || [];
 
   useEffect(() => {
     dispatch(fetchTransactionsBySeller());

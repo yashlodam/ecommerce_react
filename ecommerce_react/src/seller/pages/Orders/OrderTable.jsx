@@ -40,9 +40,9 @@ function formatINR(val) {
 
 export default function OrderTable() {
   const dispatch = useAppDispatch();
-  const { orders = [], loading: isLoading = false } = useAppSelector(
-    (store) => store.sellerOrder || {}
-  );
+  const sellerOrder = useAppSelector((store) => store.sellerOrder);
+  const orders = sellerOrder?.orders || [];
+  const isLoading = sellerOrder?.loading || false;
 
   const [selectedTab, setSelectedTab] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
@@ -156,17 +156,102 @@ export default function OrderTable() {
           />
         </div>
       ) : (
-        <TableContainer
-          component={Paper}
-          elevation={0}
-          sx={{
-            borderRadius: "20px",
-            border: "1px solid",
-            borderColor: "divider",
-            overflow: "hidden",
-            bgcolor: "background.paper",
-          }}
-        >
+        <>
+          {/* Mobile Cards (visible on xs to md) */}
+          <div className="grid grid-cols-1 gap-4 lg:hidden">
+            {filteredOrders.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3 transition-colors"
+              >
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                  <div>
+                    <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                      Order #{item.id}
+                    </span>
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                      {item.orderDate
+                        ? new Date(item.orderDate).toLocaleDateString("en-IN")
+                        : "Recent"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={item.orderStatus} />
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      endIcon={<ExpandMoreIcon />}
+                      onClick={(e) => handleClick(e, item.id)}
+                      sx={{
+                        borderRadius: "8px",
+                        fontWeight: 700,
+                        textTransform: "none",
+                        fontSize: "11px",
+                        py: 0.3,
+                        px: 1,
+                      }}
+                    >
+                      Status
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Products list */}
+                <div className="space-y-2">
+                  {item.orderItems?.map((orderItem) => (
+                    <div key={orderItem.id} className="flex gap-3 items-center">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 shrink-0 flex items-center justify-center p-1">
+                        <img
+                          src={orderItem.product?.images?.[0] || "https://placehold.co/80x80"}
+                          alt={orderItem.product?.title || "Item"}
+                          className="max-w-full max-h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.src = "https://placehold.co/80x80";
+                          }}
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-xs truncate">
+                          {orderItem.product?.title}
+                        </h4>
+                        <p className="text-xs text-teal-600 dark:text-teal-400 font-bold">
+                          {formatINR(orderItem.sellingPrice)} × {orderItem.quantity}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Customer summary */}
+                <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/50 p-2.5 rounded-xl">
+                  <p className="font-bold text-slate-800 dark:text-slate-200">
+                    {item.shippingAddress?.name || "Customer"}
+                  </p>
+                  <p className="truncate">
+                    {item.shippingAddress?.address}, {item.shippingAddress?.city}
+                  </p>
+                  <p className="text-teal-600 dark:text-teal-400 font-medium pt-0.5">
+                    📞 {item.shippingAddress?.mobile}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table (hidden on mobile, visible on lg+) */}
+          <TableContainer
+            component={Paper}
+            elevation={0}
+            className="hidden lg:block"
+            sx={{
+              borderRadius: "20px",
+              border: "1px solid",
+              borderColor: "divider",
+              overflow: "hidden",
+              bgcolor: "background.paper",
+            }}
+          >
           <Table sx={{ minWidth: 900 }}>
             <TableHead className="bg-slate-50 dark:bg-slate-950/60">
               <TableRow>
@@ -291,7 +376,8 @@ export default function OrderTable() {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+          </TableContainer>
+        </>
       )}
     </div>
   );

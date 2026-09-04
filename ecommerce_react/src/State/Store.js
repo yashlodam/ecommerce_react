@@ -12,26 +12,24 @@ import transactionSlice from './seller/transactionSlice'
 import homeSlice from './customer/CustomerSlice'
 import homeCategorySlice from './admin/adminSlice'
 import adminFetchSlice from './admin/adminFetchSlice'
-
+import couponSlice from './customer/CouponSlice'
 
 const rootReducer = combineReducers({
-
-  seller:sellerSlice,
-  sellerProduct:sellerProductSlice,
-  product:productSlice,
-  auth:authSlice,
-  cart:cartSlice,
-  order:orderSlice,
+  seller: sellerSlice,
+  sellerProduct: sellerProductSlice,
+  product: productSlice,
+  auth: authSlice,
+  cart: cartSlice,
+  order: orderSlice,
   wishlist: wishlistSlice,
   sellerOrder: sellerOrderSlice,
   transaction: transactionSlice,
-
-  customer : homeSlice,
-
+  customer: homeSlice,
+  home: homeSlice,
+  coupon: couponSlice,
   admin: homeCategorySlice,
-
-  adminFetch: adminFetchSlice
-
+  homeCategory: homeCategorySlice,
+  adminFetch: adminFetchSlice,
 })
 
 export const store = configureStore({

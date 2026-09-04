@@ -91,10 +91,12 @@ function CustomTooltip({ active, payload, label }) {
 export default function Dashboard() {
   const dispatch = useAppDispatch();
 
-  const { products = [] } = useAppSelector((store) => store.sellerProduct || {});
-  const { orders = [] } = useAppSelector((store) => store.sellerOrder || {});
-  const { transactions = [] } = useAppSelector((store) => store.transaction || {});
-  const { report = null, profile = null } = useAppSelector((store) => store.seller || {});
+  const products = useAppSelector((store) => store.sellerProduct?.products);
+  const orders = useAppSelector((store) => store.sellerOrder?.orders);
+  const transactions = useAppSelector((store) => store.transaction?.transactions);
+  const seller = useAppSelector((store) => store.seller);
+  const report = seller?.report || null;
+  const profile = seller?.profile || null;
   const [statusFilter, setStatusFilter] = useState(null);
 
   useEffect(() => {
