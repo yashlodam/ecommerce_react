@@ -19,10 +19,11 @@ export const getWishlistByUserId = createAsyncThunk(
 
 export const addProductToWishlist = createAsyncThunk(
   "wishlist/addProductToWishlist",
-  async (productId, { rejectWithValue }) => {
+  async (arg, { rejectWithValue }) => {
     try {
+      const id = typeof arg === "object" && arg !== null ? arg.productId : arg;
       const response = await api.post(
-        `/api/wishlist/add-product/${productId}`,
+        `/api/wishlist/add-product/${id}`,
         {}
       );
       return response.data;

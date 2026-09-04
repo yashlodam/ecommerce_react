@@ -91,10 +91,10 @@ function CustomTooltip({ active, payload, label }) {
 export default function Dashboard() {
   const dispatch = useAppDispatch();
 
-  const { products } = useAppSelector((store) => store.sellerProduct);
-  const { orders } = useAppSelector((store) => store.sellerOrder);
-  const { transaction } = useAppSelector((store) => store);
-  const { report, profile } = useAppSelector((store) => store.sellers);
+  const { products = [] } = useAppSelector((store) => store.sellerProduct || {});
+  const { orders = [] } = useAppSelector((store) => store.sellerOrder || {});
+  const { transactions = [] } = useAppSelector((store) => store.transaction || {});
+  const { report = null, profile = null } = useAppSelector((store) => store.seller || {});
   const [statusFilter, setStatusFilter] = useState(null);
 
   useEffect(() => {
@@ -104,9 +104,9 @@ export default function Dashboard() {
     dispatch(fetchSellerReport());
   }, [dispatch]);
 
-  const rawOrders = orders || [];
-  const rawProducts = products || [];
-  const rawTransactions = transaction?.transactions || [];
+  const rawOrders = Array.isArray(orders) ? orders : [];
+  const rawProducts = Array.isArray(products) ? products : [];
+  const rawTransactions = Array.isArray(transactions) ? transactions : [];
 
   const totalRevenue = useMemo(() => {
     if (report?.totalEarnings && report.totalEarnings > 0) return report.totalEarnings;

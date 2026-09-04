@@ -42,7 +42,8 @@ function formatINR(val) {
 export default function ProductTable() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { products, loading } = useAppSelector((store) => store.sellerProduct);
+  const { products = [], loading = false } = useAppSelector((store) => store.sellerProduct || {});
+  const productList = Array.isArray(products) ? products : [];
 
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [stockDialog, setStockDialog] = useState(false);
@@ -141,14 +142,14 @@ export default function ProductTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {!products || products.length === 0 ? (
+              {productList.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} align="center" className="py-12 text-slate-400 dark:text-slate-500">
                     No products listed yet. Click "Add Product" to create your first listing!
                   </TableCell>
                 </TableRow>
               ) : (
-                products.map((item) => {
+                productList.map((item) => {
                   const isInStock = item.quantity > 0;
                   const variantCount = item.variants?.length ?? 0;
                   return (

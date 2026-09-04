@@ -79,6 +79,7 @@ export const fetchHomeProducts = createAsyncThunk(
 // ================= Initial State =================
 const initialState = {
   product: null,
+  productDetailsLoading: false,
   products: [],
   totalPages: 1,
   totalElements: 0,
@@ -108,16 +109,16 @@ const productSlice = createSlice({
     // Fetch Product By Id
     builder
       .addCase(fetchProductById.pending, (state) => {
-        state.loading = true;
+        state.productDetailsLoading = true;
         state.error = null;
       })
       .addCase(fetchProductById.fulfilled, (state, action) => {
-        state.loading = false;
+        state.productDetailsLoading = false;
         state.product = action.payload;
         state.error = null;
       })
       .addCase(fetchProductById.rejected, (state, action) => {
-        state.loading = false;
+        state.productDetailsLoading = false;
         state.error = action.payload;
       });
 

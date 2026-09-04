@@ -10,7 +10,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 function Order() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { order } = useAppSelector((store) => store);
+  const order = useAppSelector((store) => store.order);
 
   useEffect(() => {
     dispatch(fetchUserOrderHistory(localStorage.getItem("jwt")));

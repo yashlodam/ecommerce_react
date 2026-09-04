@@ -40,18 +40,19 @@ function formatINR(val) {
 
 export default function OrderTable() {
   const dispatch = useAppDispatch();
-  const { sellerOrder } = useAppSelector((store) => store);
+  const { orders = [], loading: isLoading = false } = useAppSelector(
+    (store) => store.sellerOrder || {}
+  );
 
   const [selectedTab, setSelectedTab] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [anchorEl, setAnchorEl] = useState({});
 
   useEffect(() => {
-    dispatch(fetchSellerOrders(localStorage.getItem("jwt") || ""));
+    dispatch(fetchSellerOrders());
   }, [dispatch]);
 
-  const orders = sellerOrder?.orders || [];
-  const isLoading = sellerOrder?.loading;
+  const orderList = Array.isArray(orders) ? orders : [];
 
   const handleClick = (event, orderId) => {
     setAnchorEl((prev) => ({
@@ -70,7 +71,6 @@ export default function OrderTable() {
   const handleStatusChange = (orderId, status) => {
     dispatch(
       updateOrderStatus({
-        jwt: localStorage.getItem("jwt"),
         orderId,
         orderStatus: status,
       })
@@ -78,15 +78,18 @@ export default function OrderTable() {
     handleClose(orderId);
   };
 
-  const filteredOrders = orders.filter((order) => {
+  const filteredOrders = orderList.filter((order) => {
+    if (!order) return false;
     const matchesTab =
       selectedTab === "ALL" || order.orderStatus === selectedTab;
+    const q = searchQuery.trim().toLowerCase();
     const matchesSearch =
-      searchQuery.trim() === "" ||
-      order.id?.toString().includes(searchQuery) ||
-      order.shippingAddress?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      q === "" ||
+      order.id?.toString().includes(q) ||
+      (order.orderId && String(order.orderId).toLowerCase().includes(q)) ||
+      (order.shippingAddress?.name && order.shippingAddress.name.toLowerCase().includes(q)) ||
       order.orderItems?.some((i) =>
-        i.product?.title?.toLowerCase().includes(searchQuery.toLowerCase())
+        i.product?.title?.toLowerCase().includes(q)
       );
     return matchesTab && matchesSearch;
   });

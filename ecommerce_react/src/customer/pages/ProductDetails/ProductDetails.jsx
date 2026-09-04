@@ -30,6 +30,7 @@ import { addProductToWishlist } from "../../../State/customer/WishlistSlice";
 import useRequireAuth from "../../../useRequireAuth";
 import SimilarProduct from "./SimilarProduct";
 import ReviewCard from "../Review/ReviewCard";
+import { api } from "../../../config/Api";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -41,22 +42,29 @@ function formatINR(val) {
 
 function ProductDetails() {
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
   const [alertMsg, setAlertMsg] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("success");
   const [activeImage, setActiveImage] = useState(0);
   const [addingToCart, setAddingToCart] = useState(false);
 
+  // Variant state
+  const [variants, setVariants] = useState([]);
+  const [variantsLoading, setVariantsLoading] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { productId } = useParams();
-  const { product, wishlist } = useAppSelector((store) => store);
+  const product = useAppSelector((store) => store.product);
+  const wishlist = useAppSelector((store) => store.wishlist);
   const requireAuth = useRequireAuth();
 
   const currentProduct = product?.product;
-  const isLoading = product?.loading;
+  const isDetailsLoading = product?.productDetailsLoading;
+  const isMatchingProduct = currentProduct && String(currentProduct.id) === String(productId);
   const error = product?.error;
+  const isLoading = isDetailsLoading || (!isMatchingProduct && !error);
 
   useEffect(() => {
     if (productId) {
@@ -65,23 +73,46 @@ function ProductDetails() {
     }
   }, [productId, dispatch]);
 
+  // Fetch variants when product loads
   useEffect(() => {
-    if (currentProduct?.sizes) {
-      const firstSize = currentProduct.sizes.split(",")[0]?.trim();
-      setSelectedSize(firstSize || "");
-    }
-  }, [currentProduct]);
+    if (!productId) return;
+    setVariantsLoading(true);
+    api
+      .get(`/products/${productId}/variants`)
+      .then((res) => {
+        const variantList = res.data || [];
+        setVariants(variantList);
+        // Auto-select first variant (or the default one)
+        const defaultV =
+          variantList.find((v) => v.isDefault) || variantList[0] || null;
+        setSelectedVariant(defaultV);
+      })
+      .catch(() => {
+        setVariants([]);
+      })
+      .finally(() => setVariantsLoading(false));
+  }, [productId]);
 
   const images = currentProduct?.images || [];
-  const isInStock = (currentProduct?.quantity ?? 0) > 0;
   const isWishlisted = wishlist?.wishlist?.products?.some(
     (p) => p.id === Number(productId)
   );
 
+  // Use selected variant's stock to determine in-stock status
+  const isInStock = selectedVariant
+    ? (selectedVariant.quantity ?? 0) > 0
+    : (currentProduct?.quantity ?? 0) > 0;
+
+  // Displayed prices come from selected variant when available
+  const displayMrpPrice = selectedVariant?.mrpPrice ?? currentProduct?.mrpPrice ?? 0;
+  const displaySellingPrice = selectedVariant?.sellingPrice ?? currentProduct?.sellingPrice ?? 0;
+  const displayDiscount = selectedVariant?.discountPercent ?? currentProduct?.discountPercent ?? 0;
+  const displayStock = selectedVariant?.quantity ?? currentProduct?.quantity ?? 0;
+
   const handleAddToCart = () => {
     if (!requireAuth()) return;
     if (!isInStock) {
-      setAlertMsg("Sorry, this product is currently out of stock.");
+      setAlertMsg("Sorry, this variant is currently out of stock.");
       setAlertSeverity("error");
       setOpenAlert(true);
       return;
@@ -92,7 +123,9 @@ function ProductDetails() {
     const data = {
       productId: Number(productId),
       quantity,
-      size: selectedSize || currentProduct?.sizes || "Standard",
+      // Send variantId if a real (non-default) variant is selected
+      variantId: selectedVariant?.id ?? null,
+      size: selectedVariant?.variantName ?? currentProduct?.sizes ?? "Standard",
     };
 
     dispatch(
@@ -190,10 +223,6 @@ function ProductDetails() {
     );
   }
 
-  const availableSizes = currentProduct.sizes
-    ? currentProduct.sizes.split(",").map((s) => s.trim()).filter(Boolean)
-    : [];
-
   const categoryName = currentProduct.category?.name || "Catalog";
 
   return (
@@ -275,7 +304,7 @@ function ProductDetails() {
                 </span>
 
                 <Chip
-                  label={isInStock ? `In Stock (${currentProduct.quantity} available)` : "Out of Stock"}
+                  label={isInStock ? `In Stock (${displayStock} available)` : "Out of Stock"}
                   size="small"
                   color={isInStock ? "success" : "error"}
                   className="font-bold text-xs"
@@ -298,18 +327,18 @@ function ProductDetails() {
                 </span>
               </div>
 
-              {/* Price Line */}
+              {/* Price Line — updates dynamically from selected variant */}
               <div className="flex items-baseline gap-3 mt-4">
                 <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100">
-                  {formatINR(currentProduct.sellingPrice)}
+                  {formatINR(displaySellingPrice)}
                 </span>
-                {currentProduct.mrpPrice > currentProduct.sellingPrice && (
+                {displayMrpPrice > displaySellingPrice && (
                   <>
                     <span className="text-base sm:text-lg text-slate-400 line-through font-semibold">
-                      {formatINR(currentProduct.mrpPrice)}
+                      {formatINR(displayMrpPrice)}
                     </span>
                     <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 px-2.5 py-0.5 rounded-full">
-                      {currentProduct.discountPercent}% OFF
+                      {displayDiscount}% OFF
                     </span>
                   </>
                 )}
@@ -320,30 +349,58 @@ function ProductDetails() {
 
               <Divider className="my-5 dark:border-slate-800" />
 
-              {/* Sizes Selector */}
-              {availableSizes.length > 0 && (
+              {/* Variant Selector — replaces the old static size buttons */}
+              {variantsLoading ? (
+                <div className="flex items-center gap-2 mb-5">
+                  <CircularProgress size={16} />
+                  <span className="text-xs text-slate-400">Loading options...</span>
+                </div>
+              ) : variants.length > 0 && !(variants.length === 1 && variants[0].isDefault) ? (
                 <div className="mb-5">
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                    Select Size
+                    Select Option
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {availableSizes.map((sz) => (
-                      <button
-                        key={sz}
-                        type="button"
-                        onClick={() => setSelectedSize(sz)}
-                        className={`px-4 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                          selectedSize === sz
-                            ? "bg-teal-600 text-white border-teal-600 shadow-xs"
-                            : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-teal-500"
-                        }`}
-                      >
-                        {sz}
-                      </button>
-                    ))}
+                    {variants.map((v) => {
+                      const outOfStock = v.quantity <= 0;
+                      const isSelected = selectedVariant?.id === v.id;
+                      return (
+                        <button
+                          key={v.id}
+                          type="button"
+                          disabled={outOfStock}
+                          onClick={() => {
+                            setSelectedVariant(v);
+                            setQuantity(1);
+                          }}
+                          className={`px-4 py-1.5 rounded-xl text-xs font-bold border transition-all relative ${
+                            outOfStock
+                              ? "opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 line-through"
+                              : isSelected
+                              ? "bg-teal-600 text-white border-teal-600 shadow-sm"
+                              : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-teal-500 cursor-pointer"
+                          }`}
+                        >
+                          {v.variantName}
+                          {outOfStock && (
+                            <span className="block text-[9px] font-normal not-italic leading-none mt-0.5">
+                              Out of stock
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
+                  {selectedVariant && (
+                    <p className="text-[11px] text-teal-600 dark:text-teal-400 font-semibold mt-2">
+                      Selected: <strong>{selectedVariant.variantName}</strong>
+                      {selectedVariant.quantity > 0
+                        ? ` — ${selectedVariant.quantity} in stock`
+                        : " — Out of stock"}
+                    </p>
+                  )}
                 </div>
-              )}
+              ) : null}
 
               {/* Quantity Stepper */}
               <div className="mb-6">
@@ -364,7 +421,7 @@ function ProductDetails() {
                   </span>
                   <Button
                     size="small"
-                    disabled={quantity >= (currentProduct.quantity || 10)}
+                    disabled={quantity >= (displayStock || 10)}
                     onClick={() => setQuantity((q) => q + 1)}
                     sx={{ minWidth: 32, height: 32 }}
                   >

@@ -170,8 +170,6 @@ function AddProduct() {
 
   // ── Variant builder helpers ─────────────────────────────────────────────────
 
-  const suggestions = variantSuggestions[formik?.values?.category] || [];
-
   const addVariantFromSuggestion = (name) => {
     if (variants.some((v) => v.variantName === name)) return;
     setVariants((prev) => [
@@ -270,7 +268,7 @@ function AddProduct() {
     },
   });
 
-  const suggestions2 = variantSuggestions[formik.values.category] || [];
+  const suggestions = variantSuggestions[formik.values.category] || [];
 
   return (
     <div className="pb-10">
@@ -517,10 +515,10 @@ function AddProduct() {
             </div>
 
             {/* Quick-fill suggestions */}
-            {formik.values.category && suggestions2.length > 0 && (
+            {formik.values.category && suggestions.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 <span className="text-xs text-slate-500 dark:text-slate-400 self-center">Quick add:</span>
-                {suggestions2.map((s) => (
+                {suggestions.map((s) => (
                   <Chip
                     key={s}
                     label={s}

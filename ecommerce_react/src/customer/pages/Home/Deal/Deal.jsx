@@ -16,7 +16,7 @@ import { homeCategories } from "../../../../data/HomeCategories";
 
 function Deals() {
   const navigate = useNavigate();
-  const { customer } = useAppSelector((state) => state);
+  const customer = useAppSelector((state) => state.customer);
 
   const fallbackDeals = homeCategories
     .filter((c) => c.section === "DEALS")

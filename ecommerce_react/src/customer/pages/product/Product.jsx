@@ -41,7 +41,7 @@ function Product() {
   const { category = "all" } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useAppDispatch();
-  const { product } = useAppSelector((store) => store);
+  const product = useAppSelector((store) => store.product);
 
   // Parse filters and sort state from URL
   const priceParam = searchParams.get("price") || "";

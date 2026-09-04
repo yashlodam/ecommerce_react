@@ -43,9 +43,9 @@ function Navbar() {
   const isLarge = useMediaQuery(theme.breakpoints.up("lg"));
   const navigate = useNavigate();
 
-  const { cart } = useAppSelector((store) => store);
+  const cart = useAppSelector((store) => store.cart);
   const { isLoggedIn, user, role } = useAppSelector((store) => store.auth);
-  const { product } = useAppSelector((store) => store);
+  const product = useAppSelector((store) => store.product);
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showCategorySheet, setShowCategorySheet] = useState(false);
@@ -133,6 +133,9 @@ function Navbar() {
         anchor="left"
         open={openDrawer}
         onClose={closeDrawer}
+        ModalProps={{
+          disableRestoreFocus: true,
+        }}
         PaperProps={{
           sx: {
             width: 300,
@@ -334,7 +337,10 @@ function Navbar() {
             <div className="flex min-w-0 items-center gap-1.5">
               {!isLarge && (
                 <IconButton
-                  onClick={() => setOpenDrawer(true)}
+                  onClick={(e) => {
+                    e.currentTarget.blur();
+                    setOpenDrawer(true);
+                  }}
                   aria-label="Open menu"
                   className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
                 >

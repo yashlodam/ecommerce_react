@@ -32,7 +32,7 @@ function formatINR(val) {
 
 function Coupon() {
   const dispatch = useAppDispatch();
-  const { coupon } = useAppSelector((store) => store);
+  const coupon = useAppSelector((store) => store.coupon);
   const [openAddModal, setOpenAddModal] = useState(false);
 
   useEffect(() => {

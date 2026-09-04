@@ -62,6 +62,8 @@ const initialState = {
   selectedSeller: null,
   profile: null,
   report: null,
+  profileLoading: false,
+  reportLoading: false,
   loading: false,
   error: null,
 };
@@ -76,6 +78,8 @@ const sellerSlice = createSlice({
       state.report = null;
       state.error = null;
       state.loading = false;
+      state.profileLoading = false;
+      state.reportLoading = false;
     },
     clearSellerError: (state) => {
       state.error = null;
@@ -85,29 +89,31 @@ const sellerSlice = createSlice({
     builder
       // Profile
       .addCase(fetchSellerProfile.pending, (state) => {
+        state.profileLoading = true;
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchSellerProfile.fulfilled, (state, action) => {
+        state.profileLoading = false;
         state.loading = false;
         state.profile = action.payload;
       })
       .addCase(fetchSellerProfile.rejected, (state, action) => {
+        state.profileLoading = false;
         state.loading = false;
         state.error = action.payload;
       })
 
       // Report
       .addCase(fetchSellerReport.pending, (state) => {
-        state.loading = true;
+        state.reportLoading = true;
       })
       .addCase(fetchSellerReport.fulfilled, (state, action) => {
-        state.loading = false;
+        state.reportLoading = false;
         state.report = action.payload;
       })
       .addCase(fetchSellerReport.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.reportLoading = false;
       })
 
       // Create
@@ -126,8 +132,17 @@ const sellerSlice = createSlice({
       })
 
       // Update
+      .addCase(updateSellerProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(updateSellerProfile.fulfilled, (state, action) => {
+        state.loading = false;
         state.profile = action.payload;
+      })
+      .addCase(updateSellerProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

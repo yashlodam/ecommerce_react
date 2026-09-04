@@ -23,7 +23,7 @@ function Address() {
     dispatch(fetchUserProfile(localStorage.getItem("jwt")));
   }, [dispatch]);
 
-  const { auth } = useAppSelector((store) => store);
+  const auth = useAppSelector((store) => store.auth);
   const addresses = auth.user?.addresses || [];
 
   return (

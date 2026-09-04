@@ -20,7 +20,7 @@ function Cart() {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { cart } = useAppSelector((store) => store);
+  const cart = useAppSelector((store) => store.cart);
 
   const cartItems = cart.cart?.cartItems || [];
 

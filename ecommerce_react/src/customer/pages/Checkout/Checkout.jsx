@@ -43,7 +43,8 @@ function Checkout() {
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { auth, cart } = useAppSelector((store) => store);
+  const auth = useAppSelector((store) => store.auth);
+  const cart = useAppSelector((store) => store.cart);
 
   useEffect(() => {
     dispatch(fetchUserProfile());

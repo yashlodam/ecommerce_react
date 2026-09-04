@@ -27,7 +27,7 @@ function OrderDetails() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { orderId, orderItemId } = useParams();
-  const { order } = useAppSelector((store) => store);
+  const order = useAppSelector((store) => store.order);
 
   const [cancelling, setCancelling] = useState(false);
   const [actionMsg, setActionMsg] = useState("");

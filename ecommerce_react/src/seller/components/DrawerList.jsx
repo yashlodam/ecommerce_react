@@ -1,6 +1,6 @@
 import React from "react";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { Divider, ListItemText } from "@mui/material";
+import { Divider } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../State/Store";
 import { logout } from "../../State/AuthSlice";
@@ -14,7 +14,7 @@ function DrawerList({ menu, menu2, toggleDrawer }) {
   const handleLogout = () => {
     localStorage.removeItem("jwt");
     dispatch(logoutSeller());
-    dispatch(logout(null));
+    dispatch(logout());
     navigate("/login");
   };
 
@@ -48,13 +48,9 @@ function DrawerList({ menu, menu2, toggleDrawer }) {
                   >
                     {isActive ? item.activeIcon || item.icon : item.icon}
                   </ListItemIcon>
-                  <ListItemText
-                    primary={item.name}
-                    primaryTypographyProps={{
-                      fontSize: "14px",
-                      fontWeight: isActive ? 700 : 500,
-                    }}
-                  />
+                  <span className={`text-sm ${isActive ? "font-bold text-white" : "font-medium"}`}>
+                    {item.name}
+                  </span>
                 </div>
               </div>
             );
@@ -66,6 +62,7 @@ function DrawerList({ menu, menu2, toggleDrawer }) {
           <div className="space-y-1 pr-3">
             {menu2.map((item, index) => {
               const isLogout = item.name === "Logout";
+              const isActive = location.pathname === item.path;
               return (
                 <div
                   key={index}
@@ -79,17 +76,34 @@ function DrawerList({ menu, menu2, toggleDrawer }) {
                     if (toggleDrawer) toggleDrawer();
                   }}
                 >
-                  <div className="flex items-center px-5 py-3 rounded-r-2xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors font-semibold">
-                    <ListItemIcon sx={{ minWidth: 38, color: "inherit" }}>
-                      {item.icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={item.name}
-                      primaryTypographyProps={{
-                        fontSize: "14px",
-                        fontWeight: 600,
+                  <div
+                    className={`flex items-center px-5 py-3 rounded-r-2xl transition-colors ${
+                      isLogout
+                        ? "text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-semibold"
+                        : isActive
+                        ? "bg-teal-600 text-white font-bold shadow-sm"
+                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 font-medium"
+                    }`}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 38,
+                        color: !isLogout && isActive ? "#ffffff" : "inherit",
                       }}
-                    />
+                    >
+                      {!isLogout && isActive ? item.activeIcon || item.icon : item.icon}
+                    </ListItemIcon>
+                    <span
+                      className={`text-sm ${
+                        isLogout
+                          ? "font-semibold text-rose-600 dark:text-rose-400"
+                          : isActive
+                          ? "font-bold text-white"
+                          : "font-medium"
+                      }`}
+                    >
+                      {item.name}
+                    </span>
                   </div>
                 </div>
               );

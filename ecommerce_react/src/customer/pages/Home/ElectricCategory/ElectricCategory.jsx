@@ -4,7 +4,7 @@ import { useAppSelector } from "../../../../State/Store";
 import { homeCategories } from "../../../../data/HomeCategories";
 
 function ElectricCategory() {
-  const { customer } = useAppSelector((state) => state);
+  const customer = useAppSelector((state) => state.customer);
 
   const fallbackCategories = homeCategories.filter(
     (c) => c.section === "ELECTRIC_CATEGORIES"

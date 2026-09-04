@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Transaction from "./Transaction";
-import { useAppSelector } from "../../../State/Store";
+import { useAppDispatch, useAppSelector } from "../../../State/Store";
+import { fetchTransactionsBySeller } from "../../../State/seller/transactionSlice";
 import { IndianRupee, Receipt, ArrowUpRight } from "lucide-react";
 
 function formatINR(val) {
@@ -12,10 +13,18 @@ function formatINR(val) {
 }
 
 function Payment() {
-  const { transaction } = useAppSelector((store) => store);
-  const transactions = transaction?.transactions || [];
+  const dispatch = useAppDispatch();
+  const { transactions = [] } = useAppSelector(
+    (store) => store.transaction || {}
+  );
 
-  const totalEarning = transactions.reduce(
+  useEffect(() => {
+    dispatch(fetchTransactionsBySeller());
+  }, [dispatch]);
+
+  const transactionList = Array.isArray(transactions) ? transactions : [];
+
+  const totalEarning = transactionList.reduce(
     (sum, item) => sum + (item.order?.totalSellingPrice || 0),
     0
   );

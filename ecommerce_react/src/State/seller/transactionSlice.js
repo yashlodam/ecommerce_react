@@ -10,16 +10,9 @@ const initialState = {
 
 export const fetchTransactionsBySeller = createAsyncThunk(
   "transactions/fetchTransactionsBySeller",
-  async (jwt, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/api/transactions/seller", {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-
-      console.log("fetchTransactionsBySeller", response.data);
-
+      const response = await api.get("/api/transactions/seller");
       return response.data;
     } catch (error) {
       if (error.response) {
@@ -27,7 +20,6 @@ export const fetchTransactionsBySeller = createAsyncThunk(
           error.response.data.message || "Failed to fetch transactions"
         );
       }
-
       return rejectWithValue("Failed to fetch transactions");
     }
   }
@@ -55,7 +47,7 @@ const transactionSlice = createSlice({
 
       .addCase(fetchTransactionsBySeller.fulfilled, (state, action) => {
         state.loading = false;
-        state.transactions = action.payload;
+        state.transactions = Array.isArray(action.payload) ? action.payload : [];
       })
 
       .addCase(fetchTransactionsBySeller.rejected, (state, action) => {

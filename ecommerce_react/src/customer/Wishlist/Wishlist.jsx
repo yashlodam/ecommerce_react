@@ -14,7 +14,7 @@ function Wishlist() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { wishlist } = useAppSelector((store) => store);
+  const wishlist = useAppSelector((store) => store.wishlist);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 

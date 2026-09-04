@@ -11,7 +11,7 @@ function formatINR(val) {
 }
 
 function PricingCrd() {
-  const { cart } = useAppSelector((store) => store);
+  const cart = useAppSelector((store) => store.cart);
   const currentCart = cart?.cart;
 
   const totalMrp = currentCart?.totalMrpPrice || 0;

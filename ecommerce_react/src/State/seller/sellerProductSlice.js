@@ -162,7 +162,7 @@ const sellerProductSlice = createSlice({
       })
       .addCase(fetchSellerProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload;
+        state.products = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchSellerProduct.rejected, (state, action) => {
         state.loading = false;
@@ -175,7 +175,9 @@ const sellerProductSlice = createSlice({
       })
       .addCase(createProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.products.push(action.payload);
+        if (action.payload) {
+          state.products.push(action.payload);
+        }
       })
       .addCase(createProduct.rejected, (state, action) => {
         state.loading = false;
@@ -188,9 +190,11 @@ const sellerProductSlice = createSlice({
       })
       .addCase(updateSellerProduct.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.products.findIndex((p) => p.id === action.payload.id);
-        if (index !== -1) {
-          state.products[index] = action.payload;
+        if (action.payload?.id) {
+          const index = state.products.findIndex((p) => p.id === action.payload.id);
+          if (index !== -1) {
+            state.products[index] = action.payload;
+          }
         }
       })
       .addCase(updateSellerProduct.rejected, (state, action) => {

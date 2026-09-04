@@ -70,7 +70,7 @@ const sellerOrderSlice = createSlice({
       })
       .addCase(fetchSellerOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload;
+        state.orders = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchSellerOrders.rejected, (state, action) => {
         state.loading = false;
@@ -83,11 +83,13 @@ const sellerOrderSlice = createSlice({
       })
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.orders.findIndex(
-          (order) => order.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.orders[index] = action.payload;
+        if (action.payload?.id) {
+          const index = state.orders.findIndex(
+            (order) => order.id === action.payload.id
+          );
+          if (index !== -1) {
+            state.orders[index] = action.payload;
+          }
         }
       })
       .addCase(updateOrderStatus.rejected, (state, action) => {

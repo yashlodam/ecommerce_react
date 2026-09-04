@@ -25,7 +25,7 @@ const TRENDING_SEARCHES = [
 function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useAppDispatch();
-  const { product } = useAppSelector((store) => store);
+  const product = useAppSelector((store) => store.product);
 
   // Parse search query, filters, sort, page from URL
   const queryParam = searchParams.get("q") || "";

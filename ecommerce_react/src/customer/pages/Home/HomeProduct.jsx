@@ -40,7 +40,7 @@ function HomeProducts() {
     });
   }, [dispatch]);
 
-  const { product } = useAppSelector((store) => store);
+  const product = useAppSelector((store) => store.product);
   const { homeProducts } = product;
 
   return (

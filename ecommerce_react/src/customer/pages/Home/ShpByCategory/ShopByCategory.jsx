@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 function ShopByCategory() {
   const navigate = useNavigate();
-  const { customer } = useAppSelector((store) => store);
+  const customer = useAppSelector((store) => store.customer);
 
   const fallbackCategories = homeCategories.filter(
     (c) => c.section === "SHOP_BY_CATEGORIES"

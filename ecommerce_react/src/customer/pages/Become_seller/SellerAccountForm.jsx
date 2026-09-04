@@ -112,14 +112,32 @@ function SellerAccountForm({ onRegisterSuccess }) {
     if (activeStep === steps.length - 1) {
       setSubmitting(true);
       try {
-        const resultAction = await dispatch(createSellers(formik.values));
+        const payload = {
+          ...formik.values,
+          gstin: formik.values.gstin,
+          GSTIN: formik.values.gstin,
+          pickupAddress: {
+            ...formik.values.pickupAddress,
+            pinCode: formik.values.pickupAddress.pincode || formik.values.pickupAddress.pinCode,
+          },
+          bankDetails: {
+            ...formik.values.bankDetails,
+            accountHolderName:
+              formik.values.bankDetails.accountHoldername ||
+              formik.values.bankDetails.accountHolderName,
+          },
+        };
+
+        const resultAction = await dispatch(createSellers(payload));
         if (createSellers.fulfilled.match(resultAction)) {
           onRegisterSuccess();
         } else {
-          alert(
-            resultAction.payload?.message ||
-              "Unable to complete seller registration. Please verify details."
-          );
+          const errMsg =
+            typeof resultAction.payload === "string"
+              ? resultAction.payload
+              : resultAction.payload?.message ||
+                "Unable to complete seller registration. Please verify details.";
+          alert(errMsg);
         }
       } catch {
         alert("Something went wrong during registration. Please try again.");

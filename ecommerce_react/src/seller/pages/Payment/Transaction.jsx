@@ -21,13 +21,15 @@ function formatINR(val) {
 
 export default function Transaction() {
   const dispatch = useAppDispatch();
-  const { transaction } = useAppSelector((store) => store);
+  const { transactions = [], loading = false } = useAppSelector(
+    (store) => store.transaction || {}
+  );
 
   useEffect(() => {
     dispatch(fetchTransactionsBySeller(localStorage.getItem("jwt") || ""));
   }, [dispatch]);
 
-  const transactions = transaction?.transactions || [];
+  const transactionList = Array.isArray(transactions) ? transactions : [];
 
   return (
     <TableContainer
@@ -52,21 +54,23 @@ export default function Transaction() {
         </TableHead>
 
         <TableBody>
-          {transaction.loading ? (
+          {loading ? (
             <TableRow>
               <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
                 <CircularProgress color="primary" size={28} />
               </TableCell>
             </TableRow>
-          ) : transactions.length > 0 ? (
-            transactions.map((item) => (
+          ) : transactionList.length > 0 ? (
+            transactionList.map((item) => (
               <TableRow key={item.id} hover className="transition-colors">
                 <TableCell className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                  {new Date(item.date).toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
+                  {item.date
+                    ? new Date(item.date).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "—"}
                 </TableCell>
 
                 <TableCell>

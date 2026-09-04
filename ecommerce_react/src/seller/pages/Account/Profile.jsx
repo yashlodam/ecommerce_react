@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
 import StatusBadge from "../../../common/StatusBadge";
@@ -9,12 +10,19 @@ import PersonIcon from "@mui/icons-material/Person";
 
 function Profile() {
   const dispatch = useAppDispatch();
-  const { sellers } = useAppSelector((store) => store);
-  const profile = sellers?.profile;
+  const { profile, loading } = useAppSelector((store) => store.seller || {});
 
   useEffect(() => {
-    dispatch(fetchSellerProfile(localStorage.getItem("jwt") || ""));
+    dispatch(fetchSellerProfile());
   }, [dispatch]);
+
+  if (loading && !profile) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <CircularProgress color="primary" />
+      </div>
+    );
+  }
 
   const SectionCard = ({ title, icon: Icon, children }) => (
     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 mb-6 overflow-hidden transition-colors">
@@ -85,7 +93,7 @@ function Profile() {
         />
         <Row
           label="Account Number"
-          value={profile?.bankDetails?.accountNumber ? `•••• •••• ${profile.bankDetails.accountNumber.slice(-4)}` : "—"}
+          value={profile?.bankDetails?.accountNumber ? `•••• •••• ${String(profile.bankDetails.accountNumber).slice(-4)}` : "—"}
         />
         <Row
           label="IFSC Code"
