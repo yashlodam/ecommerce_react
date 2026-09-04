@@ -76,11 +76,34 @@ export const fetchHomeProducts = createAsyncThunk(
   }
 );
 
+// ================= Fetch Real Brands =================
+export const fetchBrands = createAsyncThunk(
+  "products/fetchBrands",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const queryParams = {};
+      if (typeof params === "string") {
+        if (params && params !== "all") queryParams.category = params;
+      } else if (params && typeof params === "object") {
+        if (params.category && params.category !== "all") queryParams.category = params.category;
+        if (params.query) queryParams.query = params.query;
+      }
+      const response = await api.get("/products/brands", { params: queryParams });
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to fetch real brands"
+      );
+    }
+  }
+);
+
 // ================= Initial State =================
 const initialState = {
   product: null,
   productDetailsLoading: false,
   products: [],
+  brands: [],
   totalPages: 1,
   totalElements: 0,
   homeProducts: {
@@ -171,6 +194,15 @@ const productSlice = createSlice({
       .addCase(searchProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      });
+
+    // Fetch Brands
+    builder
+      .addCase(fetchBrands.fulfilled, (state, action) => {
+        state.brands = action.payload || [];
+      })
+      .addCase(fetchBrands.rejected, (state) => {
+        // Retain current brands if fetch fails
       });
   },
 });

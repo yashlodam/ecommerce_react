@@ -12,7 +12,7 @@ import { fetchAllProducts, clearProductError } from "../../State/customer/Produc
 import ProductListingLayout from "./Listing/ProductListingLayout";
 
 const TRENDING_SEARCHES = [
-  "Nike",
+  "Shirts",
   "Shoes",
   "Smartwatch",
   "T-Shirts",
@@ -29,6 +29,7 @@ function SearchPage() {
 
   // Parse search query, filters, sort, page from URL
   const queryParam = searchParams.get("q") || "";
+  const categoryParam = searchParams.get("category") || "";
   const priceParam = searchParams.get("price") || "";
   const colorParam = searchParams.get("color") || "";
   const brandParam = searchParams.get("brand") || "";
@@ -46,13 +47,14 @@ function SearchPage() {
 
   const activeFilters = useMemo(
     () => ({
+      category: categoryParam,
       price: priceParam,
       color: colorParam,
       brand: brandParam,
       discount: discountParam,
       stock: stockParam,
     }),
-    [priceParam, colorParam, brandParam, discountParam, stockParam]
+    [categoryParam, priceParam, colorParam, brandParam, discountParam, stockParam]
   );
 
   // Load products based on query & filters
@@ -74,6 +76,7 @@ function SearchPage() {
 
     const filterRequest = {
       query: queryParam ? queryParam.trim() : undefined,
+      category: categoryParam || undefined,
       colors: colorParam || undefined,
       brand: brandParam || undefined,
       minPrice,
@@ -85,7 +88,7 @@ function SearchPage() {
     };
 
     dispatch(fetchAllProducts(filterRequest));
-  }, [dispatch, queryParam, priceParam, colorParam, brandParam, discountParam, stockParam, sortParam, pageParam]);
+  }, [dispatch, queryParam, categoryParam, priceParam, colorParam, brandParam, discountParam, stockParam, sortParam, pageParam]);
 
   useEffect(() => {
     loadSearchProducts();
@@ -152,9 +155,19 @@ function SearchPage() {
     setSearchParams(nextParams);
   };
 
+  const categoryLabels = {
+    men: "Men's Fashion",
+    women: "Women's Fashion",
+    electronics: "Electronics",
+    electronics_smartphones: "Smartphones",
+    home_furniture: "Home Living",
+    beauty: "Beauty",
+  };
+
   const breadcrumbs = [
     { label: "Catalog", path: "/products/all" },
     { label: "Search", path: "/search" },
+    ...(categoryParam ? [{ label: categoryLabels[categoryParam] || categoryParam, path: `/search?category=${categoryParam}` }] : []),
     ...(queryParam ? [{ label: `"${queryParam}"`, path: `/search?q=${queryParam}` }] : []),
   ];
 
@@ -278,6 +291,7 @@ function SearchPage() {
       onRetry={loadSearchProducts}
       isSearchPage
       headerSlot={searchHeaderSlot}
+      category={categoryParam}
     />
   );
 }

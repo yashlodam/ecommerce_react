@@ -12,6 +12,9 @@ export default function MobileFilterDrawer({
   onFilterChange,
   onClearAll,
   totalCount = 0,
+  isSearchPage = false,
+  category = "",
+  searchQuery = "",
 }) {
   const activeCount = Object.values(filters).filter(Boolean).length;
 
@@ -60,6 +63,9 @@ export default function MobileFilterDrawer({
             onFilterChange={onFilterChange}
             onClearAll={onClearAll}
             showTitle={false}
+            showCategoryFilter={isSearchPage}
+            category={category}
+            searchQuery={searchQuery}
           />
         </div>
 

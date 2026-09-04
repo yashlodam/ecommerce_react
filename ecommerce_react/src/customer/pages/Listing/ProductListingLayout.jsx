@@ -38,9 +38,11 @@ export default function ProductListingLayout({
   onRetry,
   isSearchPage = false,
   headerSlot = null,
+  category = "",
 }) {
   const navigate = useNavigate();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [showDesktopFilters, setShowDesktopFilters] = useState(true);
 
   const activeCount = Object.values(filters).filter(Boolean).length + (searchQuery ? 1 : 0);
   const countDisplay = totalElements > 0 ? totalElements : products.length;
@@ -113,6 +115,29 @@ export default function ProductListingLayout({
             {/* Desktop Count & Sort Combo on top */}
             {!loading && (
               <div className="hidden lg:flex items-center gap-3 shrink-0">
+                <Button
+                  variant={showDesktopFilters ? "contained" : "outlined"}
+                  color="primary"
+                  size="small"
+                  startIcon={<FilterAltOutlinedIcon sx={{ fontSize: 16 }} />}
+                  onClick={() => setShowDesktopFilters((prev) => !prev)}
+                  sx={{
+                    borderRadius: "10px",
+                    textTransform: "none",
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    py: 0.6,
+                    px: 1.8,
+                    bgcolor: showDesktopFilters ? "primary.main" : "transparent",
+                    color: showDesktopFilters ? "#ffffff" : "text.primary",
+                    borderColor: showDesktopFilters ? "primary.main" : "divider",
+                    "&:hover": {
+                      bgcolor: showDesktopFilters ? "primary.dark" : "action.hover",
+                    },
+                  }}
+                >
+                  {showDesktopFilters ? "Hide Filters" : `Show Filters ${activeCount > 0 ? `(${activeCount})` : ""}`}
+                </Button>
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
                   <strong className="text-slate-900 dark:text-slate-100 font-extrabold">{countDisplay}</strong> products
                 </span>
@@ -168,17 +193,22 @@ export default function ProductListingLayout({
         {/* Split Layout: Filter Sidebar + Product Grid */}
         <div className="flex flex-col lg:flex-row gap-5 items-start">
           {/* Desktop Filter Sidebar */}
-          <aside className="hidden lg:block w-[260px] xl:w-[280px] shrink-0 sticky top-20">
-            <FilterSidebar
-              filters={filters}
-              onFilterChange={onFilterChange}
-              onClearAll={onClearAllFilters}
-              showTitle
-            />
-          </aside>
+          {showDesktopFilters && (
+            <aside className="hidden lg:block w-[260px] xl:w-[280px] shrink-0 sticky top-20 animate-fade-in">
+              <FilterSidebar
+                filters={filters}
+                onFilterChange={onFilterChange}
+                onClearAll={onClearAllFilters}
+                showTitle
+                showCategoryFilter={isSearchPage}
+                category={filters.category || category}
+                searchQuery={searchQuery}
+              />
+            </aside>
+          )}
 
           {/* Main Product Grid Area */}
-          <main className="flex-1 min-w-0 w-full">
+          <main className="flex-1 min-w-0 w-full transition-all duration-300">
             {error ? (
               <ErrorListingState error={error} onRetry={onRetry} />
             ) : loading ? (
@@ -192,7 +222,13 @@ export default function ProductListingLayout({
               />
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4">
+                <div
+                  className={`grid gap-3.5 sm:gap-4 transition-all duration-300 ${
+                    showDesktopFilters
+                      ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+                      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+                  }`}
+                >
                   {products.map((item) => (
                     <ProductCard key={item.id || item.productId} item={item} />
                   ))}
@@ -218,6 +254,9 @@ export default function ProductListingLayout({
         onFilterChange={onFilterChange}
         onClearAll={onClearAllFilters}
         totalCount={countDisplay}
+        isSearchPage={isSearchPage}
+        category={filters.category || category}
+        searchQuery={searchQuery}
       />
     </div>
   );

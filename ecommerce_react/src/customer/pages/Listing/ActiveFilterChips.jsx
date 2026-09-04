@@ -20,6 +20,22 @@ export default function ActiveFilterChips({
     });
   }
 
+  if (filters.category) {
+    const categoryLabels = {
+      men: "Men's Fashion",
+      women: "Women's Fashion",
+      electronics: "Electronics & Audio",
+      electronics_smartphones: "Smartphones & 5G",
+      home_furniture: "Home Living",
+      beauty: "Beauty & Care",
+    };
+    chips.push({
+      key: "category",
+      label: `Category: ${categoryLabels[filters.category] || filters.category}`,
+      onDelete: () => onRemoveFilter("category"),
+    });
+  }
+
   if (filters.price) {
     chips.push({
       key: "price",

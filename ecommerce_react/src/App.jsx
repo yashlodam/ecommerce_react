@@ -21,6 +21,7 @@ import PaymentSucess from "./customer/PaymentSucess";
 import OrderSuccess from "./customer/OrderSuccess";
 import SearchPage from "./customer/pages/SearchPage";
 import Auth from "./customer/pages/Auth/Auth";
+import AiChatWidget from "./customer/components/AiChat/AiChatWidget";
 
 // Seller / Admin dashboards
 import SellerDashboard from "./seller/pages/SellerDashboard/SellerDashboard";
@@ -166,6 +167,9 @@ function App() {
             }
           />
         </Routes>
+
+        {/* AI Shopping Assistant Widget (Customer routes only) */}
+        {!isAdmin && !isSeller && <AiChatWidget />}
       </div>
   );
 }

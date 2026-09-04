@@ -182,6 +182,7 @@ function Product() {
       onPageChange={handlePageChange}
       onRetry={loadProducts}
       isSearchPage={false}
+      category={category}
     />
   );
 }
