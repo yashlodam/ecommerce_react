@@ -13,7 +13,7 @@ function Order() {
   const order = useAppSelector((store) => store.order);
 
   useEffect(() => {
-    dispatch(fetchUserOrderHistory(localStorage.getItem("jwt")));
+    dispatch(fetchUserOrderHistory());
   }, [dispatch]);
 
   const orders = order?.orders || [];

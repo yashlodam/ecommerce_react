@@ -65,9 +65,8 @@ function SellerLoginForm() {
         ).unwrap();
 
         setSuccess(result?.message || "Login successful.");
-        const jwt = localStorage.getItem("jwt");
-        if (jwt) {
-          await dispatch(fetchSellerProfile(jwt));
+        if (result?.jwt) {
+          await dispatch(fetchSellerProfile(result.jwt));
         }
         navigate("/seller");
       } catch (err) {

@@ -11,13 +11,22 @@ import { useAppSelector } from "../State/Store";
  *   <ProtectedRoute role="ROLE_ADMIN">   → requires admin login
  */
 function ProtectedRoute({ children, role }) {
-  const { isLoggedIn, jwt, role: userRole } = useAppSelector(
+  const { isLoggedIn, jwt, role: userRole, authChecking } = useAppSelector(
     (state) => state.auth
   );
   const location = useLocation();
 
+  // Wait for initial silent refresh before redirecting to login
+  if (authChecking) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   // Not logged in at all → go to login
-  const loggedIn = isLoggedIn && (jwt || localStorage.getItem("jwt"));
+  const loggedIn = isLoggedIn && jwt;
   if (!loggedIn) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

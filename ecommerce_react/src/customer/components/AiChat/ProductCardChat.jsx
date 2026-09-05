@@ -15,6 +15,10 @@ export default function ProductCardChat({ product }) {
 
   const defaultVariant = product.variants?.find((v) => v.default) || product.variants?.[0];
   const size = defaultVariant?.variantName || 'M';
+  const isInStock =
+    product.inStock !== false &&
+    (product.quantity == null || product.quantity > 0) &&
+    (defaultVariant ? (defaultVariant.quantity == null || defaultVariant.quantity > 0) : true);
   const imageUrl =
     product.images?.[0] ||
     'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=300&q=80';
@@ -26,6 +30,7 @@ export default function ProductCardChat({ product }) {
 
   const handleAddToCart = async (e) => {
     e.stopPropagation();
+    if (!isInStock || adding || added) return;
     const token = jwt || localStorage.getItem('jwt');
     if (!token) {
       navigate('/login');
@@ -83,12 +88,12 @@ export default function ProductCardChat({ product }) {
         )}
         <span
           className={`absolute top-2 right-2 text-[10px] font-semibold px-1.5 py-0.5 rounded shadow-xs ${
-            product.inStock
+            isInStock
               ? 'bg-emerald-600 text-white'
-              : 'bg-slate-600 text-white'
+              : 'bg-red-600 text-white'
           }`}
         >
-          {product.inStock ? 'In Stock' : 'Out of Stock'}
+          {isInStock ? 'In Stock' : 'Out of Stock'}
         </span>
       </div>
 
@@ -154,7 +159,7 @@ export default function ProductCardChat({ product }) {
             <span>Details</span>
           </button>
 
-          {product.inStock && (
+          {isInStock ? (
             <button
               type="button"
               onClick={handleAddToCart}
@@ -179,6 +184,14 @@ export default function ProductCardChat({ product }) {
                   <span>+ Cart</span>
                 </>
               )}
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-200/80 dark:border-slate-800"
+            >
+              Out of Stock
             </button>
           )}
         </div>

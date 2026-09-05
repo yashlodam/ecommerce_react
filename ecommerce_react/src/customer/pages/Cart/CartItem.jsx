@@ -33,8 +33,21 @@ function CartItem({ item }) {
   });
 
   const product = item?.product;
+  const availableStock = item?.productVariant?.quantity ?? product?.quantity ?? 0;
+  const isOutOfStock = (product?.inStock === false) || availableStock <= 0;
+  const isMaxStockReached = item.quantity >= availableStock;
 
   const handleUpdateQuantity = (value) => {
+    if (value > item.quantity && (isOutOfStock || isMaxStockReached)) {
+      setSnackbar({
+        open: true,
+        message: isOutOfStock
+          ? "This item is currently out of stock."
+          : `Cannot add more. Only ${availableStock} available in stock.`,
+        severity: "warning",
+      });
+      return;
+    }
     dispatch(
       updateCartItem({
         jwt: localStorage.getItem("jwt"),
@@ -72,7 +85,11 @@ function CartItem({ item }) {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative">
+    <div className={`bg-white dark:bg-slate-900 rounded-2xl border transition-all duration-300 overflow-hidden relative ${
+      isOutOfStock
+        ? "border-red-300 dark:border-red-900/80 shadow-xs bg-red-50/10"
+        : "border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md"
+    }`}>
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
@@ -107,12 +124,19 @@ function CartItem({ item }) {
           )
         }
       >
-        <div className="shrink-0 w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-2">
+        <div className="shrink-0 w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-2 relative">
           <img
             className="w-full h-full object-contain"
             src={product?.images?.[0] || "https://placehold.co/120x120?text=Item"}
             alt={product?.title || "Item"}
           />
+          {isOutOfStock && (
+            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-2xs flex items-center justify-center">
+              <span className="text-[10px] font-bold text-white bg-red-600 px-1.5 py-0.5 rounded">
+                Out of Stock
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex-1 space-y-1.5 pr-8 min-w-0">
@@ -130,9 +154,20 @@ function CartItem({ item }) {
             Color: <span className="text-slate-600 dark:text-slate-300 font-medium">{product?.color || "Standard"}</span> • Size: <span className="text-slate-600 dark:text-slate-300 font-medium">{item?.size || "Standard"}</span>
           </p>
 
-          <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
-            ✓ In Stock • Eligible for Fast Shipping
-          </p>
+          {isOutOfStock ? (
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900/80 text-red-700 dark:text-red-400 text-xs font-bold">
+              <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+              <span>Out of Stock — Please remove item to checkout</span>
+            </div>
+          ) : isMaxStockReached ? (
+            <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
+              Maximum available stock selected ({availableStock} available)
+            </p>
+          ) : (
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+              ✓ In Stock • Eligible for Fast Shipping
+            </p>
+          )}
         </div>
       </div>
 
@@ -162,7 +197,7 @@ function CartItem({ item }) {
           <Button
             size="small"
             onClick={() => handleUpdateQuantity(item.quantity + 1)}
-            disabled={item.quantity >= (product?.quantity || 10)}
+            disabled={isOutOfStock || isMaxStockReached}
             sx={{
               minWidth: "32px",
               width: "32px",

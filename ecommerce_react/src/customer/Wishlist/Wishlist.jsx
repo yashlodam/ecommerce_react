@@ -19,7 +19,7 @@ function Wishlist() {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    dispatch(getWishlistByUserId(localStorage.getItem("jwt")));
+    dispatch(getWishlistByUserId());
   }, [dispatch]);
 
   const products = wishlist.wishlist?.products || [];

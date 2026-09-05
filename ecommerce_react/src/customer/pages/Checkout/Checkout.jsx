@@ -46,6 +46,12 @@ function Checkout() {
   const auth = useAppSelector((store) => store.auth);
   const cart = useAppSelector((store) => store.cart);
 
+  const cartItems = cart.cart?.cartItems || [];
+  const hasOutOfStockItems = cartItems.some((item) => {
+    const stock = item?.productVariant?.quantity ?? item?.product?.quantity ?? 0;
+    return item?.product?.inStock === false || stock <= 0;
+  });
+
   useEffect(() => {
     dispatch(fetchUserProfile());
     dispatch(fetchUserCart());
@@ -59,6 +65,12 @@ function Checkout() {
   }, [auth.user, selectedAddress]);
 
   const handleBuyNow = async () => {
+    if (hasOutOfStockItems) {
+      setOrderError(
+        "Your cart contains out-of-stock items. Please return to your cart and remove them before placing an order."
+      );
+      return;
+    }
     if (!selectedAddress) {
       setOrderError("Please select a delivery address before placing order.");
       return;
@@ -247,6 +259,21 @@ function Checkout() {
           {/* Pricing Breakdown */}
           <PricingCrd />
 
+          {/* Out of Stock Items Banner */}
+          {hasOutOfStockItems && (
+            <Alert severity="error" className="rounded-xl text-xs font-semibold">
+              Some items in your cart are currently <strong>out of stock</strong>. Please{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/cart")}
+                className="underline font-bold text-red-700 dark:text-red-300 ml-1 cursor-pointer bg-transparent border-0 p-0"
+              >
+                return to your cart
+              </button>{" "}
+              to remove them before completing your order.
+            </Alert>
+          )}
+
           {/* Error Banner */}
           {orderError && (
             <Alert
@@ -261,17 +288,31 @@ function Checkout() {
           {/* Place Order CTA */}
           <Button
             variant="contained"
-            color="primary"
+            color={hasOutOfStockItems ? "inherit" : "primary"}
             fullWidth
             size="large"
-            disabled={placing}
+            disabled={placing || hasOutOfStockItems}
             startIcon={
-              placing ? <CircularProgress size={18} color="inherit" /> : <LockOutlinedIcon />
+              placing ? (
+                <CircularProgress size={18} color="inherit" />
+              ) : (
+                <LockOutlinedIcon />
+              )
             }
             className="py-4 font-extrabold text-base rounded-xl shadow-lg"
             onClick={handleBuyNow}
+            sx={{
+              ...(hasOutOfStockItems && {
+                bgcolor: "action.disabledBackground",
+                color: "text.disabled",
+              }),
+            }}
           >
-            {placing ? "Processing Order..." : `Pay & Place Order`}
+            {placing
+              ? "Processing Order..."
+              : hasOutOfStockItems
+              ? "Cart Contains Out-of-Stock Items"
+              : `Pay & Place Order`}
           </Button>
         </div>
       </div>

@@ -5,34 +5,39 @@ import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 function BrandInSpotlight() {
   const navigate = useNavigate();
 
+  // Brands in spotlight: Apple, Samsung, Sony, Vivo
   const brands = [
     {
-      name: "Nike",
-      category: "men",
-      query: "Nike",
-      discount: "Min 30% Off",
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop",
+      name: "Apple",
+      tagline: "iPhones, Mac & Accessories",
+      category: "electronics",
+      query: "Apple",
+      discount: "Min 15% Off",
+      image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800&auto=format&fit=crop&q=80",
     },
     {
-      name: "Adidas",
-      category: "men",
-      query: "Adidas",
-      discount: "Flat 40% Off",
-      image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=800&auto=format&fit=crop",
+      name: "Samsung",
+      tagline: "Flagship Galaxy 5G Phones",
+      category: "electronics",
+      query: "Samsung",
+      discount: "Up to 25% Off",
+      image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&auto=format&fit=crop&q=80",
     },
     {
-      name: "Puma",
-      category: "men",
-      query: "Puma",
-      discount: "Up to 50% Off",
-      image: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=800&auto=format&fit=crop",
+      name: "Sony",
+      tagline: "Noise Cancelling Headphones & Audio",
+      category: "electronics",
+      query: "Sony",
+      discount: "Up to 30% Off",
+      image: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800&auto=format&fit=crop&q=80",
     },
     {
-      name: "Levi's",
-      category: "men",
-      query: "Levis",
-      discount: "Starting ₹899",
-      image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800&auto=format&fit=crop",
+      name: "Vivo",
+      tagline: "Ultra Slim & Portrait 5G",
+      category: "electronics",
+      query: "Vivo",
+      discount: "Flat 20% Off",
+      image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&auto=format&fit=crop&q=80",
     },
   ];
 
@@ -48,7 +53,7 @@ function BrandInSpotlight() {
           </h2>
         </div>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-          Handpicked official store releases and seasonal collections from top athletic and denim brands.
+          Handpicked releases and verified collections from authorized marketplace brand partners.
         </p>
       </div>
 
@@ -56,12 +61,13 @@ function BrandInSpotlight() {
         {brands.map((brand, index) => (
           <div
             key={index}
-            onClick={() => navigate(`/search?q=${brand.query}`)}
+            onClick={() => navigate(`/search?q=${encodeURIComponent(brand.query)}`)}
             className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-sm transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl cursor-pointer"
           >
             <img
               src={brand.image}
               alt={brand.name}
+              referrerPolicy="no-referrer"
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
             />
@@ -76,7 +82,7 @@ function BrandInSpotlight() {
                 <h3 className="text-xl font-extrabold tracking-tight">
                   {brand.name}
                 </h3>
-                <p className="text-xs text-slate-300 mt-0.5">Explore Catalog</p>
+                <p className="text-xs text-slate-300 mt-0.5">{brand.tagline}</p>
               </div>
               <div className="w-8 h-8 rounded-full bg-teal-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-md">
                 <ArrowForwardRoundedIcon sx={{ fontSize: 16 }} />

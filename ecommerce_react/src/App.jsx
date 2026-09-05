@@ -29,7 +29,7 @@ import AdminDashboard from "./admin/pages/Dashboard/Dashboard";
 
 // State
 import { useAppDispatch, useAppSelector } from "./State/Store";
-import { fetchCurrentRole, fetchUserProfile } from "./State/AuthSlice";
+import { fetchCurrentRole, fetchUserProfile, refreshToken, setAuthChecking } from "./State/AuthSlice";
 import { fetchSellerProfile } from "./State/seller/sellerSlice";
 import { createHomeCategories } from "./State/customer/CustomerSlice";
 import { homeCategories } from "./data/HomeCategories";
@@ -45,26 +45,28 @@ function App() {
   const isSeller = location.pathname.startsWith("/seller");
   const isAdmin = location.pathname.startsWith("/admin");
 
-  // ─── Bootstrap on mount ─────────────────────────────────────────────────────
+  // ─── Bootstrap on mount (Silent Refresh via HttpOnly cookie) ─────────────────
   useEffect(() => {
     const initialize = async () => {
-      const jwt = localStorage.getItem("jwt");
-
       // Always seed home categories for the homepage
       dispatch(createHomeCategories(homeCategories));
 
-      if (!jwt) return;
-
       try {
-        const role = await dispatch(fetchCurrentRole()).unwrap();
+        // Attempt silent refresh using the HttpOnly refresh token cookie
+        const authData = await dispatch(refreshToken()).unwrap();
 
-        if (role === "ROLE_SELLER") {
-          await dispatch(fetchSellerProfile());
-        } else {
-          await dispatch(fetchUserProfile());
+        if (authData?.jwt) {
+          const role = authData?.role;
+          if (role === "ROLE_SELLER") {
+            await dispatch(fetchSellerProfile());
+          } else {
+            await dispatch(fetchUserProfile());
+          }
         }
       } catch {
-        // JWT is invalid / expired — the 401 interceptor will handle redirect
+        // No active session or refresh token expired — user continues as guest
+      } finally {
+        dispatch(setAuthChecking(false));
       }
     };
 

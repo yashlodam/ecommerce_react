@@ -82,9 +82,13 @@ function ProductDetails() {
       .then((res) => {
         const variantList = res.data || [];
         setVariants(variantList);
-        // Auto-select first variant (or the default one)
+        // Auto-select first in-stock variant, or default/first variant
+        const defaultCandidate = variantList.find((v) => v.isDefault);
+        const inStockCandidate = variantList.find((v) => (v.quantity ?? 0) > 0);
         const defaultV =
-          variantList.find((v) => v.isDefault) || variantList[0] || null;
+          (defaultCandidate && (defaultCandidate.quantity ?? 0) > 0)
+            ? defaultCandidate
+            : inStockCandidate || defaultCandidate || variantList[0] || null;
         setSelectedVariant(defaultV);
       })
       .catch(() => {
@@ -99,21 +103,25 @@ function ProductDetails() {
   );
 
   // Use selected variant's stock to determine in-stock status
-  const isInStock = selectedVariant
-    ? (selectedVariant.quantity ?? 0) > 0
-    : (currentProduct?.quantity ?? 0) > 0;
+  const currentStock = selectedVariant != null
+    ? (selectedVariant.quantity ?? 0)
+    : (currentProduct?.quantity ?? 0);
+
+  const isInStock =
+    (currentProduct?.inStock !== false) &&
+    currentStock > 0;
 
   // Displayed prices come from selected variant when available
   const displayMrpPrice = selectedVariant?.mrpPrice ?? currentProduct?.mrpPrice ?? 0;
   const displaySellingPrice = selectedVariant?.sellingPrice ?? currentProduct?.sellingPrice ?? 0;
   const displayDiscount = selectedVariant?.discountPercent ?? currentProduct?.discountPercent ?? 0;
-  const displayStock = selectedVariant?.quantity ?? currentProduct?.quantity ?? 0;
+  const displayStock = Math.max(0, currentStock);
 
   const handleAddToCart = () => {
     if (!requireAuth()) return;
-    if (!isInStock) {
-      setAlertMsg("Sorry, this variant is currently out of stock.");
-      setAlertSeverity("error");
+    if (!isInStock || displayStock <= 0) {
+      setAlertMsg("Sorry, this item is currently out of stock and cannot be added to your cart.");
+      setAlertSeverity("warning");
       setOpenAlert(true);
       return;
     }
@@ -402,28 +410,51 @@ function ProductDetails() {
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                   Quantity
                 </p>
-                <div className="inline-flex items-center border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 p-0.5 shadow-2xs">
-                  <Button
-                    size="small"
-                    disabled={quantity <= 1}
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    sx={{ minWidth: 32, height: 32 }}
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`inline-flex items-center border rounded-xl p-0.5 shadow-2xs transition-colors ${
+                      !isInStock
+                        ? "border-slate-200/60 dark:border-slate-800/60 bg-slate-100/70 dark:bg-slate-900/50 opacity-60"
+                        : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+                    }`}
                   >
-                    <RemoveIcon fontSize="small" />
-                  </Button>
-                  <span className="px-3 font-bold text-slate-900 dark:text-slate-100 text-xs">
-                    {quantity}
-                  </span>
-                  <Button
-                    size="small"
-                    disabled={quantity >= (displayStock || 10)}
-                    onClick={() => setQuantity((q) => q + 1)}
-                    sx={{ minWidth: 32, height: 32 }}
-                  >
-                    <AddIcon fontSize="small" />
-                  </Button>
+                    <Button
+                      size="small"
+                      disabled={!isInStock || quantity <= 1}
+                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      sx={{ minWidth: 32, height: 32 }}
+                    >
+                      <RemoveIcon fontSize="small" />
+                    </Button>
+                    <span className="px-3 font-bold text-slate-900 dark:text-slate-100 text-xs min-w-[28px] text-center">
+                      {isInStock ? quantity : 0}
+                    </span>
+                    <Button
+                      size="small"
+                      disabled={!isInStock || quantity >= displayStock}
+                      onClick={() => setQuantity((q) => q + 1)}
+                      sx={{ minWidth: 32, height: 32 }}
+                    >
+                      <AddIcon fontSize="small" />
+                    </Button>
+                  </div>
+                  {isInStock && displayStock > 0 && displayStock <= 5 && (
+                    <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                      Only {displayStock} left in stock!
+                    </span>
+                  )}
                 </div>
               </div>
+
+              {/* Out of Stock Alert Banner */}
+              {!isInStock && (
+                <div className="mb-5 flex items-center gap-2.5 p-3.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/80 rounded-xl text-red-700 dark:text-red-400 text-xs font-medium">
+                  <WarningAmberRoundedIcon fontSize="small" className="shrink-0 text-red-600 dark:text-red-400" />
+                  <span>
+                    This product/variant is currently <strong>out of stock</strong>. You cannot add it to your cart.
+                  </span>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -431,7 +462,7 @@ function ProductDetails() {
                   fullWidth
                   size="large"
                   variant="contained"
-                  color="primary"
+                  color={isInStock ? "primary" : "inherit"}
                   disabled={!isInStock || addingToCart}
                   onClick={handleAddToCart}
                   startIcon={
@@ -447,7 +478,13 @@ function ProductDetails() {
                     fontWeight: 700,
                     fontSize: "14px",
                     textTransform: "none",
-                    boxShadow: "0 4px 14px rgba(0, 146, 124, 0.3)",
+                    ...(!isInStock && {
+                      bgcolor: "action.disabledBackground",
+                      color: "text.disabled",
+                    }),
+                    ...(isInStock && {
+                      boxShadow: "0 4px 14px rgba(0, 146, 124, 0.3)",
+                    }),
                   }}
                 >
                   {addingToCart

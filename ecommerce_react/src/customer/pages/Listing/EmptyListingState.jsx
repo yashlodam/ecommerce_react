@@ -61,7 +61,7 @@ export default function EmptyListingState({
         <Button
           variant="contained"
           color="primary"
-          onClick={() => navigate("/products/men")}
+          onClick={() => navigate("/products/all")}
           endIcon={<ArrowForwardIcon />}
           sx={{
             borderRadius: "12px",

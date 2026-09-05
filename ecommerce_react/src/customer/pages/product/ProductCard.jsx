@@ -25,7 +25,10 @@ function ProductCard({ item }) {
   const { isLoggedIn } = useAppSelector((store) => store.auth);
 
   const isWishlisted = wishlist?.products?.some((p) => p.id === item.id);
-  const isOutOfStock = item.quantity === 0;
+  const isOutOfStock =
+    item.inStock === false ||
+    (item.quantity != null && item.quantity <= 0) ||
+    item.quantity === 0;
 
   // Auto-cycle product images on hover
   useEffect(() => {

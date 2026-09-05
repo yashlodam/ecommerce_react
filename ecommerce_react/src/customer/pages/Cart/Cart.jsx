@@ -23,6 +23,11 @@ function Cart() {
   const cart = useAppSelector((store) => store.cart);
 
   const cartItems = cart.cart?.cartItems || [];
+  const outOfStockItems = cartItems.filter((item) => {
+    const stock = item?.productVariant?.quantity ?? item?.product?.quantity ?? 0;
+    return item?.product?.inStock === false || stock <= 0;
+  });
+  const hasOutOfStockItems = outOfStockItems.length > 0;
 
   useEffect(() => {
     dispatch(fetchUserCart());
@@ -79,6 +84,19 @@ function Cart() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Cart Items List */}
           <div className="lg:col-span-8 space-y-4">
+            {hasOutOfStockItems && (
+              <Alert
+                severity="error"
+                className="rounded-2xl font-medium border border-red-200 dark:border-red-900"
+              >
+                <strong>Attention:</strong> {outOfStockItems.length}{" "}
+                {outOfStockItems.length === 1 ? "item" : "items"} in your cart{" "}
+                {outOfStockItems.length === 1 ? "is" : "are"} currently out of
+                stock. Please remove {outOfStockItems.length === 1 ? "it" : "them"}{" "}
+                before proceeding to checkout.
+              </Alert>
+            )}
+
             {cartItems.map((item) => (
               <CartItem key={item.id} item={item} />
             ))}
@@ -156,12 +174,25 @@ function Cart() {
               fullWidth
               size="large"
               variant="contained"
-              color="primary"
+              color={hasOutOfStockItems ? "inherit" : "primary"}
+              disabled={hasOutOfStockItems}
               onClick={() => navigate("/checkout")}
-              endIcon={<ArrowForwardIcon />}
-              className="py-3.5 font-bold rounded-xl shadow-md text-base"
+              endIcon={!hasOutOfStockItems ? <ArrowForwardIcon /> : null}
+              sx={{
+                py: 1.6,
+                fontWeight: 700,
+                borderRadius: "14px",
+                fontSize: "15px",
+                textTransform: "none",
+                ...(hasOutOfStockItems && {
+                  bgcolor: "action.disabledBackground",
+                  color: "text.disabled",
+                }),
+              }}
             >
-              Proceed to Checkout
+              {hasOutOfStockItems
+                ? "Remove Out of Stock Items to Checkout"
+                : "Proceed to Checkout"}
             </Button>
           </div>
         </div>

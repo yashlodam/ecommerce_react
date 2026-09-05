@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../config/Api";
+import { api, executeSilentRefresh } from "../config/Api";
 
-// JWT is auto-attached by the api interceptor for authenticated calls
+// ─── ASYNC THUNKS ────────────────────────────────────────────────────────────
 
 export const sendLoginSignupOtp = createAsyncThunk(
   "auth/sendLoginSignupOtp",
@@ -25,8 +25,8 @@ export const signin = createAsyncThunk(
   "auth/signin",
   async ({ email, otp }, { rejectWithValue }) => {
     try {
+      // Backend sets HttpOnly refresh token cookie and returns short-lived access token
       const response = await api.post("/auth/login", { email, otp });
-      localStorage.setItem("jwt", response.data.jwt);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -42,16 +42,29 @@ export const signup = createAsyncThunk(
   "auth/signup",
   async (signupRequest, { rejectWithValue }) => {
     try {
+      // Backend sets HttpOnly refresh token cookie and returns short-lived access token
       const response = await api.post("/auth/signup", signupRequest);
-      if (response.data.jwt) {
-        localStorage.setItem("jwt", response.data.jwt);
-      }
       return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
           error.response?.data ||
           "Signup failed. Please try again."
+      );
+    }
+  }
+);
+
+export const refreshToken = createAsyncThunk(
+  "auth/refreshToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      // Uses the shared single-flight executeSilentRefresh to eliminate concurrent refresh races
+      const data = await executeSilentRefresh();
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Session expired. Please login again."
       );
     }
   }
@@ -73,7 +86,14 @@ export const fetchUserProfile = createAsyncThunk(
 
 export const logout = createAsyncThunk(
   "auth/logout",
-  async (navigate, { dispatch }) => {
+  async (navigate) => {
+    try {
+      // Revoke refresh token and clear cookie on the server
+      await api.post("/auth/logout");
+    } catch {
+      // Ignore network errors during logout
+    }
+    // Clean up any remaining legacy localStorage tokens
     localStorage.removeItem("jwt");
     if (navigate) navigate("/");
     return null;
@@ -111,15 +131,20 @@ export const fetchCurrentRole = createAsyncThunk(
   }
 );
 
+// ─── INITIAL STATE ───────────────────────────────────────────────────────────
+
 const initialState = {
-  jwt: localStorage.getItem("jwt"),
+  jwt: null, // Short-lived access token kept strictly in frontend memory
   role: null,
   otpSend: false,
-  isLoggedIn: !!localStorage.getItem("jwt"),
+  isLoggedIn: false,
   user: null,
   loading: false,
+  authChecking: true, // true while checking silent refresh on initial app load
   error: null,
 };
+
+// ─── SLICE ───────────────────────────────────────────────────────────────────
 
 const authSlice = createSlice({
   name: "auth",
@@ -130,6 +155,14 @@ const authSlice = createSlice({
     },
     resetOtpState: (state) => {
       state.otpSend = false;
+    },
+    setAccessToken: (state, action) => {
+      state.jwt = action.payload;
+      state.isLoggedIn = !!action.payload;
+      state.authChecking = false;
+    },
+    setAuthChecking: (state, action) => {
+      state.authChecking = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -163,12 +196,14 @@ const authSlice = createSlice({
         state.jwt = action.payload.jwt;
         state.role = action.payload.role;
         state.isLoggedIn = true;
+        state.authChecking = false;
         state.error = null;
       })
       .addCase(signin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.isLoggedIn = false;
+        state.authChecking = false;
       })
 
       // Sign Up
@@ -181,11 +216,33 @@ const authSlice = createSlice({
         state.jwt = action.payload.jwt;
         state.role = action.payload.role;
         state.isLoggedIn = true;
+        state.authChecking = false;
         state.error = null;
       })
       .addCase(signup.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.authChecking = false;
+      })
+
+      // Silent Refresh Token
+      .addCase(refreshToken.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        state.loading = false;
+        state.jwt = action.payload.jwt;
+        state.role = action.payload.role;
+        state.isLoggedIn = true;
+        state.authChecking = false;
+        state.error = null;
+      })
+      .addCase(refreshToken.rejected, (state) => {
+        state.loading = false;
+        state.jwt = null;
+        state.role = null;
+        state.isLoggedIn = false;
+        state.authChecking = false;
       })
 
       // Fetch User Profile
@@ -227,11 +284,12 @@ const authSlice = createSlice({
         state.user = null;
         state.isLoggedIn = false;
         state.loading = false;
+        state.authChecking = false;
         state.error = null;
         state.otpSend = false;
       });
   },
 });
 
-export const { clearAuthError, resetOtpState } = authSlice.actions;
+export const { clearAuthError, resetOtpState, setAccessToken, setAuthChecking } = authSlice.actions;
 export default authSlice.reducer;

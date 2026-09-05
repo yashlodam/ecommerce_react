@@ -5,6 +5,11 @@ import { fetchAllProducts, clearProductError } from "../../../State/customer/Pro
 import ProductListingLayout from "../Listing/ProductListingLayout";
 
 const categoryMetaMap = {
+  all: {
+    title: "All Products Catalog",
+    subtitle: "Explore our full collection of electronics, fashion apparel, footwear, and home decor from verified sellers.",
+    badge: "Full Marketplace",
+  },
   men: {
     title: "Men's Fashion & Apparel",
     subtitle: "Curated collection of formal shirts, casual t-shirts, denim jeans, athletic footwear and accessories.",
@@ -20,10 +25,125 @@ const categoryMetaMap = {
     subtitle: "Flagship smartphones, noise-canceling headphones, smart watches, laptops and computer accessories.",
     badge: "Tech & Audio",
   },
-  electronics_smartphones: {
-    title: "Flagship Smartphones",
-    subtitle: "Next-gen 5G mobile phones, gaming devices and smartphone accessories from authorized brands.",
+  smartphones: {
+    title: "Flagship 5G Smartphones",
+    subtitle: "Next-gen 5G mobile phones, gaming devices and smartphone accessories from authorized brands like Apple, Samsung, Google & vivo.",
     badge: "Mobiles & 5G",
+  },
+  electronics_smartphones: {
+    title: "Flagship 5G Smartphones",
+    subtitle: "Next-gen 5G mobile phones, gaming devices and smartphone accessories from authorized brands like Apple, Samsung, Google & vivo.",
+    badge: "Mobiles & 5G",
+  },
+  mobiles: {
+    title: "Mobile Phones & 5G Tech",
+    subtitle: "Top-rated 5G smartphones, flagship devices, and mobile tech from authorized manufacturers.",
+    badge: "Mobiles & 5G",
+  },
+  electronics_mobiles: {
+    title: "Mobile Phones & 5G Tech",
+    subtitle: "Top-rated 5G smartphones, flagship devices, and mobile tech from authorized manufacturers.",
+    badge: "Mobiles & 5G",
+  },
+  laptops: {
+    title: "High Performance Laptops",
+    subtitle: "Next-gen AI laptops, high-performance gaming rigs, and ultrabooks for work and play.",
+    badge: "Computers & Gaming",
+  },
+  electronics_laptops: {
+    title: "High Performance Laptops",
+    subtitle: "Next-gen AI laptops, high-performance gaming rigs, and ultrabooks for work and play.",
+    badge: "Computers & Gaming",
+  },
+  electronics_gaming_laptops: {
+    title: "Gaming Laptops & Workstations",
+    subtitle: "GeForce RTX graphics, ultra-fast refresh rates, and raw computing power for creators and gamers.",
+    badge: "Gaming Tech",
+  },
+  headphones: {
+    title: "Headphones & High-Res Audio",
+    subtitle: "Active noise-canceling over-ear headphones, studio monitors, and wireless audio.",
+    badge: "Audio & Sound",
+  },
+  electronics_headphones: {
+    title: "Headphones & High-Res Audio",
+    subtitle: "Active noise-canceling over-ear headphones, studio monitors, and wireless audio.",
+    badge: "Audio & Sound",
+  },
+  smart_watches: {
+    title: "Smartwatches & Wearables",
+    subtitle: "Precision AMOLED displays, biometric health tracking, heart monitors, and durable battery life.",
+    badge: "Wearables & Fitness",
+  },
+  electronics_smart_watches: {
+    title: "Smartwatches & Wearables",
+    subtitle: "Precision AMOLED displays, biometric health tracking, heart monitors, and durable battery life.",
+    badge: "Wearables & Fitness",
+  },
+  cameras: {
+    title: "Cameras & Photography",
+    subtitle: "Full-frame mirrorless camera bodies, optical zoom lenses, and high-definition creator kits.",
+    badge: "Cameras & Video",
+  },
+  electronics_cameras: {
+    title: "Cameras & Photography",
+    subtitle: "Full-frame mirrorless camera bodies, optical zoom lenses, and high-definition creator kits.",
+    badge: "Cameras & Video",
+  },
+  electronics_mirrorless_cameras: {
+    title: "Mirrorless Digital Cameras",
+    subtitle: "Full-frame mirrorless cameras, 4K video recording, and fast autofocus lenses.",
+    badge: "Pro Photography",
+  },
+  tshirts: {
+    title: "Men's T-Shirts & Graphic Polos",
+    subtitle: "Breathable cotton tees, graphic streetwear, and classic tailored polos for effortless daily comfort.",
+    badge: "Casual Topwear",
+  },
+  men_tshirts: {
+    title: "Men's T-Shirts & Graphic Polos",
+    subtitle: "Breathable cotton tees, graphic streetwear, and classic tailored polos for effortless daily comfort.",
+    badge: "Casual Topwear",
+  },
+  formal_shirts: {
+    title: "Men's Formal Shirts",
+    subtitle: "Crisp cotton formal shirts, executive dress shirts, and tailored fits for meetings and events.",
+    badge: "Executive Wear",
+  },
+  men_formal_shirts: {
+    title: "Men's Formal Shirts",
+    subtitle: "Crisp cotton formal shirts, executive dress shirts, and tailored fits for meetings and events.",
+    badge: "Executive Wear",
+  },
+  jeans: {
+    title: "Men's Denim & Trousers",
+    subtitle: "Classic straight-leg jeans, baggy denim fits, and breathable relaxed-fit cotton trousers.",
+    badge: "Bottomwear",
+  },
+  men_jeans: {
+    title: "Men's Denim & Trousers",
+    subtitle: "Classic straight-leg jeans, baggy denim fits, and breathable relaxed-fit cotton trousers.",
+    badge: "Bottomwear",
+  },
+  kurtas: {
+    title: "Women's Designer Kurtas",
+    subtitle: "Artisan printed kurtas, matching palazzo pant sets, and festive ethnic ensembles.",
+    badge: "Ethnic Collection",
+  },
+  women_kurtas: {
+    title: "Women's Designer Kurtas",
+    subtitle: "Artisan printed kurtas, matching palazzo pant sets, and festive ethnic ensembles.",
+    badge: "Ethnic Collection",
+  },
+  tops: {
+    title: "Women's Tops & Western Wear",
+    subtitle: "Square neck peplum tops, casual daily tees, and chic blouson shirts for every season.",
+    badge: "Western Tops",
+  },
+  women_tops: {
+    title: "Women's Tops & Western Wear",
+    subtitle: "Square neck peplum tops, casual daily tees, and chic blouson shirts for every season.",
+    badge: "Western Tops",
   },
   home_furniture: {
     title: "Home Living & Furnishings",
@@ -150,7 +270,8 @@ function Product() {
     .replaceAll("_", " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
-  const meta = categoryMetaMap[category] || {
+  const cleanCategory = (category || "all").toLowerCase();
+  const meta = categoryMetaMap[cleanCategory] || categoryMetaMap[cleanCategory.replace(/-/g, "_")] || {
     title: formattedCategoryName,
     subtitle: `Explore authentic ${formattedCategoryName} from verified Indian sellers and official stores.`,
     badge: "Catalog Section",
