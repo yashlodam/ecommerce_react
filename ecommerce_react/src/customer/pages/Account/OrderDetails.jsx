@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import {
@@ -14,6 +18,9 @@ import {
   cancelOrder,
 } from "../../../State/customer/OrderSlice";
 import StatusBadge from "../../../common/StatusBadge";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -30,7 +37,8 @@ function OrderDetails() {
   const order = useAppSelector((store) => store.order);
 
   const [cancelling, setCancelling] = useState(false);
-  const [actionMsg, setActionMsg] = useState("");
+  const [actionMsg, setActionMsg] = useState({ type: "", text: "" });
+  const [openCancelDialog, setOpenCancelDialog] = useState(false);
 
   const currentOrder = order?.currentOrder;
   const orderItem = order?.orderItem;
@@ -38,24 +46,15 @@ function OrderDetails() {
 
   useEffect(() => {
     if (orderId) {
-      dispatch(
-        fetchOrderById({
-          orderId: Number(orderId),
-          jwt: localStorage.getItem("jwt") || "",
-        })
-      );
+      dispatch(fetchOrderById(Number(orderId)));
     }
     if (orderItemId) {
-      dispatch(
-        fetchOrderItemById({
-          orderItemId: Number(orderItemId),
-          jwt: localStorage.getItem("jwt") || "",
-        })
-      );
+      dispatch(fetchOrderItemById(Number(orderItemId)));
     }
   }, [orderId, orderItemId, dispatch]);
 
   const activeStepMap = {
+    PENDING: 0,
     PLACED: 0,
     CONFIRMED: 1,
     SHIPPED: 2,
@@ -66,25 +65,34 @@ function OrderDetails() {
   const orderStatus = currentOrder?.orderStatus || "PLACED";
   const currentStep = activeStepMap[orderStatus] ?? 0;
 
-  const handleCancelOrder = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to cancel this order? This action cannot be undone."
-    );
-    if (!confirmed) return;
+  // Safe fallback to locate item even if orderItem API request hasn't finished
+  const activeItem =
+    orderItem ||
+    currentOrder?.orderItems?.find(
+      (i) => String(i.id) === String(orderItemId)
+    ) ||
+    currentOrder?.orderItems?.[0];
 
+  const handleCancelOrder = async () => {
     setCancelling(true);
+    setActionMsg({ type: "", text: "" });
     try {
-      await dispatch(
-        cancelOrder({
-          orderId: Number(orderId),
-          jwt: localStorage.getItem("jwt") || "",
-        })
-      ).unwrap();
-      setActionMsg("Order has been successfully cancelled.");
+      await dispatch(cancelOrder(Number(orderId))).unwrap();
+      setActionMsg({
+        type: "success",
+        text: "Order has been successfully cancelled. Any reserved inventory has been restored.",
+      });
+      setOpenCancelDialog(false);
+      dispatch(fetchOrderById(Number(orderId)));
     } catch (err) {
-      setActionMsg(
-        typeof err === "string" ? err : "Failed to cancel order. Please contact support."
-      );
+      setActionMsg({
+        type: "error",
+        text:
+          typeof err === "string"
+            ? err
+            : "Failed to cancel order. Please contact customer support.",
+      });
+      setOpenCancelDialog(false);
     } finally {
       setCancelling(false);
     }

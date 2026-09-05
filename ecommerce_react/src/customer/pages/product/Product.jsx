@@ -155,10 +155,95 @@ const categoryMetaMap = {
     subtitle: "Handcrafted wooden furniture, ambient lighting, plush sofas, artisan rugs and bedsheets.",
     badge: "Home & Decor",
   },
+  home_beds: {
+    title: "Beds & Mattresses",
+    subtitle: "Comfortable solid wood beds, orthopedic mattresses, and luxury headboards for restful sleep.",
+    badge: "Bedroom",
+  },
+  home_lighting: {
+    title: "Lighting & Ambient Lamps",
+    subtitle: "Ceiling chandeliers, warm bedside lamps, fairy string lights, and architectural LEDs.",
+    badge: "Lighting & Lamps",
+  },
+  home_garden_outdoor: {
+    title: "Garden & Outdoor Living",
+    subtitle: "Plant pots, decorative planters, outdoor patio furniture, and garden watering tools.",
+    badge: "Outdoor & Garden",
+  },
+  home_kitchen_dining: {
+    title: "Kitchenware & Dining Essentials",
+    subtitle: "Non-stick cookware, elegant porcelain dinner sets, chef cutlery, and food storage containers.",
+    badge: "Kitchen & Dining",
+  },
   beauty: {
     title: "Beauty & Personal Care",
     subtitle: "Premium skincare, hair treatments, organic fragrances and everyday grooming essentials.",
     badge: "Beauty & Wellness",
+  },
+  women_beauty_personal_care: {
+    title: "Beauty & Skincare",
+    subtitle: "Dermatologist-tested skincare, essential hair oils, organic wellness serums, and luxury fragrances.",
+    badge: "Beauty & Skincare",
+  },
+  men_topwear: {
+    title: "Men's Topwear Collection",
+    subtitle: "Trendy graphic t-shirts, casual polo shirts, tailored button-downs, and effortless daily tops.",
+    badge: "Topwear",
+  },
+  men_bottomwear: {
+    title: "Men's Bottomwear & Denim",
+    subtitle: "Slim-fit jeans, relaxed cargo pants, breathable chinos, and comfortable jogger trousers.",
+    badge: "Bottomwear",
+  },
+  men_hoodies: {
+    title: "Men's Hoodies & Sweatshirts",
+    subtitle: "Fleece-lined winter hoodies, oversized streetwear pullovers, and zipper jackets.",
+    badge: "Winter Wear",
+  },
+  men_jackets: {
+    title: "Men's Jackets & Outerwear",
+    subtitle: "Rugged denim trucker jackets, leather bombers, lightweight windbreakers, and puffer coats.",
+    badge: "Outerwear",
+  },
+  men_footwear: {
+    title: "Men's Footwear & Sneakers",
+    subtitle: "High-performance running sneakers, genuine leather formal oxfords, loafers, and daily sliders.",
+    badge: "Footwear",
+  },
+  women_western_wear: {
+    title: "Women's Western Wear",
+    subtitle: "Contemporary tops, tailored blazers, peplum blouses, and modern partywear ensembles.",
+    badge: "Western Fashion",
+  },
+  women_dresses: {
+    title: "Women's Dresses & Jumpsuits",
+    subtitle: "Flattering A-line dresses, floral sundresses, elegant maxi silhouettes, and evening jumpsuits.",
+    badge: "Dresses",
+  },
+  women_jewellery: {
+    title: "Designer Jewellery & Accessories",
+    subtitle: "Gold-plated necklace sets, delicate pearl earrings, oxidized silver chokers, and bangles.",
+    badge: "Jewellery",
+  },
+  women_sarees: {
+    title: "Authentic Ethnic Sarees",
+    subtitle: "Banarasi silk weaves, lightweight georgette drapes, Kanjeevaram heritage sarees, and festive wear.",
+    badge: "Ethnic Sarees",
+  },
+  women_footwear: {
+    title: "Women's Footwear & Heels",
+    subtitle: "Strappy block heels, embroidered ethnic juttis, cushioned walking flats, and casual sneakers.",
+    badge: "Footwear",
+  },
+  speakers: {
+    title: "Bluetooth Speakers & High-Res Audio",
+    subtitle: "Deep bass portable wireless speakers, home theater soundbars, and party audio towers.",
+    badge: "Audio & Sound",
+  },
+  televisions: {
+    title: "Smart 4K Ultra HD Televisions",
+    subtitle: "Cinematic OLED & QLED displays, Dolby Vision smart TVs, and streaming displays with immersive sound.",
+    badge: "Home Theater",
   },
 };
 

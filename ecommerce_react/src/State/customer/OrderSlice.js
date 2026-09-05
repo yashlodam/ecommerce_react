@@ -21,13 +21,19 @@ export const fetchUserOrderHistory = createAsyncThunk(
 // ================= Fetch Order By Id =================
 export const fetchOrderById = createAsyncThunk(
   "orders/fetchOrderById",
-  async (orderId, { rejectWithValue }) => {
+  async (arg, { rejectWithValue }) => {
     try {
+      const orderId =
+        typeof arg === "object" && arg !== null
+          ? arg.orderId || arg.id
+          : arg;
       const response = await api.get(`${API_URL}/${orderId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch order"
+        error.response?.data?.message ||
+          error.response?.data ||
+          "Failed to fetch order"
       );
     }
   }
@@ -65,13 +71,19 @@ export const createOrder = createAsyncThunk(
 // ================= Fetch Order Item =================
 export const fetchOrderItemById = createAsyncThunk(
   "orders/fetchOrderItemById",
-  async (orderItemId, { rejectWithValue }) => {
+  async (arg, { rejectWithValue }) => {
     try {
+      const orderItemId =
+        typeof arg === "object" && arg !== null
+          ? arg.orderItemId || arg.id
+          : arg;
       const response = await api.get(`${API_URL}/item/${orderItemId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch order item"
+        error.response?.data?.message ||
+          error.response?.data ||
+          "Failed to fetch order item"
       );
     }
   }
@@ -99,14 +111,19 @@ export const paymentSuccess = createAsyncThunk(
 // ================= Cancel Order =================
 export const cancelOrder = createAsyncThunk(
   "orders/cancelOrder",
-  async (orderId, { rejectWithValue }) => {
+  async (arg, { rejectWithValue }) => {
     try {
+      const orderId =
+        typeof arg === "object" && arg !== null
+          ? arg.orderId || arg.id
+          : arg;
       // JWT is auto-attached by the api interceptor
       const response = await api.put(`${API_URL}/${orderId}/cancel`, {});
       return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
+          error.response?.data ||
           "An error occurred while cancelling the order"
       );
     }
