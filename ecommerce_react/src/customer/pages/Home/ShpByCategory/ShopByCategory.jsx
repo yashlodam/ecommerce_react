@@ -216,15 +216,15 @@ function ShopByCategory() {
       {/* Categories Presentation Stage */}
       {viewMode === "carousel" ? (
         <div className="relative group/carousel">
-          {/* Desktop Floating Navigation Arrows */}
+          {/* Floating Navigation Arrows */}
           {canScrollLeft && (
             <button
               type="button"
               onClick={() => handleScroll("left")}
               aria-label="Previous categories"
-              className="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-xl border border-slate-200/80 dark:border-slate-700 hover:bg-teal-50 hover:text-teal-600 dark:hover:bg-slate-700 transition-all cursor-pointer"
+              className="flex absolute left-1 sm:-left-3 top-1/2 -translate-y-1/2 z-20 h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/95 dark:bg-slate-800/95 text-slate-800 dark:text-slate-100 shadow-md sm:shadow-xl border border-slate-200/80 dark:border-slate-700 hover:bg-teal-50 hover:text-teal-600 dark:hover:bg-slate-700 transition-all cursor-pointer backdrop-blur-xs"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           )}
 
@@ -233,9 +233,9 @@ function ShopByCategory() {
               type="button"
               onClick={() => handleScroll("right")}
               aria-label="Next categories"
-              className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-xl border border-slate-200/80 dark:border-slate-700 hover:bg-teal-50 hover:text-teal-600 dark:hover:bg-slate-700 transition-all cursor-pointer"
+              className="flex absolute right-1 sm:-right-3 top-1/2 -translate-y-1/2 z-20 h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/95 dark:bg-slate-800/95 text-slate-800 dark:text-slate-100 shadow-md sm:shadow-xl border border-slate-200/80 dark:border-slate-700 hover:bg-teal-50 hover:text-teal-600 dark:hover:bg-slate-700 transition-all cursor-pointer backdrop-blur-xs"
             >
-              <ChevronRight size={20} />
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           )}
 

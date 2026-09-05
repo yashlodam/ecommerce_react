@@ -85,7 +85,7 @@ function ProductCard({ item }) {
       }}
     >
       {/* Product Image Stage */}
-      <div className="relative h-56 sm:h-60 overflow-hidden bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-3 border-b border-slate-100 dark:border-slate-800/80">
+      <div className="relative h-44 sm:h-60 overflow-hidden bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-2 sm:p-3 border-b border-slate-100 dark:border-slate-800/80">
         {images.length > 0 ? (
           images.map((img, index) => (
             <img
@@ -93,7 +93,7 @@ function ProductCard({ item }) {
               src={img}
               alt={item?.title || "Product image"}
               loading="lazy"
-              className="absolute inset-0 w-full h-full object-contain p-2.5 transition-transform duration-500 ease-out"
+              className="absolute inset-0 w-full h-full object-contain p-2 sm:p-2.5 transition-transform duration-500 ease-out"
               style={{
                 transform: `translateX(${(index - currentImage) * 100}%)`,
               }}
@@ -107,7 +107,7 @@ function ProductCard({ item }) {
 
         {/* Discount or Deal Badge */}
         {item.dealActive ? (
-          <div className="absolute top-2.5 left-2.5 z-10">
+          <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 z-10">
             <DealBadge
               discountValue={item.discountPercentage || item.discountPercent}
               discountType={item.discountType || "PERCENTAGE"}
@@ -117,14 +117,14 @@ function ProductCard({ item }) {
             />
           </div>
         ) : item.discountPercent > 0 ? (
-          <span className="absolute top-2.5 left-2.5 bg-teal-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-sm z-10 uppercase tracking-wide">
+          <span className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 bg-teal-600 text-white text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full shadow-sm z-10 uppercase tracking-wide">
             {item.discountPercent}% OFF
           </span>
         ) : null}
 
         {/* Low Stock Scarcity Urgency Pill */}
         {isLowStock && (
-          <span className="absolute bottom-2.5 left-2.5 bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md z-10 tracking-tight flex items-center gap-1 border border-amber-300">
+          <span className="absolute bottom-2 left-2 sm:bottom-2.5 sm:left-2.5 bg-amber-400 text-slate-950 text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.5 rounded-full shadow-md z-10 tracking-tight flex items-center gap-1 border border-amber-300">
             <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-pulse" />
             Only {displayQuantity} left!
           </span>
@@ -133,7 +133,7 @@ function ProductCard({ item }) {
         {/* Out of Stock Overlay */}
         {isOutOfStock && (
           <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center z-10">
-            <span className="bg-red-600 text-white font-bold text-[11px] uppercase px-3 py-1 rounded-full tracking-wider shadow">
+            <span className="bg-red-600 text-white font-bold text-[10px] sm:text-[11px] uppercase px-2 sm:px-3 py-0.5 sm:py-1 rounded-full tracking-wider shadow">
               Out of Stock
             </span>
           </div>
@@ -143,29 +143,29 @@ function ProductCard({ item }) {
         <button
           onClick={handleWishlist}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-          className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm cursor-pointer ${
+          className={`absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm cursor-pointer ${
             isWishlisted
               ? "bg-rose-50 text-rose-600 dark:bg-rose-950/70 dark:text-rose-400"
               : "bg-white/90 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 hover:text-rose-500 hover:scale-110"
           }`}
         >
           {isWishlisted ? (
-            <FavoriteIcon sx={{ fontSize: 16, color: "#e11d48" }} />
+            <FavoriteIcon sx={{ fontSize: { xs: 14, sm: 16 }, color: "#e11d48" }} />
           ) : (
-            <FavoriteBorderIcon sx={{ fontSize: 16 }} />
+            <FavoriteBorderIcon sx={{ fontSize: { xs: 14, sm: 16 } }} />
           )}
         </button>
 
         {/* Image dot indicators */}
         {images.length > 1 && (
-          <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
+          <div className="absolute bottom-1.5 sm:bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
             {images.map((_, index) => (
               <span
                 key={index}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
+                className={`h-1 sm:h-1.5 rounded-full transition-all duration-300 ${
                   index === currentImage
-                    ? "w-3.5 bg-teal-600 dark:bg-teal-400"
-                    : "w-1.5 bg-slate-300 dark:bg-slate-700"
+                    ? "w-2.5 sm:w-3.5 bg-teal-600 dark:bg-teal-400"
+                    : "w-1 sm:w-1.5 bg-slate-300 dark:bg-slate-700"
                 }`}
               />
             ))}
@@ -174,37 +174,37 @@ function ProductCard({ item }) {
       </div>
 
       {/* Product Details Body */}
-      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+      <div className="p-2.5 sm:p-4 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
         <div className="space-y-1">
           {/* Category & Seller metadata */}
-          <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-            <span className="uppercase tracking-wider truncate max-w-[120px]">
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+            <span className="uppercase tracking-wider truncate max-w-[75px] sm:max-w-[120px]">
               {item.category?.name || "General"}
             </span>
 
             {item.seller?.sellerName && (
-              <span className="inline-flex items-center gap-0.5 text-teal-600 dark:text-teal-400 truncate max-w-[110px]">
-                <StorefrontOutlinedIcon sx={{ fontSize: 12 }} />
+              <span className="inline-flex items-center gap-0.5 text-teal-600 dark:text-teal-400 truncate max-w-[75px] sm:max-w-[110px]">
+                <StorefrontOutlinedIcon sx={{ fontSize: 11 }} />
                 {item.seller.sellerName}
               </span>
             )}
           </div>
 
           {/* Product Title */}
-          <h3 className="font-bold text-sm leading-snug line-clamp-2 text-slate-900 dark:text-slate-100 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+          <h3 className="font-bold text-xs sm:text-sm leading-snug line-clamp-2 text-slate-900 dark:text-slate-100 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors min-h-[30px] sm:min-h-[36px]">
             {item?.title}
           </h3>
         </div>
 
         {/* Rating & Pricing Row */}
-        <div className="space-y-2 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+        <div className="space-y-1.5 sm:space-y-2 pt-1 border-t border-slate-100 dark:border-slate-800/80">
           {/* Star Rating */}
-          <div className="flex items-center gap-1.5 text-xs">
-            <div className="inline-flex items-center gap-0.5 bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded-md border border-amber-200/80 dark:border-amber-800 text-[11px] font-bold">
+          <div className="flex items-center gap-1 sm:gap-1.5 text-xs">
+            <div className="inline-flex items-center gap-0.5 bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 px-1 sm:px-1.5 py-0.5 rounded-md border border-amber-200/80 dark:border-amber-800 text-[10px] sm:text-[11px] font-bold">
               <span>{item.rating || "4.3"}</span>
-              <StarRoundedIcon sx={{ fontSize: 13 }} />
+              <StarRoundedIcon sx={{ fontSize: 12 }} />
             </div>
-            <span className="text-[11px] text-slate-400 dark:text-slate-500">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500">
               ({item.numRatings || 12})
             </span>
           </div>

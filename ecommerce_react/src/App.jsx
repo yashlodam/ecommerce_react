@@ -21,6 +21,7 @@ import PaymentSucess from "./customer/PaymentSucess";
 import OrderSuccess from "./customer/OrderSuccess";
 import SearchPage from "./customer/pages/SearchPage";
 import DealsPage from "./customer/pages/Deals/DealsPage";
+import CategoriesPage from "./customer/pages/Categories/CategoriesPage";
 import Auth from "./customer/pages/Auth/Auth";
 import AiChatWidget from "./customer/components/AiChat/AiChatWidget";
 import CartDrawer from "./customer/components/Cart/CartDrawer";
@@ -46,6 +47,9 @@ function App() {
 
   const isSeller = location.pathname.startsWith("/seller");
   const isAdmin = location.pathname.startsWith("/admin");
+  const isCheckout = location.pathname.startsWith("/checkout") || location.pathname.startsWith("/order-success");
+  const isProductDetails = location.pathname.startsWith("/product-details");
+  const isCart = location.pathname.startsWith("/cart");
 
   // ─── Bootstrap on mount (Silent Refresh via HttpOnly cookie) ─────────────────
   useEffect(() => {
@@ -76,7 +80,7 @@ function App() {
   }, [dispatch]);
 
   return (
-    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 ${!isAdmin && !isSeller ? "pb-16 md:pb-0" : ""}`}>
+    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 ${!isAdmin && !isSeller && !isCheckout && !isProductDetails && !isCart ? "pb-16 md:pb-0" : ""}`}>
         {/* Show the correct navbar based on current section */}
         {isAdmin ? (
           <AdminNavbar />
@@ -98,6 +102,7 @@ function App() {
             element={<ProductDetails />}
           />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/deals" element={<DealsPage />} />
           <Route path="/become-seller" element={<BecomeSeller />} />
           <Route path="/login" element={<Auth />} />
@@ -177,7 +182,7 @@ function App() {
         {!isAdmin && !isSeller && (
           <>
             <CartDrawer />
-            <MobileBottomNav />
+            {!isCheckout && !isProductDetails && !isCart && <MobileBottomNav />}
             <AiChatWidget />
           </>
         )}

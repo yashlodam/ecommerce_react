@@ -8,7 +8,7 @@ const cards = [
     subtitle: "Handcrafted sarees, designer lehengas & artisan zari embroidery",
     category: "women_sarees",
     image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=85",
-    layout: "lg:col-span-4 lg:row-span-2 col-span-1 md:col-span-2 min-h-[300px] lg:min-h-0",
+    layout: "lg:col-span-4 lg:row-span-2 col-span-2 min-h-[200px] sm:min-h-[280px] lg:min-h-0",
     badge: "Featured Edit",
   },
   {
@@ -16,7 +16,7 @@ const cards = [
     subtitle: "Relaxed tailored fits, graphic tees & modern casuals",
     category: "men_topwear",
     image: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=800&q=85",
-    layout: "lg:col-span-4 lg:row-span-1 col-span-1 min-h-[220px] lg:min-h-0",
+    layout: "lg:col-span-4 lg:row-span-1 col-span-1 min-h-[160px] sm:min-h-[200px] lg:min-h-0",
     badge: "Trending",
   },
   {
@@ -24,7 +24,7 @@ const cards = [
     subtitle: "Polished modern silhouettes, chic partywear & western tops",
     category: "women_western_wear",
     image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=85",
-    layout: "lg:col-span-4 lg:row-span-1 col-span-1 min-h-[220px] lg:min-h-0",
+    layout: "lg:col-span-4 lg:row-span-1 col-span-1 min-h-[160px] sm:min-h-[200px] lg:min-h-0",
     badge: "Limited Drop",
   },
   {
@@ -32,7 +32,7 @@ const cards = [
     subtitle: "High-performance running sneakers & premium leather kicks",
     category: "men_footwear",
     image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=85",
-    layout: "lg:col-span-4 lg:row-span-1 col-span-1 min-h-[220px] lg:min-h-0",
+    layout: "lg:col-span-4 lg:row-span-1 col-span-1 min-h-[160px] sm:min-h-[200px] lg:min-h-0",
     badge: "Bestseller",
   },
   {
@@ -40,7 +40,7 @@ const cards = [
     subtitle: "Crisp cotton formal shirts, sharp blazers & executive trousers",
     category: "men_formal_shirts",
     image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=85",
-    layout: "lg:col-span-4 lg:row-span-1 col-span-1 min-h-[220px] lg:min-h-0",
+    layout: "lg:col-span-4 lg:row-span-1 col-span-1 min-h-[160px] sm:min-h-[200px] lg:min-h-0",
     badge: "Editor's Pick",
   },
 ];
@@ -74,7 +74,7 @@ function Grid() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 lg:grid-rows-2 gap-3 sm:gap-4 lg:h-[560px]">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-12 lg:grid-rows-2 gap-2.5 sm:gap-4 lg:h-[560px]">
         {cards.map((card) => (
           <article
             key={card.title}

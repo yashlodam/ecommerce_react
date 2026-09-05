@@ -51,10 +51,25 @@ function ElectricCategory() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 min-[480px]:grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-2.5 sm:gap-4 lg:gap-5">
+      <div className="grid grid-cols-2 min-[480px]:grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-8 gap-2.5 sm:gap-4 lg:gap-5">
         {electricList.map((item, index) => (
           <ElectricCategoryCard key={item.id || index} item={item} />
         ))}
+
+        {/* 8th Symmetrical Action Card for 2-Column Mobile & Desktop Grid */}
+        <button
+          type="button"
+          onClick={() => navigate("/products/electronics")}
+          className="group flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-teal-500/40 hover:border-teal-500 bg-teal-50/40 dark:bg-teal-950/20 p-2.5 sm:p-3.5 shadow-xs transition-all duration-300 hover:scale-[1.02] text-center min-h-[140px]"
+        >
+          <div className="flex aspect-square w-11 h-11 sm:w-13 sm:h-13 items-center justify-center rounded-2xl bg-teal-600 text-white shadow-md group-hover:scale-110 transition-transform">
+            <ArrowRight size={20} />
+          </div>
+          <div>
+            <p className="text-xs sm:text-sm font-bold text-teal-700 dark:text-teal-300">All Tech</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">50+ Devices →</p>
+          </div>
+        </button>
       </div>
     </section>
   );

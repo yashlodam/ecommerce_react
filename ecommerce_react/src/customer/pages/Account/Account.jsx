@@ -50,21 +50,61 @@ function Account() {
   };
 
   return (
-    <div className="min-h-[85vh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-8 px-4 lg:px-12 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 transition-colors">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-            Account Center
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Track active orders, manage saved delivery addresses, and update profile settings.
-          </p>
+    <div className="min-h-[85vh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-4 sm:py-8 px-3 sm:px-6 lg:px-12 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        {/* Header - Responsive */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-4 sm:p-6 lg:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-colors">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-teal-700 to-teal-500 text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+              {user?.fullName?.charAt(0).toUpperCase() || "U"}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                  {user?.fullName || "Account Center"}
+                </h1>
+                <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-400 border border-teal-200 dark:border-teal-800">
+                  Verified Buyer
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {user?.email || "Manage your profile, orders, and addresses"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Horizontal Navigation Strip (< lg) */}
+        <div className="lg:hidden sticky top-16 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md -mx-3 px-3 py-2 border-y border-slate-200/80 dark:border-slate-800 flex items-center gap-2 overflow-x-auto no-scrollbar">
+          {menu.map((item) => {
+            const isActive =
+              item.path === location.pathname ||
+              (item.path === "/account/orders" &&
+                location.pathname.startsWith("/account/order"));
+            const isLogout = item.name === "Logout";
+
+            return (
+              <button
+                key={item.name}
+                onClick={() => handleClick(item)}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 shrink-0 cursor-pointer select-none ${
+                  isActive
+                    ? "bg-teal-600 text-white shadow-xs"
+                    : isLogout
+                    ? "bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                }`}
+              >
+                <span>{item.icon}</span>
+                <span>{item.name}</span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Sidebar */}
-          <section className="lg:col-span-4 xl:col-span-3">
+          {/* Desktop Sidebar (lg and up) */}
+          <section className="hidden lg:block lg:col-span-4 xl:col-span-3">
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden sticky top-24 transition-colors">
               {/* Profile Card Header */}
               <div className="bg-gradient-to-br from-teal-700 via-teal-800 to-slate-900 p-6 text-center text-white">
@@ -127,8 +167,8 @@ function Account() {
           </section>
 
           {/* Content Body */}
-          <section className="lg:col-span-8 xl:col-span-9">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-6 sm:p-8 min-h-[600px] transition-colors">
+          <section className="w-full lg:col-span-8 xl:col-span-9">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-4 sm:p-6 lg:p-8 min-h-[500px] transition-colors">
               <Routes>
                 <Route path="/" element={<UserDetai />} />
                 <Route path="/orders" element={<Order />} />

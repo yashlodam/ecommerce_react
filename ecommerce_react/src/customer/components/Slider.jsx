@@ -17,7 +17,8 @@ const HERO_SLIDES = [
     categoryId: "electronics",
     cta: "Explore Tech Deals",
     image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1600&auto=format&fit=crop",
-    imagePosition: "object-[center_right] sm:object-[75%_center]",
+    imagePosition: "object-center",
+    ambientGlow: "from-teal-500/20 via-cyan-500/10 to-transparent",
   },
   {
     id: 2,
@@ -28,7 +29,8 @@ const HERO_SLIDES = [
     categoryId: "women",
     cta: "Shop Women's Fashion",
     image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop",
-    imagePosition: "object-[center_top] sm:object-[80%_center]",
+    imagePosition: "object-[center_25%]",
+    ambientGlow: "from-pink-500/20 via-rose-500/10 to-transparent",
   },
   {
     id: 3,
@@ -39,7 +41,8 @@ const HERO_SLIDES = [
     categoryId: "men",
     cta: "Shop Men's Collection",
     image: "https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1600&auto=format&fit=crop",
-    imagePosition: "object-[center_top] sm:object-[75%_center]",
+    imagePosition: "object-[center_20%]",
+    ambientGlow: "from-blue-500/20 via-indigo-500/10 to-transparent",
   },
   {
     id: 4,
@@ -50,7 +53,8 @@ const HERO_SLIDES = [
     categoryId: "smart_watches",
     cta: "Explore Smartwatches",
     image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?q=80&w=1600&auto=format&fit=crop",
-    imagePosition: "object-[center_right] sm:object-[80%_center]",
+    imagePosition: "object-center",
+    ambientGlow: "from-cyan-500/20 via-teal-500/10 to-transparent",
   },
 ];
 
@@ -153,11 +157,12 @@ function Slider() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className="relative w-full overflow-hidden rounded-[24px] sm:rounded-[36px] bg-slate-950 border border-slate-200/80 dark:border-slate-800 shadow-xl select-none min-h-[420px] min-[375px]:min-h-[450px] sm:min-h-[490px] md:min-h-[520px] lg:min-h-[560px] flex items-center transition-all duration-300 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
+      className="relative w-full overflow-hidden rounded-[24px] sm:rounded-[36px] bg-slate-950 border border-slate-200/80 dark:border-slate-800 shadow-xl select-none min-h-[350px] min-[375px]:min-h-[380px] sm:min-h-[440px] md:min-h-[480px] lg:min-h-[520px] flex items-center transition-all duration-300 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
     >
       {/* ============================================================
-          LAYER 1: BACKGROUND PHOTOGRAPHY (VIBRANT & FULLY CLICKABLE)
-          Entire active slide image surface triggers navigation
+          LAYER 1: BACKGROUND PHOTOGRAPHY (DESKTOP SPLIT + MOBILE FULL)
+          Desktop (>= md): Right-anchored stage, 100% bright, crisp & clear
+          Mobile (< md): Full-bleed with bottom-up legibility gradient
           ============================================================ */}
       {HERO_SLIDES.map((slide, idx) => {
         const isActive = idx === current;
@@ -171,34 +176,47 @@ function Slider() {
               isActive ? "opacity-100 z-10 pointer-events-auto" : "opacity-0 z-0 pointer-events-none"
             }`}
           >
-            <img
-              src={slide.image}
-              alt={slide.title}
-              loading={idx === 0 ? "eager" : "lazy"}
-              className={`w-full h-full object-cover ${slide.imagePosition} transform transition-transform duration-6000 ease-out ${
-                isActive ? "scale-105" : "scale-100"
-              }`}
+            {/* Desktop Image Stage (>= md): Right-anchored, 100% bright, visible & sharp */}
+            <div className="hidden md:block absolute right-0 top-0 bottom-0 w-[54%] lg:w-[52%] xl:w-[50%] h-full overflow-hidden">
+              <img
+                src={slide.image}
+                alt={slide.title}
+                loading={idx === 0 ? "eager" : "lazy"}
+                className={`w-full h-full object-cover ${slide.imagePosition} transition-transform duration-7000 ease-out ${
+                  isActive ? "scale-105" : "scale-100"
+                }`}
+              />
+              {/* Left feather fade ONLY on the boundary edge to blend with dark left stage */}
+              <div className="absolute inset-y-0 left-0 w-24 lg:w-36 bg-gradient-to-r from-slate-950 via-slate-950/60 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/40 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-slate-950/30 to-transparent pointer-events-none" />
+            </div>
+
+            {/* Mobile Image Stage (< md): Full bleed with bottom-up legibility gradient */}
+            <div className="md:hidden absolute inset-0">
+              <img
+                src={slide.image}
+                alt={slide.title}
+                loading={idx === 0 ? "eager" : "lazy"}
+                className={`w-full h-full object-cover ${slide.imagePosition} transition-transform duration-7000 ease-out ${
+                  isActive ? "scale-105" : "scale-100"
+                }`}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-transparent" />
+            </div>
+
+            {/* Ambient Lighting on Left Side */}
+            <div
+              className={`hidden md:block absolute -top-24 -left-24 w-[500px] h-[500px] bg-gradient-to-br ${slide.ambientGlow} blur-3xl pointer-events-none opacity-75`}
             />
-
-            {/* ============================================================
-                LAYER 2: SMART DIRECTIONAL GRADIENT OVERLAY
-                Mobile (<640px): Soft bottom-up gradient keeping top imagery crisp & clear while maintaining high-contrast readable text.
-                Tablet/Desktop (>=640px): Directional left-to-right gradient keeping hero product fully visible on the right.
-                ============================================================ */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(10,15,29,0.92)_0%,rgba(10,15,29,0.72)_48%,rgba(10,15,29,0.20)_75%,transparent_100%)] sm:bg-[linear-gradient(90deg,rgba(10,15,29,0.92)_0%,rgba(10,15,29,0.78)_42%,rgba(10,15,29,0.30)_72%,transparent_100%)]" />
-
-            {/* Subtle bottom vignette to ensure indicator contrast */}
-            <div className="absolute inset-x-0 bottom-0 h-20 sm:h-24 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
           </div>
         );
       })}
 
       {/* ============================================================
-          LAYER 3: CONTENT LAYER (SAFE-AREA INSET & STABLE TYPOGRAPHY)
-          Outer container passes pointer events through so clicking anywhere
-          outside the text box directly interacts with Layer 1 (the image).
+          LAYER 2: CONTENT LAYER (LEFT 48% ON DESKTOP, NEVER CLASHES WITH IMAGE)
           ============================================================ */}
-      <div className="relative z-20 w-full max-w-[1540px] mx-auto px-11 min-[375px]:px-12 sm:px-18 md:px-24 lg:px-28 py-10 sm:py-14 md:py-16 flex flex-col justify-center pointer-events-none">
+      <div className="relative z-20 w-full max-w-[1540px] mx-auto px-6 sm:px-12 md:px-14 lg:px-20 py-6 sm:py-10 md:py-14 flex flex-col justify-center pointer-events-none">
         {HERO_SLIDES.map((slide, idx) => {
           const isActive = idx === current;
           if (!isActive) return null;
@@ -210,7 +228,7 @@ function Slider() {
                 e.stopPropagation();
                 handleSlideClick(slide);
               }}
-              className="max-w-xl sm:max-w-2xl space-y-3 sm:space-y-4 md:space-y-5 animate-fade-in cursor-pointer group pointer-events-auto"
+              className="max-w-xl md:max-w-[46%] lg:max-w-[45%] space-y-2.5 sm:space-y-4 md:space-y-4.5 animate-fade-in cursor-pointer group pointer-events-auto"
             >
               {/* Category Badge Tag */}
               <div
@@ -222,18 +240,18 @@ function Slider() {
 
               {/* Main Heading */}
               <h2
-                className="text-[clamp(1.25rem,4.2vw+0.25rem,2.75rem)] font-extrabold text-white tracking-tight leading-[1.18] sm:leading-[1.14] group-hover:text-teal-200 transition-colors"
+                className="text-[clamp(1.25rem,3.2vw+0.2rem,2.6rem)] font-extrabold text-white tracking-tight leading-[1.2] sm:leading-[1.15] group-hover:text-teal-200 transition-colors"
               >
                 {slide.title}
               </h2>
 
               {/* Subtitle Description */}
-              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-200/90 font-normal leading-relaxed line-clamp-2 sm:line-clamp-3 max-w-lg">
+              <p className="text-xs sm:text-sm md:text-base text-slate-200/90 font-normal leading-relaxed line-clamp-2 sm:line-clamp-3">
                 {slide.subtitle}
               </p>
 
               {/* Promotion Pill & Action CTAs */}
-              <div className="pt-1.5 sm:pt-3 flex flex-wrap items-center gap-2 sm:gap-3.5">
+              <div className="pt-1 sm:pt-2.5 flex flex-wrap items-center gap-2 sm:gap-3.5">
                 <span className="inline-flex items-center gap-1 bg-amber-400 text-slate-950 text-[11px] sm:text-xs md:text-sm font-extrabold px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full shadow-md shrink-0">
                   <LocalFireDepartmentIcon sx={{ fontSize: { xs: 14, sm: 16 } }} />
                   {slide.discountText}
@@ -279,18 +297,18 @@ function Slider() {
         type="button"
         onClick={prevSlide}
         aria-label="Previous promotional slide"
-        className="absolute left-1.5 min-[375px]:left-2 sm:left-4 md:left-6 lg:left-7 top-1/2 -translate-y-1/2 z-30 w-8 h-8 min-[375px]:w-9 min-[375px]:h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-slate-950/50 hover:bg-slate-950/85 text-white backdrop-blur-md border border-white/20 shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
+        className="flex absolute left-2 sm:left-4 md:left-6 lg:left-7 top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-slate-950/60 hover:bg-slate-950/90 text-white backdrop-blur-md border border-white/25 shadow-lg items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
       >
-        <ChevronLeftIcon sx={{ fontSize: { xs: 18, sm: 24, md: 28 } }} />
+        <ChevronLeftIcon sx={{ fontSize: { xs: 20, sm: 24, md: 28 } }} />
       </button>
 
       <button
         type="button"
         onClick={nextSlide}
         aria-label="Next promotional slide"
-        className="absolute right-1.5 min-[375px]:right-2 sm:right-4 md:right-6 lg:right-7 top-1/2 -translate-y-1/2 z-30 w-8 h-8 min-[375px]:w-9 min-[375px]:h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-slate-950/50 hover:bg-slate-950/85 text-white backdrop-blur-md border border-white/20 shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
+        className="flex absolute right-2 sm:right-4 md:right-6 lg:right-7 top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-slate-950/60 hover:bg-slate-950/90 text-white backdrop-blur-md border border-white/25 shadow-lg items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
       >
-        <ChevronRightIcon sx={{ fontSize: { xs: 18, sm: 24, md: 28 } }} />
+        <ChevronRightIcon sx={{ fontSize: { xs: 20, sm: 24, md: 28 } }} />
       </button>
 
       {/* ============================================================

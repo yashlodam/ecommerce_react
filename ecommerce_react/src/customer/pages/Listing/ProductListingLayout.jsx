@@ -223,10 +223,10 @@ export default function ProductListingLayout({
             ) : (
               <>
                 <div
-                  className={`grid gap-3.5 sm:gap-4 transition-all duration-300 ${
+                  className={`grid gap-2.5 sm:gap-4 transition-all duration-300 ${
                     showDesktopFilters
-                      ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
-                      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+                      ? "grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+                      : "grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
                   }`}
                 >
                   {products.map((item) => (

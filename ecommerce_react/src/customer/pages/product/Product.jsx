@@ -180,6 +180,31 @@ const categoryMetaMap = {
     subtitle: "Premium skincare, hair treatments, organic fragrances and everyday grooming essentials.",
     badge: "Beauty & Wellness",
   },
+  beauty_makeup: {
+    title: "Makeup & Cosmetics",
+    subtitle: "Flawless foundations, lipsticks, eyeliners, and makeup essentials for every occasion.",
+    badge: "Cosmetics",
+  },
+  beauty_skincare: {
+    title: "Skincare & Sun Protection",
+    subtitle: "Hydrating moisturizers, vitamin serums, nourishing face masks, and sunscreen.",
+    badge: "Skincare",
+  },
+  beauty_haircare: {
+    title: "Haircare & Treatment",
+    subtitle: "Strengthening shampoos, deep conditioners, herbal hair oils, and serums.",
+    badge: "Haircare",
+  },
+  beauty_fragrances: {
+    title: "Perfumes & Luxury Fragrances",
+    subtitle: "Captivating eau de parfums, daily body mists, and luxury scents for men and women.",
+    badge: "Fragrances",
+  },
+  beauty_personal_care: {
+    title: "Personal Care & Hygiene",
+    subtitle: "Refreshing body washes, gentle soaps, hand washes, and daily hygiene essentials.",
+    badge: "Personal Care",
+  },
   women_beauty_personal_care: {
     title: "Beauty & Skincare",
     subtitle: "Dermatologist-tested skincare, essential hair oils, organic wellness serums, and luxury fragrances.",

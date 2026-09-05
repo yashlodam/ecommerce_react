@@ -1,4 +1,5 @@
 import React from "react";
+import QuickCategoryBar from "./QuickCategoryBar";
 import Slider from "../../components/Slider";
 import TrustBar from "./TrustBar";
 import ElectricCategory from "./ElectricCategory/ElectricCategory";
@@ -17,7 +18,10 @@ import Footer from "./Footer";
 function Home() {
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 overflow-x-hidden">
-      <div className="max-w-[1600px] mx-auto px-2.5 min-[375px]:px-4 sm:px-6 lg:px-8 py-3.5 sm:py-6 lg:py-8 space-y-6 sm:space-y-10 lg:space-y-14">
+      <div className="max-w-[1600px] mx-auto px-2.5 min-[375px]:px-4 sm:px-6 lg:px-8 py-3.5 sm:py-6 lg:py-8 space-y-5 sm:space-y-10 lg:space-y-14">
+        {/* 0. Mobile Quick Categories Rail (Flipkart / Myntra Style) */}
+        <QuickCategoryBar />
+
         {/* 1. Hero Carousel */}
         <section aria-label="Hero promotions">
           <Slider />

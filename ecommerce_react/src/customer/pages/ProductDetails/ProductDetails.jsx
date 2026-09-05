@@ -21,6 +21,8 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import StorefrontIcon from "@mui/icons-material/Storefront";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 import { useParams, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
@@ -264,7 +266,7 @@ function ProductDetails() {
   const categoryName = currentProduct.category?.name || "Catalog";
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 pb-24 md:pb-8">
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 space-y-8">
         {/* Breadcrumb Navigation */}
         <Breadcrumbs
@@ -320,7 +322,39 @@ function ProductDetails() {
             )}
 
             {/* Main Image Frame */}
-            <div className="flex-1 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 p-4 flex items-center justify-center min-h-[380px] sm:min-h-[500px] shadow-sm transition-colors">
+            <div className="relative flex-1 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 p-4 flex items-center justify-center min-h-[300px] sm:min-h-[500px] shadow-sm transition-colors group/image">
+              {images.length > 1 && (
+                <>
+                  <span className="sm:hidden absolute bottom-3 right-3 bg-slate-900/75 backdrop-blur-sm text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full z-10">
+                    {activeImage + 1} / {images.length}
+                  </span>
+
+                  {/* Image Navigation Arrows */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveImage((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+                    }}
+                    aria-label="Previous product image"
+                    className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/80 dark:border-slate-700 flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95"
+                  >
+                    <ChevronLeftIcon sx={{ fontSize: { xs: 18, sm: 22 } }} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveImage((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+                    }}
+                    aria-label="Next product image"
+                    className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/80 dark:border-slate-700 flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95"
+                  >
+                    <ChevronRightIcon sx={{ fontSize: { xs: 18, sm: 22 } }} />
+                  </button>
+                </>
+              )}
               <img
                 src={images[activeImage] || images[0] || "https://placehold.co/600x600?text=Product"}
                 alt={currentProduct.title}
@@ -633,6 +667,68 @@ function ProductDetails() {
           </h2>
           <SimilarProduct />
         </div>
+      </div>
+
+      {/* Mobile Sticky Bottom Action Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <button
+          onClick={handleWishlist}
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all shrink-0 active:scale-95 cursor-pointer ${
+            isWishlisted
+              ? "bg-rose-50 border-rose-200 text-rose-600 dark:bg-rose-950/40 dark:border-rose-900"
+              : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50"
+          }`}
+        >
+          {isWishlisted ? (
+            <FavoriteIcon sx={{ fontSize: 20, color: "#e11d48" }} />
+          ) : (
+            <FavoriteBorderIcon sx={{ fontSize: 20 }} />
+          )}
+        </button>
+
+        <div className="flex flex-col min-w-0 pr-1">
+          <span className="text-[10px] text-slate-400 font-medium line-through leading-none">
+            {dealPricing?.hasActiveDeal
+              ? formatINR(dealPricing.originalPrice)
+              : displayMrpPrice > displaySellingPrice
+              ? formatINR(displayMrpPrice)
+              : null}
+          </span>
+          <span className="text-base font-black text-slate-900 dark:text-slate-100 leading-tight">
+            {dealPricing?.hasActiveDeal
+              ? formatINR(dealPricing.dealPrice)
+              : formatINR(displaySellingPrice)}
+          </span>
+        </div>
+
+        <Button
+          variant="contained"
+          color="primary"
+          disabled={!isInStock || displayStock <= 0 || addingToCart}
+          onClick={handleAddToCart}
+          startIcon={
+            addingToCart ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <AddShoppingCartIcon fontSize="small" />
+            )
+          }
+          sx={{
+            flex: 1,
+            py: 1.2,
+            borderRadius: "14px",
+            textTransform: "none",
+            fontWeight: 700,
+            fontSize: "0.875rem",
+          }}
+        >
+          {addingToCart
+            ? "Adding..."
+            : !isInStock || displayStock <= 0
+            ? "Out of Stock"
+            : "Add to Bag"}
+        </Button>
       </div>
 
       <Snackbar

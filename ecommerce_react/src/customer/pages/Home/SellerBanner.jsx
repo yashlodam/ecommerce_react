@@ -11,20 +11,20 @@ function SellerBanner() {
   const navigate = useNavigate();
 
   return (
-    <section className="overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 border border-teal-800/40 p-6 sm:p-8 md:p-10 shadow-xl text-white transition-colors relative">
+    <section className="overflow-hidden rounded-[24px] sm:rounded-[32px] bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 border border-teal-800/40 p-4 sm:p-8 md:p-10 shadow-xl text-white transition-colors relative">
       {/* Ambient Decorative Glows */}
       <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-teal-500/15 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-blue-500/15 blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
         {/* Left Hero Text */}
-        <div className="lg:col-span-7 space-y-4 text-white">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-500/15 border border-teal-400/30 text-teal-300 text-xs sm:text-sm font-bold tracking-wide">
+        <div className="lg:col-span-7 space-y-3.5 sm:space-y-4 text-white">
+          <div className="inline-flex items-center gap-2 px-3 py-0.5 sm:py-1 rounded-full bg-teal-500/15 border border-teal-400/30 text-teal-300 text-xs sm:text-sm font-bold tracking-wide">
             <StorefrontIcon sx={{ fontSize: 16 }} />
             <span>Multi-Vendor Partner Program</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
+          <h2 className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
             Grow Your Business with India's Premier Marketplace
           </h2>
 

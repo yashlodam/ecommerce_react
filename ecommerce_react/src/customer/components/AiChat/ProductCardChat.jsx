@@ -1,9 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, Star } from 'lucide-react';
+import { useAppDispatch } from '../../../State/Store';
+import { closeChat } from '../../../State/customer/ChatSlice';
 
 export default function ProductCardChat({ product }) {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   if (!product) return null;
 
@@ -17,6 +20,7 @@ export default function ProductCardChat({ product }) {
     'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=300&q=80';
 
   const handleView = () => {
+    dispatch(closeChat());
     const categoryId = product.categoryName || 'all';
     navigate(`/product-details/${encodeURIComponent(categoryId)}/${product.id}`);
   };
@@ -33,15 +37,15 @@ export default function ProductCardChat({ product }) {
         }
       }}
       aria-label={`View details for ${product.title}`}
-      className="group relative flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs hover:shadow-md hover:border-teal-500/60 dark:hover:border-teal-500/60 transition-all duration-200 cursor-pointer w-[230px] sm:w-[250px] text-left shrink-0 focus:outline-none focus:ring-2 focus:ring-teal-500"
+      className="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden shadow-xs hover:shadow-lg hover:border-teal-500/60 dark:hover:border-teal-500/60 transition-all duration-200 cursor-pointer w-[205px] min-[375px]:w-[220px] sm:w-[245px] text-left shrink-0 snap-start focus:outline-none focus:ring-2 focus:ring-teal-500"
     >
       {/* Thumbnail Stage */}
-      <div className="relative w-full h-32 bg-slate-100 dark:bg-slate-800 overflow-hidden">
+      <div className="relative w-full h-28 min-[375px]:h-32 bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-2 overflow-hidden border-b border-slate-100 dark:border-slate-800">
         <img
           src={imageUrl}
           alt={product.title}
           loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
             e.target.src =
               'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=300&q=80';

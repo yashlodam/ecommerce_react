@@ -57,12 +57,12 @@ function BrandInSpotlight() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
         {brands.map((brand, index) => (
           <div
             key={index}
             onClick={() => navigate(`/search?q=${encodeURIComponent(brand.query)}`)}
-            className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-sm transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl cursor-pointer"
+            className="group relative aspect-[3/4] sm:aspect-[4/5] overflow-hidden rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-sm transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl cursor-pointer"
           >
             <img
               src={brand.image}
@@ -73,19 +73,19 @@ function BrandInSpotlight() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
 
-            <div className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur text-slate-900 dark:text-slate-100 text-[11px] font-extrabold px-3 py-1 rounded-full shadow-sm">
+            <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur text-slate-900 dark:text-slate-100 text-[10px] sm:text-[11px] font-extrabold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">
               {brand.discount}
             </div>
 
-            <div className="absolute bottom-4 left-4 right-4 text-white flex items-end justify-between">
-              <div>
-                <h3 className="text-xl font-extrabold tracking-tight">
+            <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 text-white flex items-end justify-between">
+              <div className="min-w-0 flex-1 mr-2">
+                <h3 className="text-base sm:text-xl font-extrabold tracking-tight truncate">
                   {brand.name}
                 </h3>
-                <p className="text-xs text-slate-300 mt-0.5">{brand.tagline}</p>
+                <p className="text-[10px] sm:text-xs text-slate-300 mt-0.5 line-clamp-1">{brand.tagline}</p>
               </div>
-              <div className="w-8 h-8 rounded-full bg-teal-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-md">
-                <ArrowForwardRoundedIcon sx={{ fontSize: 16 }} />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-teal-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-md shrink-0">
+                <ArrowForwardRoundedIcon sx={{ fontSize: { xs: 14, sm: 16 } }} />
               </div>
             </div>
           </div>

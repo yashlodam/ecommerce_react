@@ -65,7 +65,7 @@ function FeaturedCollections() {
           <div
             onClick={() => handleClick(item.category)}
             key={index}
-            className={`group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-900 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl sm:aspect-[16/10] md:aspect-[16/10] lg:aspect-[4/3] ${item.span}`}
+            className={`group relative aspect-[16/10] cursor-pointer overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-900 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl sm:aspect-[16/10] md:aspect-[16/10] lg:aspect-[4/3] ${item.span}`}
           >
             <img
               src={item.image}
@@ -76,11 +76,11 @@ function FeaturedCollections() {
 
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent transition-opacity duration-300 group-hover:from-slate-950/95" />
 
-            <div className="absolute inset-0 flex flex-col justify-end p-5 text-white sm:p-6">
+            <div className="absolute inset-0 flex flex-col justify-end p-4 text-white sm:p-6">
               <h3 className="text-base sm:text-lg lg:text-xl font-bold leading-tight">
                 {item.title}
               </h3>
-              <p className="mt-1 mb-3 text-xs text-slate-300 line-clamp-1">
+              <p className="mt-1 mb-2.5 sm:mb-3 text-xs text-slate-300 line-clamp-1">
                 {item.subtitle}
               </p>
 

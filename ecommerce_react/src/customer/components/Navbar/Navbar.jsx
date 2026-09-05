@@ -36,8 +36,17 @@ import { fetchUserProfile, logout } from "../../../State/AuthSlice";
 import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
 import { fetchUserCart, openCartDrawer } from "../../../State/customer/CartSlice";
 import { searchProduct } from "../../../State/customer/ProductSlice";
+import { openChat } from "../../../State/customer/chatSlice";
 
 const ACCENT = "#00927c";
+
+const CATEGORY_ICONS = {
+  men: "👔",
+  women: "👗",
+  electronics: "⚡",
+  home_furniture: "🏡",
+  beauty: "💄",
+};
 
 function Navbar() {
   const theme = useTheme();
@@ -51,6 +60,7 @@ function Navbar() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showCategorySheet, setShowCategorySheet] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState(null);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -260,24 +270,104 @@ function Navbar() {
                     label="🔥 Deals & Promotions"
                     onClick={() => { navigate("/deals"); closeDrawer(); }}
                   />
+                  <DrawerRow
+                    icon={<span className="text-base">✨</span>}
+                    label="ShopSphere AI Assistant"
+                    onClick={() => {
+                      closeDrawer();
+                      dispatch(openChat());
+                    }}
+                  />
                 </>
               )}
             </div>
 
-            <p className="px-5 pb-1 pt-4 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">
+            <div className="px-3 pt-3 pb-1">
+              <button
+                type="button"
+                onClick={() => {
+                  navigate("/categories");
+                  closeDrawer();
+                }}
+                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-teal-500/10 via-teal-500/15 to-emerald-500/10 border border-teal-500/30 text-teal-700 dark:text-teal-300 font-bold text-xs cursor-pointer hover:bg-teal-500/20 transition-all shadow-xs"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="text-base">🧭</span>
+                  <span>Explore All Categories Grid</span>
+                </span>
+                <ChevronRightIcon fontSize="small" />
+              </button>
+            </div>
+
+            <p className="px-5 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">
               Browse Categories
             </p>
             <div className="pb-2">
-              {mainCategory.map((item) => (
-                <DrawerRow
-                  key={item.categoryId}
-                  label={item.name}
-                  onClick={() => {
-                    navigate(`/products/${item.categoryId}`);
-                    closeDrawer();
-                  }}
-                />
-              ))}
+              {mainCategory.map((item) => {
+                const isExpanded = expandedCategory === item.categoryId;
+                const emoji = CATEGORY_ICONS[item.categoryId] || "🛍️";
+                const subcategories = item.levelTwoCategory || [];
+
+                return (
+                  <div key={item.categoryId} className="border-b border-slate-100 dark:border-slate-800/60 last:border-b-0">
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setExpandedCategory(isExpanded ? null : item.categoryId)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setExpandedCategory(isExpanded ? null : item.categoryId);
+                        }
+                      }}
+                      className={`flex min-h-[44px] cursor-pointer items-center justify-between gap-3 px-5 py-2.5 transition-colors select-none ${
+                        isExpanded
+                          ? "bg-slate-50 dark:bg-slate-800 text-teal-600 dark:text-teal-400 font-bold"
+                          : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5 text-sm font-semibold">
+                        <span className="text-base">{emoji}</span>
+                        <span>{item.name}</span>
+                      </span>
+                      <span className={`text-slate-400 transition-transform duration-200 ${isExpanded ? "rotate-90 text-teal-600" : ""}`}>
+                        <ChevronRightIcon fontSize="small" />
+                      </span>
+                    </div>
+
+                    <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                      <div className="bg-slate-50/70 dark:bg-slate-900/60 px-4 py-2 space-y-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigate(`/products/${item.categoryId}`);
+                            closeDrawer();
+                          }}
+                          className="w-full text-left py-1.5 px-3 rounded-lg text-xs font-bold text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/40 transition-colors flex items-center justify-between cursor-pointer"
+                        >
+                          <span>Explore All {item.name}</span>
+                          <span>→</span>
+                        </button>
+
+                        {subcategories.map((sub) => (
+                          <button
+                            key={sub.categoryId}
+                            type="button"
+                            onClick={() => {
+                              navigate(`/products/${sub.categoryId}`);
+                              closeDrawer();
+                            }}
+                            className="group w-full text-left py-2 px-3 rounded-lg text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-800 transition-colors flex items-center justify-between cursor-pointer"
+                          >
+                            <span>{sub.name}</span>
+                            <ChevronRightIcon sx={{ fontSize: 16 }} className="text-slate-400 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all" />
+                          </button>
+                        ))}
+                      </div>
+                    </Collapse>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -508,6 +598,7 @@ function Navbar() {
                   onClick={() => dispatch(openCartDrawer())}
                   aria-label="Shopping Cart"
                   sx={{
+                    display: { xs: "none", md: "inline-flex" },
                     width: { xs: 40, sm: 44 },
                     height: { xs: 40, sm: 44 },
                     minWidth: { xs: 40, sm: 44 },
@@ -864,13 +955,13 @@ function DrawerRow({ icon, label, onClick }) {
           onClick();
         }
       }}
-      className="flex min-h-[44px] cursor-pointer items-center justify-between gap-3 px-5 py-2.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-300 focus-visible:outline-none focus-visible:bg-slate-100 dark:focus-visible:bg-slate-800 select-none"
+      className="group flex min-h-[44px] cursor-pointer items-center justify-between gap-3 px-5 py-2.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/70 active:bg-slate-100 dark:active:bg-slate-800 text-slate-700 dark:text-slate-300 focus-visible:outline-none focus-visible:bg-slate-100 dark:focus-visible:bg-slate-800 select-none"
     >
-      <span className="flex items-center gap-3 text-sm font-semibold">
-        {icon && <span className="flex text-slate-400 dark:text-slate-500">{icon}</span>}
+      <span className="flex items-center gap-3 text-sm font-semibold group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+        {icon && <span className="flex text-slate-400 dark:text-slate-500 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{icon}</span>}
         {label}
       </span>
-      <ChevronRightIcon fontSize="small" className="text-slate-400 dark:text-slate-600" />
+      <ChevronRightIcon fontSize="small" className="text-slate-400 dark:text-slate-600 group-hover:text-teal-600 dark:group-hover:text-teal-400 group-hover:translate-x-0.5 transition-all" />
     </div>
   );
 }

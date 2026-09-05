@@ -6,6 +6,7 @@ import EmptyState from "../../../common/EmptyState";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
 
 function Order() {
   const dispatch = useAppDispatch();
@@ -21,6 +22,12 @@ function Order() {
 
   return (
     <div className="max-w-4xl space-y-6">
+      {order?.error && (
+        <Alert severity="error" className="rounded-2xl">
+          {order.error}
+        </Alert>
+      )}
+
       {/* Header Card */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200/80 dark:border-slate-800">
         <div>

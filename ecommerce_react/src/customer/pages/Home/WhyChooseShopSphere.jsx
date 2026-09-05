@@ -39,22 +39,22 @@ function WhyChooseShopSphere() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
         {features.map((feature, index) => (
           <div
             key={index}
-            className="group rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-teal-500/60 dark:hover:border-teal-500/60 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md"
+            className="group rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-3 sm:p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-teal-500/60 dark:hover:border-teal-500/60 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md"
           >
-            <div className="mb-3.5 flex justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 dark:bg-teal-950/60 border border-teal-100 dark:border-teal-800/80 text-teal-600 dark:text-teal-400 transition-all duration-300 group-hover:bg-teal-600 group-hover:text-white">
+            <div className="mb-2.5 sm:mb-3.5 flex justify-center">
+              <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-teal-50 dark:bg-teal-950/60 border border-teal-100 dark:border-teal-800/80 text-teal-600 dark:text-teal-400 transition-all duration-300 group-hover:bg-teal-600 group-hover:text-white">
                 {feature.icon}
               </div>
             </div>
 
-            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+            <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
               {feature.title}
             </h3>
-            <p className="mt-1.5 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+            <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-slate-500 dark:text-slate-400 line-clamp-2 sm:line-clamp-none">
               {feature.description}
             </p>
           </div>

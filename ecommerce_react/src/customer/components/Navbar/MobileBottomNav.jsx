@@ -10,7 +10,7 @@ import {
 import Badge from "@mui/material/Badge";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { openCartDrawer } from "../../../State/customer/CartSlice";
-import { openChat } from "../../../State/customer/ChatSlice";
+import { toggleChat } from "../../../State/customer/ChatSlice";
 
 export default function MobileBottomNav() {
   const location = useLocation();
@@ -24,6 +24,7 @@ export default function MobileBottomNav() {
   const wishlist = useAppSelector((state) => state.wishlist?.wishlist);
   const wishlistCount =
     wishlist?.products?.length ?? wishlist?.items?.length ?? 0;
+  const isChatOpen = useAppSelector((state) => state.chat?.isOpen);
 
   const currentPath = location.pathname;
 
@@ -39,15 +40,16 @@ export default function MobileBottomNav() {
       id: "categories",
       label: "Categories",
       icon: LayoutGrid,
-      isActive: currentPath.startsWith("/products"),
-      onClick: () => navigate("/products/all"),
+      isActive: currentPath === "/categories" || currentPath.startsWith("/products"),
+      onClick: () => navigate("/categories"),
     },
     {
       id: "ai-assistant",
-      label: "AI Stylist",
+      label: "ShopSphere AI",
       icon: Sparkles,
       isSpecial: true,
-      onClick: () => dispatch(openChat()),
+      isActive: Boolean(isChatOpen),
+      onClick: () => dispatch(toggleChat()),
     },
     {
       id: "wishlist",
@@ -78,17 +80,31 @@ export default function MobileBottomNav() {
           const Icon = item.icon;
 
           if (item.isSpecial) {
+            const isChatActive = item.isActive;
             return (
               <button
                 key={item.id}
                 onClick={item.onClick}
-                className="flex flex-col items-center justify-center -mt-4 relative group"
-                aria-label="Open AI Shopping Assistant"
+                className="flex flex-col items-center justify-center -mt-5 relative group cursor-pointer"
+                aria-label="Toggle ShopSphere AI Assistant"
+                aria-expanded={isChatActive}
               >
-                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 group-active:scale-95 transition-transform">
-                  <Icon className="w-6 h-6 animate-pulse" />
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg transition-all duration-300 group-active:scale-95 ${
+                    isChatActive
+                      ? "bg-gradient-to-tr from-emerald-500 to-teal-600 shadow-teal-500/40 ring-4 ring-teal-100 dark:ring-teal-950 scale-105"
+                      : "bg-gradient-to-tr from-teal-600 via-teal-500 to-emerald-500 shadow-teal-500/30 hover:scale-105"
+                  }`}
+                >
+                  <Icon className={`w-6 h-6 ${isChatActive ? "rotate-12" : "animate-pulse"}`} />
                 </div>
-                <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">
+                <span
+                  className={`text-[10px] font-bold mt-0.5 tracking-tight ${
+                    isChatActive
+                      ? "text-teal-600 dark:text-teal-400"
+                      : "text-slate-700 dark:text-slate-300"
+                  }`}
+                >
                   {item.label}
                 </span>
               </button>
@@ -101,7 +117,7 @@ export default function MobileBottomNav() {
               onClick={item.onClick}
               className={`flex-1 flex flex-col items-center justify-center py-1 relative transition-colors ${
                 item.isActive
-                  ? "text-indigo-600 dark:text-indigo-400 font-semibold"
+                  ? "text-teal-600 dark:text-teal-400 font-bold"
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
               }`}
             >

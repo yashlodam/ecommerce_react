@@ -52,14 +52,14 @@ function TopRatedProducts() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {products.map((product, index) => (
           <div
             key={index}
             onClick={() => navigate(`/products/${product.category}`)}
             className="group cursor-pointer overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-teal-500/60 dark:hover:border-teal-500/60 flex flex-col justify-between"
           >
-            <div className="bg-white dark:bg-slate-950 p-4 flex items-center justify-center border-b border-slate-100 dark:border-slate-800">
+            <div className="bg-white dark:bg-slate-950 p-2.5 sm:p-4 flex items-center justify-center border-b border-slate-100 dark:border-slate-800">
               <img
                 src={product.image}
                 alt={product.title}
@@ -68,21 +68,21 @@ function TopRatedProducts() {
                     e.target.src = product.fallbackImage;
                   }
                 }}
-                className="h-40 w-full object-contain transition-transform duration-500 group-hover:scale-110"
+                className="h-28 sm:h-40 w-full object-contain transition-transform duration-500 group-hover:scale-110"
                 loading="lazy"
               />
             </div>
 
-            <div className="p-4 space-y-2">
-              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+            <div className="p-2.5 sm:p-4 space-y-1.5 sm:space-y-2">
+              <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-1 sm:line-clamp-2">
                 {product.title}
               </h3>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 border border-amber-200 dark:border-amber-800 text-xs font-bold text-amber-700 dark:text-amber-300">
-                  <Star size={13} className="fill-amber-400 text-amber-400" />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="flex items-center gap-0.5 sm:gap-1 rounded-full bg-amber-50 dark:bg-amber-950/50 px-1.5 sm:px-2 py-0.5 border border-amber-200 dark:border-amber-800 text-[10px] sm:text-xs font-bold text-amber-700 dark:text-amber-300">
+                  <Star size={12} className="fill-amber-400 text-amber-400" />
                   <span>{product.rating}</span>
                 </div>
-                <span className="text-[11px] text-slate-400 font-semibold">Verified Rating</span>
+                <span className="hidden sm:inline text-[11px] text-slate-400 font-semibold">Verified Rating</span>
               </div>
             </div>
           </div>

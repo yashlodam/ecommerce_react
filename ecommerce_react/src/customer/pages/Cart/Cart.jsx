@@ -13,6 +13,14 @@ import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { fetchUserCart } from "../../../State/customer/CartSlice";
 import { applyCoupon } from "../../../State/customer/CouponSlice";
 
+function formatINR(val) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(val || 0);
+}
+
 function Cart() {
   const [couponCode, setCouponCode] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
@@ -60,7 +68,7 @@ function Cart() {
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8 min-h-[80vh]">
+    <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-12 py-4 sm:py-8 min-h-[80vh] pb-28 md:pb-8">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
           Shopping Cart ({cartItems.length} {cartItems.length === 1 ? "item" : "items"})
@@ -195,6 +203,54 @@ function Cart() {
                 : "Proceed to Checkout"}
             </Button>
           </div>
+        </div>
+      )}
+
+      {/* Sticky Bottom Checkout Bar on Mobile (< md) */}
+      {cartItems.length > 0 && (
+        <div
+          className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] flex items-center justify-between gap-3"
+          style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
+        >
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Total ({cartItems.length} {cartItems.length === 1 ? "item" : "items"})
+            </p>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg font-black text-teal-700 dark:text-teal-400">
+                {formatINR(cart.cart?.totalSellingPrice)}
+              </span>
+              {cart.cart?.totalMrpPrice > cart.cart?.totalSellingPrice && (
+                <span className="text-[11px] line-through text-slate-400">
+                  {formatINR(cart.cart?.totalMrpPrice)}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <Button
+            variant="contained"
+            color={hasOutOfStockItems ? "inherit" : "primary"}
+            disabled={hasOutOfStockItems}
+            onClick={() => navigate("/checkout")}
+            endIcon={!hasOutOfStockItems ? <ArrowForwardIcon sx={{ fontSize: 16 }} /> : null}
+            sx={{
+              py: 1.2,
+              px: 3,
+              fontWeight: 800,
+              borderRadius: "12px",
+              fontSize: "13px",
+              textTransform: "none",
+              whiteSpace: "nowrap",
+              boxShadow: 2,
+              ...(hasOutOfStockItems && {
+                bgcolor: "action.disabledBackground",
+                color: "text.disabled",
+              }),
+            }}
+          >
+            {hasOutOfStockItems ? "Fix Items" : "Checkout"}
+          </Button>
         </div>
       )}
     </div>

@@ -5,26 +5,38 @@ export const mainCategory = [
         level:1,
         levelTwoCategory:[
             {
-                "name":"Topwere",
-                "categoryId":"men_topwere",
+                "name":"Topwear",
+                "categoryId":"men_topwear",
                 "parentCategoryId":"men",
                 "level":2
             },
             {
-                "name":"Bottomwere",
-                "categoryId":"men_bottomwere",
+                "name":"Bottomwear",
+                "categoryId":"men_bottomwear",
                 "parentCategoryId":"men",
                 "level":2
             },
             {
-                "name":"Innerwere And Sleepwear",
-                "categoryId":"men_innwer_and_sleepwear",
+                "name":"Innerwear & Sleepwear",
+                "categoryId":"men_innerwear_sleepwear",
                 "parentCategoryId":"men",
                 "level":2
             },
             {
                 "name":"Footwear",
-                "categoryId" :"men_footwear",
+                "categoryId":"men_footwear",
+                "parentCategoryId":"men",
+                "level":2
+            },
+            {
+                "name":"Watches",
+                "categoryId":"men_watches",
+                "parentCategoryId":"men",
+                "level":2
+            },
+            {
+                "name":"Accessories",
+                "categoryId":"men_accessories",
                 "parentCategoryId":"men",
                 "level":2
             }
@@ -498,6 +510,73 @@ export const mainCategory = [
       },
     ],
   },
+  {
+    name: "Beauty",
+    categoryId: "beauty",
+    level: 1,
 
-
-]
+    levelTwoCategory: [
+      {
+        name: "Makeup",
+        categoryId: "beauty_makeup",
+        parentCategoryId: "beauty",
+        level: 2,
+        levelThreeCategory: [
+          "Lipstick",
+          "Foundation",
+          "Concealer",
+          "Mascara",
+          "Eyeliner",
+        ],
+      },
+      {
+        name: "Skincare",
+        categoryId: "beauty_skincare",
+        parentCategoryId: "beauty",
+        level: 2,
+        levelThreeCategory: [
+          "Face Wash",
+          "Moisturizer",
+          "Serum",
+          "Sunscreen",
+          "Face Masks",
+        ],
+      },
+      {
+        name: "Haircare",
+        categoryId: "beauty_haircare",
+        parentCategoryId: "beauty",
+        level: 2,
+        levelThreeCategory: [
+          "Shampoo",
+          "Conditioner",
+          "Hair Oil",
+          "Hair Serum",
+        ],
+      },
+      {
+        name: "Fragrances",
+        categoryId: "beauty_fragrances",
+        parentCategoryId: "beauty",
+        level: 2,
+        levelThreeCategory: [
+          "Perfumes",
+          "Body Mist",
+          "Deodorants",
+        ],
+      },
+      {
+        name: "Personal Care",
+        categoryId: "beauty_personal_care",
+        parentCategoryId: "beauty",
+        level: 2,
+        levelThreeCategory: [
+          "Body Wash",
+          "Soap",
+          "Hand Wash",
+          "Sanitizers",
+        ],
+      },
+    ],
+  },
+];
