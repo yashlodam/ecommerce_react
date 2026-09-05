@@ -13,6 +13,7 @@ import {
 } from "../../../State/customer/CartSlice";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import DealBadge from "../../../common/deals/DealBadge";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -36,6 +37,12 @@ function CartItem({ item }) {
   const availableStock = item?.productVariant?.quantity ?? product?.quantity ?? 0;
   const isOutOfStock = (product?.inStock === false) || availableStock <= 0;
   const isMaxStockReached = item.quantity >= availableStock;
+
+  const qty = item?.quantity || 1;
+  const unitSellingPrice = Math.round((item?.sellingPrice || 0) / qty);
+  const unitMrpPrice = Math.round((item?.mrpPrice || item?.sellingPrice || 0) / qty);
+  const totalItemDiscount = Math.max(0, (item?.mrpPrice || 0) - (item?.sellingPrice || 0));
+  const discountPercent = item?.mrpPrice > 0 ? Math.round((totalItemDiscount / item.mrpPrice) * 100) : 0;
 
   const handleUpdateQuantity = (value) => {
     if (value > item.quantity && (isOutOfStock || isMaxStockReached)) {
@@ -154,6 +161,21 @@ function CartItem({ item }) {
             Color: <span className="text-slate-600 dark:text-slate-300 font-medium">{product?.color || "Standard"}</span> • Size: <span className="text-slate-600 dark:text-slate-300 font-medium">{item?.size || "Standard"}</span>
           </p>
 
+          {/* Unit Pricing & Deal Tag */}
+          <div className="flex items-baseline gap-2 pt-0.5 flex-wrap">
+            <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
+              {formatINR(unitSellingPrice)}
+            </span>
+            {unitMrpPrice > unitSellingPrice && (
+              <span className="text-xs line-through text-slate-400 font-medium">
+                {formatINR(unitMrpPrice)}
+              </span>
+            )}
+            {discountPercent > 0 && (
+              <DealBadge discountValue={discountPercent} size="xs" />
+            )}
+          </div>
+
           {isOutOfStock ? (
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900/80 text-red-700 dark:text-red-400 text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
@@ -210,14 +232,17 @@ function CartItem({ item }) {
         </div>
 
         {/* Price Section */}
-        <div className="text-right">
+        <div className="text-right space-y-0.5">
           <p className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100">
             {formatINR(item.sellingPrice)}
           </p>
-          {item.mrpPrice > item.sellingPrice && (
-            <p className="text-xs text-slate-400 dark:text-slate-500 line-through">
-              {formatINR(item.mrpPrice)}
-            </p>
+          {totalItemDiscount > 0 && (
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 space-x-1">
+              <span>Subtotal: <span className="line-through">{formatINR(item.mrpPrice)}</span></span>
+              <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                (-{formatINR(totalItemDiscount)})
+              </span>
+            </div>
           )}
         </div>
       </div>

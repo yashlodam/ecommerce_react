@@ -160,6 +160,16 @@ function OrderDetails() {
                 <strong>Item Price:</strong> <span className="text-slate-800 dark:text-slate-200 font-bold">{formatINR(orderItem?.sellingPrice)}</span>
               </p>
             </div>
+
+            {orderItem?.appliedDealTitle && (
+              <p className="text-xs font-bold text-teal-600 dark:text-teal-400 flex items-center gap-1 pt-1">
+                <span>🔥</span>
+                <span>Promotional Deal: {orderItem.appliedDealTitle}</span>
+                {orderItem.discountAmount > 0 && (
+                  <span className="text-slate-500 font-normal">(-{formatINR(orderItem.discountAmount)} discount)</span>
+                )}
+              </p>
+            )}
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import DealCard from "./DealCard";
 import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -11,30 +11,110 @@ import { Button } from "@mui/material";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import LocalOfferRoundedIcon from "@mui/icons-material/LocalOfferRounded";
 
-import { useAppSelector } from "../../../../State/Store";
+import { useAppDispatch, useAppSelector } from "../../../../State/Store";
+import {
+  fetchHomePageData,
+  fetchActiveDeals,
+} from "../../../../State/customer/CustomerSlice";
 import { homeCategories } from "../../../../data/HomeCategories";
 
 function Deals() {
   const navigate = useNavigate();
-  const customer = useAppSelector((state) => state.customer);
+  const dispatch = useAppDispatch();
+  const customer = useAppSelector((state) => state.customer || state.home);
 
   const fallbackDeals = homeCategories
     .filter((c) => c.section === "DEALS")
     .map((c, i) => ({ id: i + 1, discount: 20, category: c }));
 
-  const deals =
-    customer?.homeCategories?.deals?.length > 0
-      ? customer.homeCategories.deals
-      : fallbackDeals;
+  const activeDeals =
+    customer?.activeDeals && customer.activeDeals.length > 0
+      ? customer.activeDeals
+      : customer?.deals && customer.deals.length > 0
+        ? customer.deals
+        : customer?.homeCategories?.deals && customer.homeCategories.deals.length > 0
+          ? customer.homeCategories.deals
+          : customer?.homePageData?.deals && customer.homePageData.deals.length > 0
+            ? customer.homePageData.deals
+            : null;
+
+  const deals = activeDeals && activeDeals.length > 0 ? activeDeals : fallbackDeals;
+
+  // Real earliest expiring active deal from backend
+  const earliestEndAt = React.useMemo(() => {
+    if (!deals || deals.length === 0) return null;
+    const now = Date.now();
+    const validEnds = deals
+      .map((d) => (d.endAt ? new Date(d.endAt).getTime() : null))
+      .filter((t) => t && !isNaN(t) && t > now);
+
+    if (validEnds.length === 0) return null;
+    return new Date(Math.min(...validEnds));
+  }, [deals]);
+
+  const [timeLeft, setTimeLeft] = useState(null);
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = Date.now();
+      // Target the real earliest deal expiration timestamp from the database
+      let targetTime = earliestEndAt ? earliestEndAt.getTime() : null;
+      if (!targetTime) {
+        const nowDate = new Date();
+        targetTime = new Date(
+          nowDate.getFullYear(),
+          nowDate.getMonth(),
+          nowDate.getDate(),
+          23,
+          59,
+          59
+        ).getTime();
+      }
+
+      const diffMs = Math.max(0, targetTime - now);
+      const totalSec = Math.floor(diffMs / 1000);
+
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const minutes = Math.floor((totalSec % 3600) / 60);
+      const seconds = totalSec % 60;
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [earliestEndAt]);
+
 
   return (
     <section className="overflow-hidden rounded-[32px] border border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 p-4 sm:p-6 lg:p-7 shadow-sm transition-colors">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-slate-100 dark:border-slate-800 pb-5">
         <div className="max-w-2xl">
-          <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/50 px-3 py-1 text-[11px] font-bold text-teal-700 dark:text-teal-400">
-            <LocalOfferRoundedIcon sx={{ fontSize: 14 }} />
-            Flash Promotions
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/50 px-3 py-1 text-[11px] font-bold text-teal-700 dark:text-teal-400">
+              <LocalOfferRoundedIcon sx={{ fontSize: 14 }} />
+              Flash Promotions
+            </div>
+
+            {/* Real Deal Countdown connected to database expiration */}
+            {timeLeft && (
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/50 px-3 py-1 text-[11px] font-extrabold text-rose-700 dark:text-rose-300 shadow-xs">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                </span>
+                <span>Ends in</span>
+                <span className="font-mono bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-800/80 px-1.5 py-0.5 rounded text-[11px] font-black tracking-wider shadow-xs">
+                  {timeLeft.days > 0 ? `${timeLeft.days}d ` : ""}
+                  {String(timeLeft.hours).padStart(2, "0")}h :{" "}
+                  {String(timeLeft.minutes).padStart(2, "0")}m :{" "}
+                  {String(timeLeft.seconds).padStart(2, "0")}s
+                </span>
+              </div>
+            )}
           </div>
+
 
           <h2 className="text-xl sm:text-2xl lg:text-[28px] font-bold tracking-tight text-slate-900 dark:text-slate-100">
             Limited-Time Category Deals
@@ -46,7 +126,7 @@ function Deals() {
         </div>
 
         <Button
-          onClick={() => navigate("/products/men")}
+          onClick={() => navigate("/deals")}
           variant="contained"
           color="primary"
           endIcon={<ArrowForwardRoundedIcon />}

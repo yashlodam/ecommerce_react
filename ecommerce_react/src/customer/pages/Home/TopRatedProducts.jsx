@@ -8,26 +8,30 @@ function TopRatedProducts() {
   const products = [
     {
       image: "https://rukminim2.flixcart.com/image/612/612/xif0q/shoe/h/x/a/6-k11241g-tan-6-paragon-tan-original-imahjhweztmchfx9.jpeg?q=70",
+      fallbackImage: "https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=800&auto=format&fit=crop",
       title: "Premium Leather Footwear",
       category: "men",
       rating: 4.9,
     },
     {
-      image: "https://rukminim2.flixcart.com/image/612/612/xif0q/watch/f/l/z/-original-imagqhvgybexgkmh.jpeg?q=70",
+      image: "https://res.cloudinary.com/dkn3nesb8/image/upload/v1788605573/s4rsosqrs7lxpy9qpobd.webp",
+      fallbackImage: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?q=80&w=800&auto=format&fit=crop",
       title: "Smart Fitness Watch",
-      category: "electronics",
+      category: "smart_watches",
       rating: 4.8,
     },
     {
-      image: "https://rukminim2.flixcart.com/image/612/612/xif0q/headphone/x/x/x/-original-imaghx9qj7jzgh8g.jpeg?q=70",
+      image: "https://res.cloudinary.com/dkn3nesb8/image/upload/v1788604020/uu1ovs7ketnvjsfcttmo.webp",
+      fallbackImage: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop",
       title: "Wireless ANC Headphones",
-      category: "electronics",
+      category: "headphones",
       rating: 4.7,
     },
     {
-      image: "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/h/e/g/-original-imagx9egm9mgmvab.jpeg?q=70",
+      image: "https://res.cloudinary.com/dkn3nesb8/image/upload/v1788603326/wywqpqfbp5so7ngyly4r.webp",
+      fallbackImage: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=800&auto=format&fit=crop",
       title: "Flagship 5G Smartphone",
-      category: "electronics",
+      category: "smartphones",
       rating: 4.9,
     },
   ];
@@ -59,6 +63,11 @@ function TopRatedProducts() {
               <img
                 src={product.image}
                 alt={product.title}
+                onError={(e) => {
+                  if (product.fallbackImage && e.target.src !== product.fallbackImage) {
+                    e.target.src = product.fallbackImage;
+                  }
+                }}
                 className="h-40 w-full object-contain transition-transform duration-500 group-hover:scale-110"
                 loading="lazy"
               />

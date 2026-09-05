@@ -20,8 +20,11 @@ import BecomeSeller from "./customer/pages/Become_seller/BecomeSeller";
 import PaymentSucess from "./customer/PaymentSucess";
 import OrderSuccess from "./customer/OrderSuccess";
 import SearchPage from "./customer/pages/SearchPage";
+import DealsPage from "./customer/pages/Deals/DealsPage";
 import Auth from "./customer/pages/Auth/Auth";
 import AiChatWidget from "./customer/components/AiChat/AiChatWidget";
+import CartDrawer from "./customer/components/Cart/CartDrawer";
+import MobileBottomNav from "./customer/components/Navbar/MobileBottomNav";
 
 // Seller / Admin dashboards
 import SellerDashboard from "./seller/pages/SellerDashboard/SellerDashboard";
@@ -31,8 +34,7 @@ import AdminDashboard from "./admin/pages/Dashboard/Dashboard";
 import { useAppDispatch, useAppSelector } from "./State/Store";
 import { fetchCurrentRole, fetchUserProfile, refreshToken, setAuthChecking } from "./State/AuthSlice";
 import { fetchSellerProfile } from "./State/seller/sellerSlice";
-import { createHomeCategories } from "./State/customer/CustomerSlice";
-import { homeCategories } from "./data/HomeCategories";
+import { fetchHomePageData } from "./State/customer/CustomerSlice";
 
 // Auth guard
 import ProtectedRoute from "./Routes/ProtectedRoute";
@@ -48,8 +50,8 @@ function App() {
   // ─── Bootstrap on mount (Silent Refresh via HttpOnly cookie) ─────────────────
   useEffect(() => {
     const initialize = async () => {
-      // Always seed home categories for the homepage
-      dispatch(createHomeCategories(homeCategories));
+      // Load live homepage categories and promotional deals
+      dispatch(fetchHomePageData());
 
       try {
         // Attempt silent refresh using the HttpOnly refresh token cookie
@@ -74,7 +76,7 @@ function App() {
   }, [dispatch]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 ${!isAdmin && !isSeller ? "pb-16 md:pb-0" : ""}`}>
         {/* Show the correct navbar based on current section */}
         {isAdmin ? (
           <AdminNavbar />
@@ -96,6 +98,7 @@ function App() {
             element={<ProductDetails />}
           />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/deals" element={<DealsPage />} />
           <Route path="/become-seller" element={<BecomeSeller />} />
           <Route path="/login" element={<Auth />} />
 
@@ -170,8 +173,14 @@ function App() {
           />
         </Routes>
 
-        {/* AI Shopping Assistant Widget (Customer routes only) */}
-        {!isAdmin && !isSeller && <AiChatWidget />}
+        {/* Customer Global Drawers & Navigation */}
+        {!isAdmin && !isSeller && (
+          <>
+            <CartDrawer />
+            <MobileBottomNav />
+            <AiChatWidget />
+          </>
+        )}
       </div>
   );
 }

@@ -34,9 +34,18 @@ function SimilarProductCard({ item }) {
         />
 
         {item.discountPercent > 0 && (
-          <span className="absolute top-3 left-3 bg-teal-600 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow">
+          <span className="absolute top-3 left-3 bg-teal-600 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow z-10">
             {item.discountPercent}% OFF
           </span>
+        )}
+
+        {/* Out of Stock Overlay */}
+        {((item.quantity != null && item.quantity <= 0) || item.inStock === false) && (
+          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-2xs flex items-center justify-center z-10">
+            <span className="bg-red-600 text-white font-bold text-[10px] uppercase px-2.5 py-1 rounded-full tracking-wider shadow">
+              Out of Stock
+            </span>
+          </div>
         )}
       </div>
 

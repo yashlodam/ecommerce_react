@@ -72,9 +72,12 @@ function PricingCrd() {
       </div>
 
       {totalDiscount > 0 && (
-        <div className="bg-emerald-50 dark:bg-emerald-950/40 rounded-xl p-2.5 text-center">
+        <div className="bg-emerald-50 dark:bg-emerald-950/40 rounded-xl p-2.5 text-center space-y-0.5 border border-emerald-200/60 dark:border-emerald-800/40">
           <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
             🎉 You are saving {formatINR(totalDiscount + couponDiscount)} on this order
+          </p>
+          <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+            Best promotional deals & discounts applied automatically
           </p>
         </div>
       )}

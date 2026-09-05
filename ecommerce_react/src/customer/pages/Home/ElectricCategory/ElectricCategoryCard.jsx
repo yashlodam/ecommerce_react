@@ -3,7 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 function ElectricCategoryCard({ item }) {
   const navigate = useNavigate();
-  const categoryId = `electronics_${item.categoryId}`;
+  const rawId = item.categoryId || "";
+  const categoryId = rawId.startsWith("electronics")
+    ? rawId
+    : `electronics_${rawId}`;
 
   return (
     <button
@@ -14,8 +17,12 @@ function ElectricCategoryCard({ item }) {
       <div className="flex h-14 w-14 min-[375px]:h-16 min-[375px]:w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 p-2 sm:p-2.5 transition-transform duration-500 group-hover:scale-110 shadow-xs">
         <img
           className="h-full w-full object-contain"
-          src={item.image}
+          src={item.image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=80"}
           alt={item.name}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=80";
+          }}
           loading="lazy"
         />
       </div>

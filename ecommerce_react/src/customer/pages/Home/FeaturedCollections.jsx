@@ -21,12 +21,12 @@ function FeaturedCollections() {
       category: "electronics",
     },
     {
-      title: "Home Living & Furnishings",
-      subtitle: "Contemporary furniture, lighting & bedsheets",
+      title: "Cameras & Digital Photography",
+      subtitle: "Mirrorless cameras, 4K video bodies & zoom lenses",
       image:
-        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1200&q=80",
       span: "md:col-span-3 lg:col-span-2",
-      category: "home_furniture",
+      category: "cameras",
     },
     {
       title: "Athletic & Pro Footwear",

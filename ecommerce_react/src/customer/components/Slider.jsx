@@ -14,43 +14,43 @@ const HERO_SLIDES = [
     title: "Flagship Gadgets & Smart Audio",
     subtitle: "Experience next-gen smartphones, noise-canceling headphones & sleek wearables with manufacturer warranty.",
     discountText: "UP TO 45% OFF",
-    categoryId: "smartphones",
+    categoryId: "electronics",
     cta: "Explore Tech Deals",
     image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1600&auto=format&fit=crop",
     imagePosition: "object-[center_right] sm:object-[75%_center]",
   },
   {
     id: 2,
-    tag: "Exclusive Seasonal Drop",
-    title: "Designer Apparel & Modern Fits",
-    subtitle: "Curated ethnic wear, formal tailored suits, and everyday urban streetwear from verified Indian sellers.",
-    discountText: "FLAT 50% DISCOUNT",
-    categoryId: "men",
-    cta: "Shop Fashion Edit",
+    tag: "Women's Fashion Edit",
+    title: "Designer Kurtas & Modern Fits",
+    subtitle: "Handcrafted printed kurtas, palazzo sets, chic crop tops & seasonal festive collections curated for women.",
+    discountText: "FLAT 40% OFF",
+    categoryId: "women",
+    cta: "Shop Women's Fashion",
     image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop",
     imagePosition: "object-[center_top] sm:object-[80%_center]",
   },
   {
     id: 3,
-    tag: "Home & Lifestyle Special",
-    title: "Contemporary Furniture & Ambient Decor",
-    subtitle: "Transform your living space with handcrafted wooden beds, plush sofas, artisan rugs & ambient lights.",
-    discountText: "STARTING AT ₹499",
-    categoryId: "home_furniture",
-    cta: "Discover Home Living",
-    image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1600&auto=format&fit=crop",
-    imagePosition: "object-center sm:object-[70%_center]",
+    tag: "Men's Contemporary Edit",
+    title: "Graphic Tees, Chinos & Formal Wear",
+    subtitle: "Upgrade your wardrobe with premium cotton tees, relaxed denim trousers, and executive formal shirts.",
+    discountText: "UP TO 50% OFF",
+    categoryId: "men",
+    cta: "Shop Men's Collection",
+    image: "https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1600&auto=format&fit=crop",
+    imagePosition: "object-[center_top] sm:object-[75%_center]",
   },
   {
     id: 4,
-    tag: "Athletic & Performance",
-    title: "Smartwatches & Pro Footwear",
-    subtitle: "Precision health and biometric fitness monitors, ultra-light running sneakers, and durable athletic gear.",
-    discountText: "EXTRA 20% WITH CODE: SAVE20",
+    tag: "Smart Wearables 2026",
+    title: "AMOLED Smartwatches & Fitness Bands",
+    subtitle: "Continuous biometric health tracking, heart rate, sleep monitoring, and Bluetooth calling on the go.",
+    discountText: "STARTING AT ₹1,499",
     categoryId: "smart_watches",
-    cta: "View Fitness Gear",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1600&auto=format&fit=crop",
-    imagePosition: "object-[center_right] sm:object-[85%_center]",
+    cta: "Explore Smartwatches",
+    image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?q=80&w=1600&auto=format&fit=crop",
+    imagePosition: "object-[center_right] sm:object-[80%_center]",
   },
 ];
 
@@ -65,9 +65,11 @@ function Slider() {
   const lastClickRef = useRef(0);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+  const isSwipingRef = useRef(false);
   const containerRef = useRef(null);
 
-  const goTo = useCallback((index) => {
+  const goTo = useCallback((index, e) => {
+    if (e) e.stopPropagation();
     const now = Date.now();
     if (now - lastClickRef.current < TRANSITION_COOLDOWN) return;
     lastClickRef.current = now;
@@ -75,8 +77,15 @@ function Slider() {
     setCurrent(next);
   }, []);
 
-  const nextSlide = useCallback(() => goTo(current + 1), [current, goTo]);
-  const prevSlide = useCallback(() => goTo(current - 1), [current, goTo]);
+  const nextSlide = useCallback((e) => {
+    if (e) e.stopPropagation();
+    goTo(current + 1);
+  }, [current, goTo]);
+
+  const prevSlide = useCallback((e) => {
+    if (e) e.stopPropagation();
+    goTo(current - 1);
+  }, [current, goTo]);
 
   // Autoplay handler with pause on hover
   useEffect(() => {
@@ -91,21 +100,28 @@ function Slider() {
   const handleKeyDown = (e) => {
     if (e.key === "ArrowLeft") {
       e.preventDefault();
-      prevSlide();
+      prevSlide(e);
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
-      nextSlide();
+      nextSlide(e);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      handleSlideClick(HERO_SLIDES[current]);
     }
   };
 
   // Touch swipe handling
   const handleTouchStart = (e) => {
+    isSwipingRef.current = false;
     touchStartX.current = e.touches[0].clientX;
     touchEndX.current = e.touches[0].clientX;
   };
 
   const handleTouchMove = (e) => {
     touchEndX.current = e.touches[0].clientX;
+    if (Math.abs(touchStartX.current - touchEndX.current) > 10) {
+      isSwipingRef.current = true;
+    }
   };
 
   const handleTouchEnd = () => {
@@ -114,6 +130,14 @@ function Slider() {
       if (delta > 0) nextSlide();
       else prevSlide();
     }
+    setTimeout(() => {
+      isSwipingRef.current = false;
+    }, 120);
+  };
+
+  const handleSlideClick = (slide) => {
+    if (isSwipingRef.current) return;
+    navigate(`/products/${slide.categoryId}`);
   };
 
   return (
@@ -132,7 +156,8 @@ function Slider() {
       className="relative w-full overflow-hidden rounded-[24px] sm:rounded-[36px] bg-slate-950 border border-slate-200/80 dark:border-slate-800 shadow-xl select-none min-h-[420px] min-[375px]:min-h-[450px] sm:min-h-[490px] md:min-h-[520px] lg:min-h-[560px] flex items-center transition-all duration-300 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none"
     >
       {/* ============================================================
-          LAYER 1: BACKGROUND PHOTOGRAPHY (VIBRANT & CLEARLY VISIBLE)
+          LAYER 1: BACKGROUND PHOTOGRAPHY (VIBRANT & FULLY CLICKABLE)
+          Entire active slide image surface triggers navigation
           ============================================================ */}
       {HERO_SLIDES.map((slide, idx) => {
         const isActive = idx === current;
@@ -140,8 +165,10 @@ function Slider() {
           <div
             key={slide.id}
             aria-hidden={!isActive}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out pointer-events-none ${
-              isActive ? "opacity-100 z-10" : "opacity-0 z-0"
+            onClick={() => handleSlideClick(slide)}
+            title={`Browse ${slide.title}`}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out cursor-pointer ${
+              isActive ? "opacity-100 z-10 pointer-events-auto" : "opacity-0 z-0 pointer-events-none"
             }`}
           >
             <img
@@ -168,9 +195,10 @@ function Slider() {
 
       {/* ============================================================
           LAYER 3: CONTENT LAYER (SAFE-AREA INSET & STABLE TYPOGRAPHY)
-          Uses strict horizontal padding to prevent collision with arrow controls.
+          Outer container passes pointer events through so clicking anywhere
+          outside the text box directly interacts with Layer 1 (the image).
           ============================================================ */}
-      <div className="relative z-20 w-full max-w-[1540px] mx-auto px-11 min-[375px]:px-12 sm:px-18 md:px-24 lg:px-28 py-10 sm:py-14 md:py-16 flex flex-col justify-center pointer-events-auto">
+      <div className="relative z-20 w-full max-w-[1540px] mx-auto px-11 min-[375px]:px-12 sm:px-18 md:px-24 lg:px-28 py-10 sm:py-14 md:py-16 flex flex-col justify-center pointer-events-none">
         {HERO_SLIDES.map((slide, idx) => {
           const isActive = idx === current;
           if (!isActive) return null;
@@ -178,16 +206,24 @@ function Slider() {
           return (
             <div
               key={slide.id}
-              className="max-w-xl sm:max-w-2xl space-y-3 sm:space-y-4 md:space-y-5 animate-fade-in"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSlideClick(slide);
+              }}
+              className="max-w-xl sm:max-w-2xl space-y-3 sm:space-y-4 md:space-y-5 animate-fade-in cursor-pointer group pointer-events-auto"
             >
               {/* Category Badge Tag */}
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-2.5 sm:px-3.5 py-0.5 sm:py-1 text-[11px] sm:text-xs md:text-sm font-bold text-white shadow-xs">
+              <div
+                className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 px-2.5 sm:px-3.5 py-0.5 sm:py-1 text-[11px] sm:text-xs md:text-sm font-bold text-white shadow-xs transition-all hover:bg-white/25"
+              >
                 <SparklesIcon sx={{ fontSize: { xs: 13, sm: 15 }, color: "#5eead4" }} />
                 <span>{slide.tag}</span>
               </div>
 
               {/* Main Heading */}
-              <h2 className="text-[clamp(1.25rem,4.2vw+0.25rem,2.75rem)] font-extrabold text-white tracking-tight leading-[1.18] sm:leading-[1.14]">
+              <h2
+                className="text-[clamp(1.25rem,4.2vw+0.25rem,2.75rem)] font-extrabold text-white tracking-tight leading-[1.18] sm:leading-[1.14] group-hover:text-teal-200 transition-colors"
+              >
                 {slide.title}
               </h2>
 
@@ -206,7 +242,10 @@ function Slider() {
                 <Button
                   variant="contained"
                   size="large"
-                  onClick={() => navigate(`/products/${slide.categoryId}`)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSlideClick(slide);
+                  }}
                   endIcon={<ArrowForwardIcon sx={{ fontSize: { xs: 15, sm: 18 } }} />}
                   sx={{
                     bgcolor: "#009688",
@@ -260,6 +299,7 @@ function Slider() {
       <div
         role="tablist"
         aria-label="Carousel slide pagination"
+        onClick={(e) => e.stopPropagation()}
         className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 sm:gap-2 bg-slate-950/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 shadow-md"
       >
         {HERO_SLIDES.map((slide, index) => {
@@ -270,7 +310,7 @@ function Slider() {
               role="tab"
               aria-selected={isSelected}
               aria-label={`Go to slide ${index + 1}: ${slide.title}`}
-              onClick={() => goTo(index)}
+              onClick={(e) => goTo(index, e)}
               className={`transition-all duration-300 rounded-full cursor-pointer focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:outline-none ${
                 isSelected
                   ? "w-6 sm:w-8 h-1.5 sm:h-2 bg-teal-400 shadow-sm"

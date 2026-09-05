@@ -83,6 +83,16 @@ function OrderItem({ item, order }) {
               <span>Qty: <strong className="text-slate-800 dark:text-slate-200">{item.quantity}</strong></span>
               <span>Total: <strong className="text-teal-700 dark:text-teal-400 font-extrabold">{formatINR(item.sellingPrice * (item.quantity || 1))}</strong></span>
             </div>
+
+            {item.appliedDealTitle && (
+              <p className="text-[11px] font-bold text-teal-600 dark:text-teal-400 flex items-center gap-1 pt-0.5">
+                <span>🔥</span>
+                <span>Deal Applied: {item.appliedDealTitle}</span>
+                {item.discountAmount > 0 && (
+                  <span className="text-slate-500 font-normal">(-{formatINR(item.discountAmount)})</span>
+                )}
+              </p>
+            )}
           </div>
         </div>
       </div>

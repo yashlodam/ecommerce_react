@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from "react";
-import Button from "@mui/material/Button";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
-import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { addProductToWishlist } from "../../../State/customer/WishlistSlice";
-import { addItemToCart } from "../../../State/customer/CartSlice";
+import DealBadge from "../../../common/deals/DealBadge";
+import DealPrice from "../../../common/deals/DealPrice";
 
 function ProductCard({ item }) {
   const images = item.images || [];
   const [currentImage, setCurrentImage] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [justAdded, setJustAdded] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -25,10 +20,25 @@ function ProductCard({ item }) {
   const { isLoggedIn } = useAppSelector((store) => store.auth);
 
   const isWishlisted = wishlist?.products?.some((p) => p.id === item.id);
+
+  // Consider variants stock if variants exist (e.g. products where total variant stock is 0)
+  const hasVariants = Array.isArray(item.variants) && item.variants.length > 0;
+  const inStockVariants = hasVariants
+    ? item.variants.filter((v) => (v.quantity ?? 0) > 0)
+    : [];
+  const totalVariantStock = hasVariants
+    ? item.variants.reduce((acc, v) => acc + (v.quantity ?? 0), 0)
+    : null;
+
+  const displayQuantity = hasVariants ? totalVariantStock : item.quantity;
   const isOutOfStock =
     item.inStock === false ||
-    (item.quantity != null && item.quantity <= 0) ||
+    (hasVariants
+      ? totalVariantStock <= 0 || inStockVariants.length === 0
+      : (item.quantity == null || item.quantity <= 0)) ||
     item.quantity === 0;
+
+  const isLowStock = !isOutOfStock && displayQuantity != null && displayQuantity > 0 && displayQuantity <= 5;
 
   // Auto-cycle product images on hover
   useEffect(() => {
@@ -52,32 +62,6 @@ function ProductCard({ item }) {
           jwt: localStorage.getItem("jwt"),
         })
       );
-    }
-  };
-
-  const handleAddToCart = async (e) => {
-    e.stopPropagation();
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
-    if (isOutOfStock || isAddingToCart) return;
-
-    setIsAddingToCart(true);
-    try {
-      await dispatch(
-        addItemToCart({
-          productId: item.id,
-          size: item.sizes?.[0] || "FREE",
-          quantity: 1,
-        })
-      ).unwrap();
-      setJustAdded(true);
-      setTimeout(() => setJustAdded(false), 2000);
-    } catch (err) {
-      console.error("Failed to add product to cart:", err);
-    } finally {
-      setIsAddingToCart(false);
     }
   };
 
@@ -121,10 +105,28 @@ function ProductCard({ item }) {
           </div>
         )}
 
-        {/* Discount Badge */}
-        {item.discountPercent > 0 && (
+        {/* Discount or Deal Badge */}
+        {item.dealActive ? (
+          <div className="absolute top-2.5 left-2.5 z-10">
+            <DealBadge
+              discountValue={item.discountPercentage || item.discountPercent}
+              discountType={item.discountType || "PERCENTAGE"}
+              label={item.discountPercentage ? `${item.discountPercentage}% OFF` : "DEAL"}
+              size="xs"
+              urgent={true}
+            />
+          </div>
+        ) : item.discountPercent > 0 ? (
           <span className="absolute top-2.5 left-2.5 bg-teal-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-sm z-10 uppercase tracking-wide">
             {item.discountPercent}% OFF
+          </span>
+        ) : null}
+
+        {/* Low Stock Scarcity Urgency Pill */}
+        {isLowStock && (
+          <span className="absolute bottom-2.5 left-2.5 bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-md z-10 tracking-tight flex items-center gap-1 border border-amber-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-pulse" />
+            Only {displayQuantity} left!
           </span>
         )}
 
@@ -207,62 +209,23 @@ function ProductCard({ item }) {
             </span>
           </div>
 
-          {/* Price Line */}
-          <div className="flex items-baseline gap-2 flex-wrap">
-            <span className="text-base font-extrabold text-slate-900 dark:text-white">
-              ₹{Number(item.sellingPrice || 0).toLocaleString("en-IN")}
-            </span>
+          {/* Price Line — uses DealPrice for authoritative backend deal prices */}
+          <DealPrice
+            effectivePrice={item.dealActive && item.effectivePrice != null ? item.effectivePrice : item.sellingPrice}
+            basePrice={item.dealActive ? (item.basePrice || item.sellingPrice) : null}
+            mrpPrice={item.mrpPrice}
+            discountPercentage={item.dealActive ? item.discountPercentage : item.discountPercent}
+            discountAmount={item.discountAmount}
+            dealActive={Boolean(item.dealActive)}
+            size="md"
+          />
 
-            {item.mrpPrice > item.sellingPrice && (
-              <span className="line-through text-slate-400 dark:text-slate-500 text-xs font-medium">
-                ₹{Number(item.mrpPrice).toLocaleString("en-IN")}
-              </span>
-            )}
-
-            {item.discountPercent > 0 && (
-              <span className="text-teal-600 dark:text-teal-400 font-bold text-xs">
-                Save {item.discountPercent}%
-              </span>
-            )}
-          </div>
-
-          {/* Quick Add to Cart CTA */}
-          <Button
-            fullWidth
-            variant={justAdded ? "contained" : "outlined"}
-            color={justAdded ? "success" : "primary"}
-            disabled={isOutOfStock || isAddingToCart}
-            onClick={handleAddToCart}
-            startIcon={
-              isAddingToCart ? (
-                <CircularProgress size={14} color="inherit" />
-              ) : justAdded ? (
-                <CheckCircleIcon sx={{ fontSize: 16 }} />
-              ) : (
-                <AddShoppingCartIcon sx={{ fontSize: 16 }} />
-              )
-            }
-            sx={{
-              borderRadius: "10px",
-              py: 0.65,
-              textTransform: "none",
-              fontWeight: 700,
-              fontSize: "12px",
-              mt: 1,
-              ...(justAdded && {
-                bgcolor: "#059669 !important",
-                color: "#ffffff !important",
-              }),
-            }}
-          >
-            {isAddingToCart
-              ? "Adding..."
-              : justAdded
-              ? "Added to Cart"
-              : isOutOfStock
-              ? "Out of Stock"
-              : "Add to Cart"}
-          </Button>
+          {item.dealActive && item.appliedDealTitle && (
+            <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 truncate flex items-center gap-1">
+              <span>🔥</span>
+              <span>{item.appliedDealTitle}</span>
+            </p>
+          )}
         </div>
       </div>
     </div>

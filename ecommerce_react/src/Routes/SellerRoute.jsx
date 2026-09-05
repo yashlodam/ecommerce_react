@@ -8,6 +8,7 @@ import Profile from '../seller/pages/Account/Profile'
 import Transaction from '../seller/pages/Payment/Transaction'
 import Payment from '../seller/pages/Payment/Payment'
 import Orders from '../seller/pages/Orders/Orders'
+import SellerDeals from '../seller/pages/Deals/SellerDeals'
 
 
 
@@ -19,6 +20,7 @@ function SellerRoute() {
 
         <Route path='/*' element= {<Dashboard/>} />
         <Route path='/products' element= {<Products/>} />
+        <Route path='/deals' element= {<SellerDeals/>} />
         {/* Support both spellings for backward compat */}
         <Route path='/add-product' element= {<AddProduct/>} />
         <Route path='/add-products' element= {<AddProduct/>} />

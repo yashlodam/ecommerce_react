@@ -16,7 +16,9 @@ function ShopByCategory() {
   const categories =
     customer?.homeCategories?.shopByCategories?.length > 0
       ? customer.homeCategories.shopByCategories
-      : fallbackCategories;
+      : customer?.homePageData?.shopByCategories?.length > 0
+        ? customer.homePageData.shopByCategories
+        : fallbackCategories;
 
   return (
     <section className="overflow-hidden rounded-[24px] sm:rounded-[32px] border border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 p-3.5 min-[375px]:p-4 sm:p-6 lg:p-7 shadow-sm transition-colors">
@@ -34,7 +36,7 @@ function ShopByCategory() {
         </div>
 
         <button
-          onClick={() => navigate("/products/men")}
+          onClick={() => navigate("/products/all")}
           className="hidden items-center gap-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 transition hover:bg-slate-100 dark:hover:bg-slate-700 md:inline-flex cursor-pointer shrink-0 ml-4"
         >
           View all

@@ -10,6 +10,11 @@ const categoryMetaMap = {
     subtitle: "Explore our full collection of electronics, fashion apparel, footwear, and home decor from verified sellers.",
     badge: "Full Marketplace",
   },
+  deals: {
+    title: "Promotional Deals & Flash Offers",
+    subtitle: "Explore limited-time discounts and special marketplace offers from verified sellers.",
+    badge: "Flash Deals",
+  },
   men: {
     title: "Men's Fashion & Apparel",
     subtitle: "Curated collection of formal shirts, casual t-shirts, denim jeans, athletic footwear and accessories.",
@@ -201,12 +206,16 @@ function Product() {
     }
 
     const filterRequest = {
-      category: category === "all" ? undefined : category,
+      category: category === "all" || category === "deals" ? undefined : category,
       colors: colorParam || undefined,
       brand: brandParam || undefined,
       minPrice,
       maxPrice,
-      minDiscount: discountParam ? Number(discountParam) : undefined,
+      minDiscount: discountParam
+        ? Number(discountParam)
+        : category === "deals"
+          ? 20
+          : undefined,
       stock: stockParam || undefined,
       sort: sortParam || undefined,
       pageNumber: Math.max(0, pageParam - 1),

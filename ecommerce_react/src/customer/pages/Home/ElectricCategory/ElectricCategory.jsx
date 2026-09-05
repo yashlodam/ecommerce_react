@@ -13,7 +13,9 @@ function ElectricCategory() {
   const electricList =
     customer?.homeCategories?.electricCategories?.length > 0
       ? customer.homeCategories.electricCategories
-      : fallbackCategories;
+      : customer?.homePageData?.electricCategories?.length > 0
+        ? customer.homePageData.electricCategories
+        : fallbackCategories;
 
   return (
     <section className="overflow-hidden rounded-[24px] sm:rounded-[32px] border border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 shadow-sm p-3.5 min-[375px]:p-4 sm:p-6 lg:p-7 transition-colors">

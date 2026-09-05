@@ -11,6 +11,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import StoreIcon from "@mui/icons-material/Store";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -33,7 +34,7 @@ import Collapse from "@mui/material/Collapse";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { fetchUserProfile, logout } from "../../../State/AuthSlice";
 import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
-import { fetchUserCart } from "../../../State/customer/CartSlice";
+import { fetchUserCart, openCartDrawer } from "../../../State/customer/CartSlice";
 import { searchProduct } from "../../../State/customer/ProductSlice";
 
 const ACCENT = "#00927c";
@@ -247,12 +248,17 @@ function Navbar() {
                   <DrawerRow
                     icon={<ShoppingCartOutlinedIcon fontSize="small" />}
                     label={`Cart (${cart.cart?.totalItem || 0})`}
-                    onClick={() => { navigate("/cart"); closeDrawer(); }}
+                    onClick={() => { closeDrawer(); dispatch(openCartDrawer()); }}
                   />
                   <DrawerRow
                     icon={<FavoriteBorderOutlinedIcon fontSize="small" />}
                     label="My Wishlist"
                     onClick={() => { navigate("/wishlist"); closeDrawer(); }}
+                  />
+                  <DrawerRow
+                    icon={<LocalOfferIcon fontSize="small" className="text-rose-500" />}
+                    label="🔥 Deals & Promotions"
+                    onClick={() => { navigate("/deals"); closeDrawer(); }}
                   />
                 </>
               )}
@@ -376,6 +382,13 @@ function Navbar() {
                     {item.name}
                   </li>
                 ))}
+                <li
+                  onClick={() => navigate("/deals")}
+                  className="flex h-16 items-center gap-1 rounded-full px-3.5 transition-all duration-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold cursor-pointer select-none"
+                >
+                  <span className="text-sm">🔥</span>
+                  <span>Deals</span>
+                </li>
               </ul>
             )}
           </div>
@@ -492,7 +505,7 @@ function Navbar() {
                   <SearchIcon sx={{ fontSize: { xs: 20, sm: 22 } }} />
                 </IconButton>
                 <IconButton
-                  onClick={() => navigate("/cart")}
+                  onClick={() => dispatch(openCartDrawer())}
                   aria-label="Shopping Cart"
                   sx={{
                     width: { xs: 40, sm: 44 },
@@ -539,7 +552,7 @@ function Navbar() {
                     </IconButton>
 
                     <IconButton
-                      onClick={() => navigate("/cart")}
+                      onClick={() => dispatch(openCartDrawer())}
                       aria-label="Cart"
                       className="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
                     >

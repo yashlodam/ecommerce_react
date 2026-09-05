@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import LogoutIcon from '@mui/icons-material/Logout';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 
 
@@ -35,6 +36,12 @@ import LogoutIcon from '@mui/icons-material/Logout';
                 path:"/seller/products",
                 icon:<InventoryIcon className="text-primary"/>,
                 activeIcon:<InventoryIcon className="text-white"/>,
+            },
+            {
+                name:"Deals & Promotions",
+                path:"/seller/deals",
+                icon:<LocalOfferIcon className="text-primary"/>,
+                activeIcon:<LocalOfferIcon className="text-white"/>,
             },
             {
                 name:"Add Product",

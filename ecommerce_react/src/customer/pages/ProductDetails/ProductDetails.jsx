@@ -31,6 +31,9 @@ import useRequireAuth from "../../../useRequireAuth";
 import SimilarProduct from "./SimilarProduct";
 import ReviewCard from "../Review/ReviewCard";
 import { api } from "../../../config/Api";
+import DealBadge from "../../../common/deals/DealBadge";
+import DealPrice from "../../../common/deals/DealPrice";
+import DealCountdown from "../../../common/deals/DealCountdown";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -52,6 +55,7 @@ function ProductDetails() {
   const [variants, setVariants] = useState([]);
   const [variantsLoading, setVariantsLoading] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [dealPricing, setDealPricing] = useState(null);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -97,19 +101,50 @@ function ProductDetails() {
       .finally(() => setVariantsLoading(false));
   }, [productId]);
 
+  // Fetch real-time deal pricing
+  useEffect(() => {
+    if (!productId) return;
+    const variantQuery = selectedVariant?.id ? `&variantId=${selectedVariant.id}` : "";
+    api
+      .get(`/api/deals/pricing?productId=${productId}${variantQuery}`)
+      .then((res) => setDealPricing(res.data))
+      .catch(() => setDealPricing(null));
+  }, [productId, selectedVariant?.id]);
+
+  const handleDealExpire = () => {
+    if (!productId) return;
+    const variantQuery = selectedVariant?.id ? `&variantId=${selectedVariant.id}` : "";
+    api
+      .get(`/api/deals/pricing?productId=${productId}${variantQuery}`)
+      .then((res) => setDealPricing(res.data))
+      .catch(() => setDealPricing(null));
+  };
+
   const images = currentProduct?.images || [];
   const isWishlisted = wishlist?.wishlist?.products?.some(
     (p) => p.id === Number(productId)
   );
 
-  // Use selected variant's stock to determine in-stock status
+  // Use selected variant's stock or overall variant stock to determine in-stock status
+  const allVariants = variants.length > 0 ? variants : (currentProduct?.variants || []);
+  const hasVariants = allVariants.length > 0;
+  const inStockVariants = hasVariants
+    ? allVariants.filter((v) => (v.quantity ?? 0) > 0)
+    : [];
+  const totalVariantStock = hasVariants
+    ? allVariants.reduce((acc, v) => acc + (v.quantity ?? 0), 0)
+    : null;
+
   const currentStock = selectedVariant != null
     ? (selectedVariant.quantity ?? 0)
+    : hasVariants
+    ? (totalVariantStock ?? 0)
     : (currentProduct?.quantity ?? 0);
 
   const isInStock =
     (currentProduct?.inStock !== false) &&
-    currentStock > 0;
+    currentStock > 0 &&
+    (!hasVariants || inStockVariants.length > 0);
 
   // Displayed prices come from selected variant when available
   const displayMrpPrice = selectedVariant?.mrpPrice ?? currentProduct?.mrpPrice ?? 0;
@@ -330,21 +365,52 @@ function ProductDetails() {
                 </span>
               </div>
 
-              {/* Price Line — updates dynamically from selected variant */}
-              <div className="flex items-baseline gap-3 mt-4">
-                <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100">
-                  {formatINR(displaySellingPrice)}
-                </span>
-                {displayMrpPrice > displaySellingPrice && (
-                  <>
-                    <span className="text-base sm:text-lg text-slate-400 line-through font-semibold">
-                      {formatINR(displayMrpPrice)}
-                    </span>
-                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 px-2.5 py-0.5 rounded-full">
-                      {displayDiscount}% OFF
-                    </span>
-                  </>
-                )}
+              {/* Deal Promotional Banner */}
+              {dealPricing?.dealActive && (
+                <div className="mt-3 p-3.5 bg-linear-to-r from-amber-500/10 via-teal-500/10 to-emerald-500/10 rounded-2xl border border-teal-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-xl animate-bounce">🔥</span>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-extrabold text-sm text-teal-900 dark:text-teal-200">
+                          {dealPricing.appliedDealTitle || "Special Promotional Deal"}
+                        </p>
+                        <DealBadge
+                          discountValue={dealPricing.discountPercentage}
+                          discountType="PERCENTAGE"
+                          size="xs"
+                          urgent={true}
+                        />
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                        Instant promotional discount applied. Save extra {formatINR(dealPricing.discountAmount)}!
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Live Countdown if dealEndsAt is available */}
+                  {dealPricing.dealEndsAt && (
+                    <div className="shrink-0">
+                      <DealCountdown
+                        dealEndsAt={dealPricing.dealEndsAt}
+                        onExpire={handleDealExpire}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Price Line — uses authoritative DealPrice component */}
+              <div className="mt-4">
+                <DealPrice
+                  effectivePrice={dealPricing?.dealActive ? dealPricing.effectivePrice : displaySellingPrice}
+                  basePrice={dealPricing?.dealActive ? dealPricing.basePrice : null}
+                  mrpPrice={displayMrpPrice}
+                  discountPercentage={dealPricing?.dealActive ? dealPricing.discountPercentage : displayDiscount}
+                  discountAmount={dealPricing?.discountAmount}
+                  dealActive={Boolean(dealPricing?.dealActive)}
+                  size="xl"
+                />
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
                 Inclusive of all taxes. Free express shipping on all prepaid orders across India.

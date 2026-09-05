@@ -26,14 +26,14 @@ function Home() {
         {/* 2. Interactive Trust & Value Proposition Bar */}
         <TrustBar />
 
-        {/* 3. Electronic Gadgets & Tech Highlights */}
+        {/* 3. Limited-Time Flash Deals (Live Urgency & High Conversion) */}
+        <Deal />
+
+        {/* 4. Electronic Gadgets & Tech Highlights */}
         <ElectricCategory />
 
-        {/* 4. Curated Trending Products Carousel */}
+        {/* 5. Curated Trending Products Carousel */}
         <HomeProducts />
-
-        {/* 5. Limited-Time Flash Deals */}
-        <Deal />
 
         {/* 6. Shop by Category (Interactive Circles) */}
         <ShopByCategory />
@@ -50,14 +50,14 @@ function Home() {
         {/* 10. Top Rated Marketplace Picks */}
         <TopRatedProducts />
 
-        {/* 11. Become a Seller Partner Card */}
-        <SellerBanner />
-
-        {/* 12. Value Proposition & Assurance */}
+        {/* 11. Value Proposition & Assurance */}
         <WhyChooseShopSphere />
 
-        {/* 13. Customer Testimonials */}
+        {/* 12. Customer Testimonials & Social Proof */}
         <CustomerReviews />
+
+        {/* 13. Become a Seller Partner Card */}
+        <SellerBanner />
 
         {/* 14. Marketplace Footer */}
         <Footer />

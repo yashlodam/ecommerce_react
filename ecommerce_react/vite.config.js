@@ -2,6 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+// Helper function to bypass proxy for browser page navigations (HTML requests)
+// This ensures client-side routing works for URLs like /products/women, /products/men, /seller, /admin
+const htmlBypass = (req) => {
+  if (req.headers.accept && req.headers.accept.includes('text/html')) {
+    return '/index.html';
+  }
+};
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
 
@@ -24,6 +32,7 @@ export default defineConfig({
         target: 'http://localhost:5454',
         changeOrigin: true,
         secure: false,
+        bypass: htmlBypass,
       },
       '/sellers': {
         target: 'http://localhost:5454',
@@ -34,6 +43,7 @@ export default defineConfig({
         target: 'http://localhost:5454',
         changeOrigin: true,
         secure: false,
+        bypass: htmlBypass,
       },
       '/home': {
         target: 'http://localhost:5454',
@@ -44,6 +54,7 @@ export default defineConfig({
         target: 'http://localhost:5454',
         changeOrigin: true,
         secure: false,
+        bypass: htmlBypass,
       },
     },
   },

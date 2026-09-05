@@ -1,20 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, Eye, Check, Star } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '../../../State/Store';
-import { addItemToCart } from '../../../State/customer/CartSlice';
+import { Eye, Star } from 'lucide-react';
 
 export default function ProductCardChat({ product }) {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const jwt = useAppSelector((state) => state.auth?.jwt);
-  const [added, setAdded] = useState(false);
-  const [adding, setAdding] = useState(false);
 
   if (!product) return null;
 
   const defaultVariant = product.variants?.find((v) => v.default) || product.variants?.[0];
-  const size = defaultVariant?.variantName || 'M';
   const isInStock =
     product.inStock !== false &&
     (product.quantity == null || product.quantity > 0) &&
@@ -26,33 +19,6 @@ export default function ProductCardChat({ product }) {
   const handleView = () => {
     const categoryId = product.categoryName || 'all';
     navigate(`/product-details/${encodeURIComponent(categoryId)}/${product.id}`);
-  };
-
-  const handleAddToCart = async (e) => {
-    e.stopPropagation();
-    if (!isInStock || adding || added) return;
-    const token = jwt || localStorage.getItem('jwt');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    setAdding(true);
-    try {
-      await dispatch(
-        addItemToCart({
-          productId: product.id,
-          size: size,
-          quantity: 1,
-        })
-      ).unwrap();
-      setAdded(true);
-      setTimeout(() => setAdded(false), 2500);
-    } catch {
-      // handled in slice
-    } finally {
-      setAdding(false);
-    }
   };
 
   return (
@@ -148,52 +114,16 @@ export default function ProductCardChat({ product }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1.5">
+        <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800">
           <button
             type="button"
             onClick={handleView}
             aria-label={`View details for ${product.title}`}
-            className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold bg-teal-50 dark:bg-teal-950/60 hover:bg-teal-100 dark:hover:bg-teal-900/60 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800 transition-colors cursor-pointer"
           >
-            <Eye className="w-3 h-3" />
-            <span>Details</span>
+            <Eye className="w-3.5 h-3.5" />
+            <span>View Product Details</span>
           </button>
-
-          {isInStock ? (
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={adding || added}
-              aria-label={`Add size ${size} of ${product.title} to cart`}
-              className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-medium transition-all ${
-                added
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-teal-600 hover:bg-teal-700 text-white shadow-xs'
-              }`}
-            >
-              {added ? (
-                <>
-                  <Check className="w-3 h-3" />
-                  <span>Added</span>
-                </>
-              ) : adding ? (
-                <span>Adding...</span>
-              ) : (
-                <>
-                  <ShoppingBag className="w-3 h-3" />
-                  <span>+ Cart</span>
-                </>
-              )}
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled
-              className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-200/80 dark:border-slate-800"
-            >
-              Out of Stock
-            </button>
-          )}
         </div>
       </div>
     </div>

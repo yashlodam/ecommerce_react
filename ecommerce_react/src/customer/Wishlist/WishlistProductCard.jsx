@@ -70,13 +70,22 @@ function WishlistProductCard({ item, setOpenSuccess, setSuccessMessage }) {
       )}
 
       {/* Product Image */}
-      <div className="w-full h-64 sm:h-72 bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
+      <div className="w-full h-64 sm:h-72 bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 relative">
         <img
           src={item.images?.[0] || "https://placehold.co/200x200?text=Wishlist"}
           alt={item.title}
           className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
+
+        {/* Out of Stock Overlay */}
+        {((item.quantity != null && item.quantity <= 0) || item.inStock === false) && (
+          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-2xs flex items-center justify-center z-10">
+            <span className="bg-red-600 text-white font-bold text-[11px] uppercase px-3 py-1 rounded-full tracking-wider shadow">
+              Out of Stock
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Product Details */}
