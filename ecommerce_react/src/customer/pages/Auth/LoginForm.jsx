@@ -133,12 +133,17 @@ function LoginForm() {
     setErrorMessage("");
     setSuccessMessage("");
     try {
-      await dispatch(sendLoginSignupOtp(formik.values.email.trim())).unwrap();
+      const res = await dispatch(sendLoginSignupOtp(formik.values.email.trim())).unwrap();
       setOtpSent(true);
       toast.info("Security code sent to your email!");
-      setSuccessMessage("OTP code sent to your email! Valid for 10 minutes.");
-      formik.setFieldValue("otp", "");
-      setTimeout(() => setSuccessMessage(""), 5000);
+      if (res?.otp) {
+        setSuccessMessage(`Demo OTP: ${res.otp} (Auto-filled)`);
+        formik.setFieldValue("otp", res.otp);
+      } else {
+        setSuccessMessage("OTP code sent to your email! Valid for 10 minutes.");
+        formik.setFieldValue("otp", "");
+      }
+      setTimeout(() => setSuccessMessage(""), 8000);
     } catch (error) {
       const errText =
         typeof error === "string" ? error : "Failed to send OTP code. Please try again.";

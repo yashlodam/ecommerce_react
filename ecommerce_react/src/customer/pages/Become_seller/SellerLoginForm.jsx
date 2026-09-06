@@ -109,7 +109,12 @@ function SellerLoginForm() {
       ).unwrap();
       setOtpSent(true);
       setCooldown(RESEND_COOLDOWN_SECONDS);
-      setSuccess(result?.message || "OTP sent successfully to your email.");
+      if (result?.otp) {
+        setSuccess(`Demo OTP: ${result.otp} (Auto-filled)`);
+        formik.setFieldValue("otp", result.otp);
+      } else {
+        setSuccess(result?.message || "OTP sent successfully to your email.");
+      }
       toast.info("Verification code sent to your email.");
     } catch (err) {
       const message =

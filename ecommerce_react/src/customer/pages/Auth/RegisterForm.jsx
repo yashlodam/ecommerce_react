@@ -84,10 +84,15 @@ function RegisterForm() {
     setSuccessMessage("");
 
     try {
-      await dispatch(sendLoginSignupOtp(formik.values.email.trim())).unwrap();
+      const res = await dispatch(sendLoginSignupOtp(formik.values.email.trim())).unwrap();
       setOtpSent(true);
-      setSuccessMessage("Verification code sent to your email!");
-      setTimeout(() => setSuccessMessage(""), 5000);
+      if (res?.otp) {
+        setSuccessMessage(`Demo OTP: ${res.otp} (Auto-filled)`);
+        formik.setFieldValue("otp", res.otp);
+      } else {
+        setSuccessMessage("Verification code sent to your email!");
+      }
+      setTimeout(() => setSuccessMessage(""), 8000);
     } catch (error) {
       setErrorMessage(
         typeof error === "string" ? error : "Unable to send verification code. Try again."
