@@ -72,7 +72,7 @@ export default function NotificationsPage({ role = null }) {
 
   const handleNavigate = (url) => {
     if (url) {
-      navigate(url);
+      navigate(normalizeActionUrl(url));
     }
   };
 
