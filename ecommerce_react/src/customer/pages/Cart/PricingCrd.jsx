@@ -1,5 +1,6 @@
 import React from "react";
 import Divider from "@mui/material/Divider";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import { useAppSelector } from "../../../State/Store";
 
 function formatINR(val) {
@@ -16,9 +17,13 @@ function PricingCrd() {
 
   const totalMrp = currentCart?.totalMrpPrice || 0;
   const totalSelling = currentCart?.totalSellingPrice || 0;
-  const totalDiscount = Math.max(0, totalMrp - totalSelling);
-  const couponDiscount = currentCart?.couponPrice || 0;
-  const finalPayable = currentCart?.totalSellingPrice || 0;
+  const couponDiscount = currentCart?.discount || 0;
+  const couponCode = currentCart?.couponCode || "";
+  
+  // Breakdown retail discount vs. coupon discount
+  const retailDiscount = Math.max(0, totalMrp - (totalSelling + couponDiscount));
+  const totalOverallSavings = Math.max(0, totalMrp - totalSelling);
+  const finalPayable = totalSelling;
   const totalItems = currentCart?.totalItem || 0;
 
   return (
@@ -33,17 +38,22 @@ function PricingCrd() {
           <span className="font-medium text-slate-900 dark:text-slate-100">{formatINR(totalMrp)}</span>
         </div>
 
-        <div className="flex justify-between text-slate-600 dark:text-slate-400">
-          <span>Retail Discount</span>
-          <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-            - {formatINR(totalDiscount)}
-          </span>
-        </div>
+        {retailDiscount > 0 && (
+          <div className="flex justify-between text-slate-600 dark:text-slate-400">
+            <span>Retail Discount</span>
+            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+              - {formatINR(retailDiscount)}
+            </span>
+          </div>
+        )}
 
         {couponDiscount > 0 && (
-          <div className="flex justify-between text-slate-600 dark:text-slate-400">
-            <span>Coupon Savings</span>
-            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+          <div className="flex justify-between items-center bg-emerald-50/60 dark:bg-emerald-950/30 -mx-2 px-2 py-1.5 rounded-lg border border-emerald-200/50 dark:border-emerald-800/40">
+            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+              <LocalOfferIcon sx={{ fontSize: 13 }} />
+              Coupon Savings {couponCode ? `(${couponCode})` : ""}
+            </span>
+            <span className="font-extrabold text-xs text-emerald-700 dark:text-emerald-300">
               - {formatINR(couponDiscount)}
             </span>
           </div>
@@ -71,13 +81,15 @@ function PricingCrd() {
         <span className="text-xl text-teal-700 dark:text-teal-400">{formatINR(finalPayable)}</span>
       </div>
 
-      {totalDiscount > 0 && (
+      {totalOverallSavings > 0 && (
         <div className="bg-emerald-50 dark:bg-emerald-950/40 rounded-xl p-2.5 text-center space-y-0.5 border border-emerald-200/60 dark:border-emerald-800/40">
           <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
-            🎉 You are saving {formatINR(totalDiscount + couponDiscount)} on this order
+            🎉 You are saving {formatINR(totalOverallSavings)} on this order
           </p>
           <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-            Best promotional deals & discounts applied automatically
+            {couponDiscount > 0
+              ? `Including ${formatINR(couponDiscount)} discount from coupon ${couponCode}`
+              : "Best promotional deals & discounts applied automatically"}
           </p>
         </div>
       )}

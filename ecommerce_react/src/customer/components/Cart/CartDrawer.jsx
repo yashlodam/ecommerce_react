@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   RotateCcw,
   Sparkles,
+  Tag,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import {
@@ -23,6 +24,11 @@ import {
   deleteCartItem,
   updateCartItem,
 } from "../../../State/customer/CartSlice";
+import CouponModal from "../../../common/coupons/CouponModal";
+import {
+  applyCoupon,
+  fetchActiveCoupons,
+} from "../../../State/customer/CouponSlice";
 
 const FREE_SHIPPING_THRESHOLD = 499;
 
@@ -42,6 +48,28 @@ export default function CartDrawer() {
     (state) => state.cart?.isCartDrawerOpen
   );
   const cart = useAppSelector((state) => state.cart?.cart);
+  const couponState = useAppSelector((state) => state.coupon);
+  const activeCoupons = couponState?.activeCoupons || [];
+  const [couponModalOpen, setCouponModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (isCartDrawerOpen) {
+      dispatch(fetchActiveCoupons());
+    }
+  }, [isCartDrawerOpen, dispatch]);
+
+  const handleApplyCouponFromDrawer = async (code) => {
+    const baseValue =
+      (cart?.totalSellingPrice || 0) + (cart?.couponCode ? (cart?.discount || 0) : 0);
+    return dispatch(
+      applyCoupon({
+        apply: "true",
+        code: code,
+        orderValue: baseValue,
+      })
+    ).unwrap();
+  };
+
   const cartItems = cart?.cartItems || [];
 
   const totalSellingPrice = cart?.totalSellingPrice || 0;
@@ -363,6 +391,42 @@ export default function CartDrawer() {
         {/* ── Footer ────────────────────────────────────────────────────────── */}
         {cartItems.length > 0 && (
           <div className="p-4 sm:p-5 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/90 space-y-3">
+            {/* Quick Coupon Bar in Drawer */}
+            {cart?.couponCode ? (
+              <div className="flex items-center justify-between p-2.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/40 text-xs">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <Tag className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span className="font-bold text-emerald-800 dark:text-emerald-300 truncate">
+                    Coupon: {cart.couponCode}
+                  </span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold shrink-0">
+                    (-{formatINR(cart.discount)})
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCouponModalOpen(true)}
+                  className="text-[11px] font-bold text-teal-700 dark:text-teal-300 hover:underline shrink-0 ml-2"
+                >
+                  Change
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setCouponModalOpen(true)}
+                className="w-full flex items-center justify-between p-2.5 rounded-xl border border-dashed border-teal-300 dark:border-teal-800/80 bg-teal-50/40 dark:bg-teal-950/20 text-xs hover:bg-teal-100/40 dark:hover:bg-teal-900/30 transition-all text-slate-700 dark:text-slate-300"
+              >
+                <span className="flex items-center gap-1.5 font-bold text-teal-700 dark:text-teal-400">
+                  <Tag className="w-3.5 h-3.5" />
+                  Have a Coupon? Save Extra
+                </span>
+                <span className="text-[11px] font-semibold text-teal-600 dark:text-teal-400">
+                  {activeCoupons.length > 0 ? `${activeCoupons.length} available →` : "View Offers →"}
+                </span>
+              </button>
+            )}
+
             {/* Price breakdown summary */}
             <div className="space-y-1.5 text-xs">
               <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
@@ -464,6 +528,20 @@ export default function CartDrawer() {
           </div>
         )}
       </div>
+
+      {/* Coupon Discovery Modal for Drawer */}
+      <CouponModal
+        open={couponModalOpen}
+        onClose={() => setCouponModalOpen(false)}
+        coupons={activeCoupons}
+        orderValue={
+          (cart?.totalSellingPrice || 0) +
+          (cart?.couponCode ? (cart?.discount || 0) : 0)
+        }
+        appliedCouponCode={cart?.couponCode || ""}
+        onApply={handleApplyCouponFromDrawer}
+        loading={couponState?.loadingActiveCoupons}
+      />
     </Drawer>
   );
 }

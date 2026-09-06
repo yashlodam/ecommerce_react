@@ -5,13 +5,22 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CircularProgress from "@mui/material/CircularProgress";
+import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 
 import CartItem from "./CartItem";
 import PricingCrd from "./PricingCrd";
 import EmptyState from "../../../common/EmptyState";
+import CouponModal from "../../../common/coupons/CouponModal";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { fetchUserCart } from "../../../State/customer/CartSlice";
-import { applyCoupon } from "../../../State/customer/CouponSlice";
+import {
+  applyCoupon,
+  removeCoupon,
+  fetchActiveCoupons,
+} from "../../../State/customer/CouponSlice";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -23,14 +32,21 @@ function formatINR(val) {
 
 function Cart() {
   const [couponCode, setCouponCode] = useState("");
-  const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState("");
+  const [isApplying, setIsApplying] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [couponModalOpen, setCouponModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const cart = useAppSelector((store) => store.cart);
+  const couponState = useAppSelector((store) => store.coupon);
 
   const cartItems = cart.cart?.cartItems || [];
+  const activeCoupons = couponState?.activeCoupons || [];
+  const activeCouponCode = cart.cart?.couponCode || "";
+  const couponDiscountAmount = cart.cart?.discount || 0;
+
   const outOfStockItems = cartItems.filter((item) => {
     const stock = item?.productVariant?.quantity ?? item?.product?.quantity ?? 0;
     return item?.product?.inStock === false || stock <= 0;
@@ -39,32 +55,51 @@ function Cart() {
 
   useEffect(() => {
     dispatch(fetchUserCart());
+    dispatch(fetchActiveCoupons());
   }, [dispatch]);
 
-  const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) return;
+  // Base cart order value before coupon discount
+  const baseOrderValue =
+    (cart.cart?.totalSellingPrice || 0) + (activeCouponCode ? couponDiscountAmount : 0);
+
+  const handleApplyCoupon = async (codeToApply) => {
+    const code = (typeof codeToApply === "string" ? codeToApply : couponCode).trim();
+    if (!code) return;
     setCouponError("");
+    setIsApplying(true);
     try {
       await dispatch(
         applyCoupon({
-          apply: true,
-          code: couponCode.trim(),
-          orderValue: cart.cart?.totalSellingPrice || 0,
+          apply: "true",
+          code: code,
+          orderValue: baseOrderValue,
         })
       ).unwrap();
-      setCouponApplied(true);
+      setCouponCode("");
     } catch (err) {
-      setCouponError(
-        typeof err === "string" ? err : "Invalid coupon code. Please try again."
-      );
+      const msg =
+        typeof err === "string" ? err : "Invalid coupon code. Please try again.";
+      setCouponError(msg);
+      throw msg;
+    } finally {
+      setIsApplying(false);
     }
   };
 
-  const handleRemoveCoupon = () => {
-    setCouponApplied(false);
-    setCouponCode("");
+  const handleRemoveCoupon = async () => {
+    if (!activeCouponCode) return;
     setCouponError("");
-    dispatch(fetchUserCart());
+    setIsRemoving(true);
+    try {
+      await dispatch(removeCoupon(activeCouponCode)).unwrap();
+      setCouponCode("");
+    } catch (err) {
+      setCouponError(
+        typeof err === "string" ? err : "Failed to remove coupon. Please try again."
+      );
+    } finally {
+      setIsRemoving(false);
+    }
   };
 
   return (
@@ -112,64 +147,160 @@ function Cart() {
 
           {/* Checkout & Coupon Sidebar */}
           <div className="lg:col-span-4 sticky top-24 space-y-4">
-            {/* Coupon Card */}
+            {/* Real E-Commerce Coupon Hub */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-4">
-              <div className="flex items-center gap-2">
-                <LocalOfferIcon className="text-teal-600 dark:text-teal-400" fontSize="small" />
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                  Apply Discount Coupon
-                </h3>
-              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <LocalOfferIcon className="text-teal-600 dark:text-teal-400" fontSize="small" />
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                    Coupons & Offers
+                  </h3>
+                </div>
 
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Enter promo code"
-                  value={couponCode}
-                  onChange={(e) => {
-                    setCouponCode(e.target.value.toUpperCase());
-                    setCouponError("");
-                  }}
-                  disabled={couponApplied}
-                  className={`flex-1 border uppercase font-mono rounded-xl px-3.5 py-2 text-sm outline-none transition-all ${
-                    couponApplied
-                      ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-400 text-emerald-700 dark:text-emerald-300 font-bold"
-                      : "border-slate-200 dark:border-slate-700 focus:border-teal-500 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-                  }`}
-                />
-                {!couponApplied ? (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleApplyCoupon}
-                    disabled={!couponCode.trim()}
-                    className="font-bold text-xs rounded-xl px-4"
+                {activeCoupons.length > 0 && !activeCouponCode && (
+                  <button
+                    type="button"
+                    onClick={() => setCouponModalOpen(true)}
+                    className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
                   >
-                    Apply
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={handleRemoveCoupon}
-                    className="font-bold text-xs rounded-xl px-3"
-                  >
-                    Remove
-                  </Button>
+                    View All ({activeCoupons.length}) →
+                  </button>
                 )}
               </div>
 
-              {couponError && (
-                <Alert severity="error" className="text-xs rounded-xl py-0.5">
-                  {couponError}
-                </Alert>
-              )}
+              {/* ── APPLIED COUPON STATE ── */}
+              {activeCouponCode ? (
+                <div className="relative overflow-hidden rounded-xl border border-emerald-500/80 bg-emerald-50/50 dark:bg-emerald-950/30 p-3.5 space-y-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircleIcon sx={{ fontSize: 18, color: "#10b981" }} />
+                      <div>
+                        <span className="font-mono font-black text-xs text-emerald-800 dark:text-emerald-200 tracking-wider bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded border border-emerald-300/50">
+                          {activeCouponCode}
+                        </span>
+                        <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 ml-1.5">
+                          Applied
+                        </span>
+                      </div>
+                    </div>
 
-              {couponApplied && (
-                <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl p-3">
-                  <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
-                    ✓ Coupon code applied to cart
+                    <Button
+                      size="small"
+                      variant="text"
+                      color="error"
+                      disabled={isRemoving}
+                      onClick={handleRemoveCoupon}
+                      startIcon={
+                        isRemoving ? (
+                          <CircularProgress size={12} color="inherit" />
+                        ) : (
+                          <DeleteIcon sx={{ fontSize: 15 }} />
+                        )
+                      }
+                      sx={{
+                        textTransform: "none",
+                        fontWeight: 700,
+                        fontSize: "11px",
+                        p: "2px 8px",
+                      }}
+                    >
+                      {isRemoving ? "Removing..." : "Remove"}
+                    </Button>
+                  </div>
+
+                  <p className="text-xs font-medium text-emerald-800 dark:text-emerald-300">
+                    🎉 You saved <strong>{formatINR(couponDiscountAmount)}</strong> with this promo code!
                   </p>
+                </div>
+              ) : (
+                /* ── NOT APPLIED: INPUT & QUICK DISCOVERY ── */
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Enter promo code"
+                      value={couponCode}
+                      onChange={(e) => {
+                        setCouponCode(e.target.value.toUpperCase());
+                        setCouponError("");
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleApplyCoupon();
+                      }}
+                      className="flex-1 border uppercase font-mono rounded-xl px-3.5 py-2 text-sm outline-none transition-all border-slate-200 dark:border-slate-700 focus:border-teal-500 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    />
+                    <Button
+                      variant="contained"
+                      onClick={() => handleApplyCoupon()}
+                      disabled={!couponCode.trim() || isApplying}
+                      sx={{
+                        bgcolor: "#0d9488",
+                        "&:hover": { bgcolor: "#0f766e" },
+                        fontWeight: 700,
+                        fontSize: "12px",
+                        borderRadius: "12px",
+                        px: 3,
+                        textTransform: "none",
+                      }}
+                    >
+                      {isApplying ? (
+                        <CircularProgress size={14} color="inherit" />
+                      ) : (
+                        "Apply"
+                      )}
+                    </Button>
+                  </div>
+
+                  {couponError && (
+                    <Alert severity="error" className="text-xs rounded-xl py-0.5">
+                      {couponError}
+                    </Alert>
+                  )}
+
+                  {/* Quick-apply active coupon pills */}
+                  {activeCoupons.length > 0 && (
+                    <div className="space-y-1.5 pt-1">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Recommended For You:
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {activeCoupons.slice(0, 3).map((cpn) => {
+                          const isEligible = baseOrderValue >= (cpn.minimumOrderValue || 0);
+                          return (
+                            <button
+                              key={cpn.code}
+                              type="button"
+                              onClick={() => {
+                                setCouponCode(cpn.code);
+                                handleApplyCoupon(cpn.code);
+                              }}
+                              className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border flex items-center gap-1.5 transition-all ${
+                                isEligible
+                                  ? "border-teal-300 dark:border-teal-800 bg-teal-50/60 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-900/60"
+                                  : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-500 hover:border-slate-300"
+                              }`}
+                            >
+                              <ConfirmationNumberOutlinedIcon sx={{ fontSize: 13 }} />
+                              <span>{cpn.code}</span>
+                              <span className="opacity-75">({cpn.discountPercentage}% off)</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* View All Coupons Button Trigger */}
+                  {activeCoupons.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setCouponModalOpen(true)}
+                      className="w-full text-center py-2 px-3 rounded-xl border border-dashed border-teal-300 dark:border-teal-800/80 bg-teal-50/40 dark:bg-teal-950/20 text-teal-700 dark:text-teal-300 text-xs font-bold hover:bg-teal-100/50 dark:hover:bg-teal-900/30 transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <ConfirmationNumberOutlinedIcon sx={{ fontSize: 15 }} />
+                      View All Available Coupons ({activeCoupons.length})
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -192,6 +323,8 @@ function Cart() {
                 borderRadius: "14px",
                 fontSize: "15px",
                 textTransform: "none",
+                bgcolor: "#0d9488",
+                "&:hover": { bgcolor: "#0f766e" },
                 ...(hasOutOfStockItems && {
                   bgcolor: "action.disabledBackground",
                   color: "text.disabled",
@@ -215,6 +348,11 @@ function Cart() {
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Total ({cartItems.length} {cartItems.length === 1 ? "item" : "items"})
+              {activeCouponCode && (
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold ml-1">
+                  • {activeCouponCode}
+                </span>
+              )}
             </p>
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg font-black text-teal-700 dark:text-teal-400">
@@ -230,7 +368,6 @@ function Cart() {
 
           <Button
             variant="contained"
-            color={hasOutOfStockItems ? "inherit" : "primary"}
             disabled={hasOutOfStockItems}
             onClick={() => navigate("/checkout")}
             endIcon={!hasOutOfStockItems ? <ArrowForwardIcon sx={{ fontSize: 16 }} /> : null}
@@ -242,6 +379,8 @@ function Cart() {
               fontSize: "13px",
               textTransform: "none",
               whiteSpace: "nowrap",
+              bgcolor: "#0d9488",
+              "&:hover": { bgcolor: "#0f766e" },
               boxShadow: 2,
               ...(hasOutOfStockItems && {
                 bgcolor: "action.disabledBackground",
@@ -253,6 +392,17 @@ function Cart() {
           </Button>
         </div>
       )}
+
+      {/* Available Coupons Modal */}
+      <CouponModal
+        open={couponModalOpen}
+        onClose={() => setCouponModalOpen(false)}
+        coupons={activeCoupons}
+        orderValue={baseOrderValue}
+        appliedCouponCode={activeCouponCode}
+        onApply={handleApplyCoupon}
+        loading={couponState.loadingActiveCoupons}
+      />
     </div>
   );
 }

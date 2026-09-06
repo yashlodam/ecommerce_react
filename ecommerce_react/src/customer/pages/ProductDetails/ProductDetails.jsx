@@ -36,6 +36,11 @@ import { api } from "../../../config/Api";
 import DealBadge from "../../../common/deals/DealBadge";
 import DealPrice from "../../../common/deals/DealPrice";
 import DealCountdown from "../../../common/deals/DealCountdown";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { fetchActiveCoupons } from "../../../State/customer/CouponSlice";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -64,7 +69,12 @@ function ProductDetails() {
   const { productId } = useParams();
   const product = useAppSelector((store) => store.product);
   const wishlist = useAppSelector((store) => store.wishlist);
+  const couponState = useAppSelector((store) => store.coupon);
   const requireAuth = useRequireAuth();
+
+  const activeCoupons = couponState?.activeCoupons || [];
+  const [copiedCoupon, setCopiedCoupon] = useState("");
+  const [showAllOffers, setShowAllOffers] = useState(false);
 
   const currentProduct = product?.product;
   const isDetailsLoading = product?.productDetailsLoading;
@@ -78,6 +88,16 @@ function ProductDetails() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [productId, dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchActiveCoupons());
+  }, [dispatch]);
+
+  const handleCopyCoupon = (code) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCoupon(code);
+    setTimeout(() => setCopiedCoupon(""), 2500);
+  };
 
   // Fetch variants when product loads
   useEffect(() => {
@@ -449,6 +469,94 @@ function ProductDetails() {
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
                 Inclusive of all taxes. Free express shipping on all prepaid orders across India.
               </p>
+
+              {/* Available Offers & Coupons */}
+              {activeCoupons.length > 0 && (
+                <div className="mt-4 p-4 rounded-2xl border border-teal-200/80 dark:border-teal-900/60 bg-gradient-to-br from-teal-50/50 via-emerald-50/30 to-transparent dark:from-teal-950/30 dark:via-slate-900/40 dark:to-transparent">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center shadow-xs">
+                        <LocalOfferIcon sx={{ fontSize: 15 }} />
+                      </div>
+                      <div>
+                        <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                          Available Offers & Coupons
+                          <span className="text-[10px] font-bold text-teal-700 dark:text-teal-300 bg-teal-100 dark:bg-teal-900/60 px-2 py-0.5 rounded-full">
+                            {activeCoupons.length} Offers
+                          </span>
+                        </h3>
+                      </div>
+                    </div>
+
+                    {activeCoupons.length > 2 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllOffers((prev) => !prev)}
+                        className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-0.5"
+                      >
+                        {showAllOffers ? "Show Less" : `View All (${activeCoupons.length})`}
+                        <ExpandMoreIcon
+                          sx={{
+                            fontSize: 16,
+                            transform: showAllOffers ? "rotate(180deg)" : "rotate(0deg)",
+                            transition: "transform 0.2s",
+                          }}
+                        />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
+                    {(showAllOffers ? activeCoupons : activeCoupons.slice(0, 2)).map((cpn) => {
+                      const isCopied = copiedCoupon === cpn.code;
+                      return (
+                        <div
+                          key={cpn.code}
+                          className="relative p-3 rounded-xl border border-dashed border-teal-300 dark:border-teal-800 bg-white/90 dark:bg-slate-900/90 flex flex-col justify-between gap-2 shadow-2xs hover:border-teal-500 transition-colors"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <span className="font-mono font-black text-xs text-teal-800 dark:text-teal-300 tracking-wider bg-teal-50 dark:bg-teal-950/80 px-2 py-0.5 rounded border border-teal-200 dark:border-teal-800/80">
+                                {cpn.code}
+                              </span>
+                              <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-1">
+                                Flat {cpn.discountPercentage}% OFF
+                              </p>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
+                                {cpn.minimumOrderValue > 0
+                                  ? `On orders of ${formatINR(cpn.minimumOrderValue)} & above`
+                                  : "Applicable on all orders"}
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleCopyCoupon(cpn.code)}
+                              className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                                isCopied
+                                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                  : "text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950 hover:bg-teal-100 dark:hover:bg-teal-900/80"
+                              }`}
+                            >
+                              {isCopied ? (
+                                <>
+                                  <CheckCircleIcon sx={{ fontSize: 13 }} />
+                                  Copied
+                                </>
+                              ) : (
+                                <>
+                                  <ContentCopyIcon sx={{ fontSize: 12 }} />
+                                  Copy
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <Divider className="my-5 dark:border-slate-800" />
 
