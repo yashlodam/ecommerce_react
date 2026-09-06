@@ -16,7 +16,7 @@ function SellerRoute() {
     <div>
         <Routes>
 
-        <Route path='/*' element= {<Dashboard/>} />
+        <Route path='/' element= {<Dashboard/>} />
         <Route path='/products' element= {<Products/>} />
         <Route path='/deals' element= {<SellerDeals/>} />
         {/* Support both spellings for backward compat */}
@@ -28,9 +28,7 @@ function SellerRoute() {
         <Route path='/payment' element= {<Payment/>} />
         <Route path='/transaction' element= {<Transaction/>} />
         <Route path='/notifications' element= {<NotificationsPage role="ROLE_SELLER" />} />
-
-
-
+        <Route path='*' element= {<Dashboard/>} />
         </Routes>
     </div>
   )

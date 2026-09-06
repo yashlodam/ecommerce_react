@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, Navigate } from 'react-router-dom'
 import SellersTable from '../admin/pages/Sellers/SellersTable'
 import UsersTable from '../admin/pages/Users/UsersTable'
 import Coupon from '../admin/pages/Coupon/Coupon'
@@ -23,6 +23,9 @@ function AdminRoute() {
       <Route path="/electronics-category" element={<ElectronicsTable />} />
       <Route path="/shop-by-category" element={<ShopByCategoryTable />} />
       <Route path="/notifications" element={<NotificationsPage role="ROLE_ADMIN" />} />
+      <Route path="/orders" element={<Navigate to="/admin" replace />} />
+      <Route path="/transactions" element={<Navigate to="/admin" replace />} />
+      <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>
   );
 }
