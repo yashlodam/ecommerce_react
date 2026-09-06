@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCheck, Bell, ChevronRight, Inbox } from "lucide-react";
-import NotificationItem from "./NotificationItem";
+import NotificationItem, { normalizeActionUrl } from "./NotificationItem";
 import NotificationSkeleton from "./NotificationSkeleton";
 
 export default function NotificationDropdown({
@@ -51,7 +51,9 @@ export default function NotificationDropdown({
 
   const handleItemNavigate = (url) => {
     onClose();
-    navigate(url);
+    if (url) {
+      navigate(normalizeActionUrl(url));
+    }
   };
 
   const displayList = notifications.slice(0, 7);

@@ -19,7 +19,7 @@ import {
   deleteNotification,
   deleteAllReadNotifications,
 } from "../../../State/customer/notificationSlice";
-import NotificationItem from "../../../common/notifications/NotificationItem";
+import NotificationItem, { normalizeActionUrl } from "../../../common/notifications/NotificationItem";
 import NotificationSkeleton from "../../../common/notifications/NotificationSkeleton";
 
 export default function NotificationsPage({ role = null }) {

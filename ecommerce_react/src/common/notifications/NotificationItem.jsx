@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ShoppingBag,
   Truck,
@@ -14,6 +15,20 @@ import {
   Trash2,
   ExternalLink,
 } from "lucide-react";
+
+// Normalizes internal or absolute action URLs into router-compatible relative paths
+export function normalizeActionUrl(url) {
+  if (!url) return "";
+  try {
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      const parsed = new URL(url);
+      return parsed.pathname + parsed.search + parsed.hash;
+    }
+  } catch {
+    // Return original url if parsing fails
+  }
+  return url;
+}
 
 // Format relative time helper
 function formatTimeAgo(dateString) {
@@ -105,6 +120,7 @@ export default function NotificationItem({
   onNavigate,
   compact = false,
 }) {
+  const navigate = useNavigate();
   const { id, type, title, message, read, createdAt, actionUrl } = notification;
   const config = getNotificationConfig(type);
   const IconComponent = config.icon;
@@ -113,8 +129,13 @@ export default function NotificationItem({
     if (!read && onMarkAsRead) {
       onMarkAsRead(id);
     }
-    if (actionUrl && onNavigate) {
-      onNavigate(actionUrl);
+    if (actionUrl) {
+      const normalized = normalizeActionUrl(actionUrl);
+      if (onNavigate) {
+        onNavigate(normalized);
+      } else {
+        navigate(normalized);
+      }
     }
   };
 

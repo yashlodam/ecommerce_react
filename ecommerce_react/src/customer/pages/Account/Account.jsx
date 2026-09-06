@@ -1,6 +1,6 @@
 import React from "react";
 import Divider from "@mui/material/Divider";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Order from "./Order";
 import OrderDetails from "./OrderDetails";
 import UserDetai from "./UserDetai";
@@ -86,7 +86,14 @@ function Account() {
             const isActive =
               item.path === location.pathname ||
               (item.path === "/account/orders" &&
-                location.pathname.startsWith("/account/order"));
+                (location.pathname.startsWith("/account/order") ||
+                 location.pathname.startsWith("/account/orders"))) ||
+              (item.path === "/account" &&
+                (location.pathname === "/account" ||
+                 location.pathname === "/account/" ||
+                 location.pathname === "/account/profile")) ||
+              (item.path === "/account/addresses" &&
+                location.pathname.startsWith("/account/address"));
             const isLogout = item.name === "Logout";
 
             return (
@@ -139,7 +146,14 @@ function Account() {
                   const isActive =
                     item.path === location.pathname ||
                     (item.path === "/account/orders" &&
-                      location.pathname.startsWith("/account/order"));
+                      (location.pathname.startsWith("/account/order") ||
+                       location.pathname.startsWith("/account/orders"))) ||
+                    (item.path === "/account" &&
+                      (location.pathname === "/account" ||
+                       location.pathname === "/account/" ||
+                       location.pathname === "/account/profile")) ||
+                    (item.path === "/account/addresses" &&
+                      location.pathname.startsWith("/account/address"));
                   const isLogout = item.name === "Logout";
 
                   return (
@@ -177,12 +191,19 @@ function Account() {
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-4 sm:p-6 lg:p-8 min-h-[500px] transition-colors">
               <Routes>
                 <Route path="/" element={<UserDetai />} />
+                <Route path="/profile" element={<UserDetai />} />
                 <Route path="/orders" element={<Order />} />
+                <Route path="/orders/:orderId" element={<OrderDetails />} />
+                <Route path="/orders/:orderId/:orderItemId" element={<OrderDetails />} />
+                <Route path="/order/:orderId" element={<OrderDetails />} />
                 <Route
                   path="/order/:orderId/:orderItemId"
                   element={<OrderDetails />}
                 />
                 <Route path="/addresses" element={<Address />} />
+                <Route path="/address" element={<Address />} />
+                <Route path="/notifications" element={<Navigate to="/notifications" replace />} />
+                <Route path="*" element={<Navigate to="/account/orders" replace />} />
               </Routes>
             </div>
           </section>

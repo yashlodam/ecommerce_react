@@ -140,7 +140,10 @@ export const addUserAddress = createAsyncThunk(
   "user/addUserAddress",
   async (arg, { rejectWithValue }) => {
     try {
-      const payload = arg?.address ? arg.address : arg;
+      const payload =
+        arg && typeof arg.address === "object" && arg.address !== null
+          ? arg.address
+          : arg;
       const response = await api.post("/api/users/add-address", payload);
       return response.data;
     } catch (error) {
@@ -160,7 +163,10 @@ export const updateUserAddress = createAsyncThunk(
         typeof addressId === "object" && addressId !== null
           ? addressId.addressId || addressId.id
           : addressId;
-      const payload = address?.address ? address.address : address;
+      const payload =
+        address && typeof address.address === "object" && address.address !== null
+          ? address.address
+          : address;
       const response = await api.put(`/api/users/address/${id}`, payload);
       return response.data;
     } catch (error) {
