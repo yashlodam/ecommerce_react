@@ -29,6 +29,7 @@ import {
 } from "../../../State/admin/adminFetchSlice";
 import StatusBadge from "../../../common/StatusBadge";
 import EmptyState from "../../../common/EmptyState";
+import { toast } from "../../../common/toast";
 
 const accountStatuses = [
   { status: "ALL", title: "All Sellers" },
@@ -68,14 +69,19 @@ function SellersTable() {
     }));
   };
 
-  const handleStatusChange = (id, status) => {
-    dispatch(
-      updateSellerAccountStatus({
-        jwt: localStorage.getItem("jwt"),
-        id,
-        status,
-      })
-    );
+  const handleStatusChange = async (id, status) => {
+    try {
+      await dispatch(
+        updateSellerAccountStatus({
+          jwt: localStorage.getItem("jwt"),
+          id,
+          status,
+        })
+      ).unwrap();
+      toast.success(`Seller status updated to ${status.replace(/_/g, " ")}.`);
+    } catch (error) {
+      toast.error(error || "Failed to update seller account status.");
+    }
     handleClose(id);
   };
 

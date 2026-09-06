@@ -29,6 +29,7 @@ import {
   applyCoupon,
   fetchActiveCoupons,
 } from "../../../State/customer/CouponSlice";
+import { toast } from "../../../common/toast";
 
 const FREE_SHIPPING_THRESHOLD = 499;
 
@@ -61,13 +62,20 @@ export default function CartDrawer() {
   const handleApplyCouponFromDrawer = async (code) => {
     const baseValue =
       (cart?.totalSellingPrice || 0) + (cart?.couponCode ? (cart?.discount || 0) : 0);
-    return dispatch(
-      applyCoupon({
-        apply: "true",
-        code: code,
-        orderValue: baseValue,
-      })
-    ).unwrap();
+    try {
+      const res = await dispatch(
+        applyCoupon({
+          apply: "true",
+          code: code,
+          orderValue: baseValue,
+        })
+      ).unwrap();
+      toast.success(`Coupon "${code}" applied successfully!`);
+      return res;
+    } catch (err) {
+      toast.error(err || "Failed to apply coupon.");
+      throw err;
+    }
   };
 
   const cartItems = cart?.cartItems || [];

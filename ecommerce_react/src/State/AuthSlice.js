@@ -104,14 +104,30 @@ export const updateUserProfile = createAsyncThunk(
   "auth/updateUserProfile",
   async (userData, { rejectWithValue }) => {
     try {
+      const payload = userData?.userData ? userData.userData : userData;
       const response = await api.patch(
         "/api/users/profile/update",
-        userData
+        payload
       );
       return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to update profile"
+      );
+    }
+  }
+);
+
+export const deleteCustomerAccount = createAsyncThunk(
+  "auth/deleteCustomerAccount",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.delete("/api/users/profile");
+      localStorage.removeItem("jwt");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete account"
       );
     }
   }
@@ -273,6 +289,24 @@ const authSlice = createSlice({
         state.role = action.payload.role;
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Delete Customer Account
+      .addCase(deleteCustomerAccount.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteCustomerAccount.fulfilled, (state) => {
+        state.jwt = null;
+        state.role = null;
+        state.user = null;
+        state.isLoggedIn = false;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(deleteCustomerAccount.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

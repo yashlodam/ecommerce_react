@@ -4,8 +4,7 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import Select from "@mui/material/Select";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import { toast } from "../../../common/toast";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -140,10 +139,14 @@ function AddProduct() {
   const [addingVariant, setAddingVariant] = useState(false);
   const [newVariantRow, setNewVariantRow] = useState(emptyVariantRow());
 
-  // Snackbar
-  const [snackbar, setSnackbar] = useState({ open: false, msg: "", severity: "success" });
-  const showSnackbar = (msg, severity = "success") =>
-    setSnackbar({ open: true, msg, severity });
+  // Centralized Toast
+  const showSnackbar = (msg, severity = "success") => {
+    if (toast[severity]) {
+      toast[severity](msg);
+    } else {
+      toast.info(msg);
+    }
+  };
 
   // ── Image upload ────────────────────────────────────────────────────────────
   const handleImageChange = async (e) => {
@@ -720,17 +723,6 @@ function AddProduct() {
           </Grid>
         </Grid>
       </form>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert severity={snackbar.severity} variant="filled" onClose={() => setSnackbar((s) => ({ ...s, open: false }))}>
-          {snackbar.msg}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

@@ -3,8 +3,6 @@ import { Button } from "@mui/material";
 import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
 import UserAddressCard from "./UserAddressCard";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import { fetchUserProfile } from "../../../State/AuthSlice";
@@ -15,9 +13,7 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 function Address() {
   const dispatch = useAppDispatch();
   const [openDialog, setOpenDialog] = useState(false);
-  const [openSuccess, setOpenSuccess] = useState(false);
-  const [openError, setOpenError] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  const [editingAddress, setEditingAddress] = useState(null);
 
   useEffect(() => {
     dispatch(fetchUserProfile(localStorage.getItem("jwt")));
@@ -25,6 +21,16 @@ function Address() {
 
   const auth = useAppSelector((store) => store.auth);
   const addresses = auth.user?.addresses || [];
+
+  const handleOpenAdd = () => {
+    setEditingAddress(null);
+    setOpenDialog(true);
+  };
+
+  const handleOpenEdit = (addr) => {
+    setEditingAddress(addr);
+    setOpenDialog(true);
+  };
 
   return (
     <div className="max-w-4xl">
@@ -40,7 +46,7 @@ function Address() {
         </div>
 
         <Button
-          onClick={() => setOpenDialog(true)}
+          onClick={handleOpenAdd}
           variant="contained"
           color="primary"
           startIcon={<AddLocationAltIcon />}
@@ -55,28 +61,6 @@ function Address() {
         </Button>
       </div>
 
-      <Snackbar
-        open={openSuccess}
-        autoHideDuration={3000}
-        onClose={() => setOpenSuccess(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="success" variant="filled">
-          {successMessage}
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={openError}
-        autoHideDuration={3000}
-        onClose={() => setOpenError(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="error" variant="filled">
-          Failed to process address request.
-        </Alert>
-      </Snackbar>
-
       {/* Address Cards */}
       {addresses.length === 0 ? (
         <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6">
@@ -85,7 +69,7 @@ function Address() {
             title="No Saved Addresses"
             description="Add your delivery address to enjoy seamless 1-click checkout."
             actionText="Add Delivery Address"
-            onAction={() => setOpenDialog(true)}
+            onAction={handleOpenAdd}
           />
         </div>
       ) : (
@@ -94,9 +78,7 @@ function Address() {
             <UserAddressCard
               key={address.id}
               address={address}
-              setOpenSuccess={setOpenSuccess}
-              setOpenError={setOpenError}
-              setSuccessMessage={setSuccessMessage}
+              onEdit={handleOpenEdit}
             />
           ))}
         </div>
@@ -116,11 +98,11 @@ function Address() {
       >
         <DialogContent sx={{ p: 0 }}>
           <AddAddressForm
+            addressToEdit={editingAddress}
             handleClose={() => setOpenDialog(false)}
             onSuccess={() => {
-              setSuccessMessage("Address added successfully.");
-              setOpenSuccess(true);
               setOpenDialog(false);
+              setEditingAddress(null);
               dispatch(fetchUserProfile(localStorage.getItem("jwt")));
             }}
           />

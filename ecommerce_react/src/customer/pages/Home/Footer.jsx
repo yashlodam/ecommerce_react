@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from "../../../common/toast";
 import {
   Mail,
   Phone,
@@ -57,7 +58,8 @@ function Footer() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                alert("Thank you for subscribing to ShopSphere VIP Deals!");
+                toast.success("Thank you for subscribing to ShopSphere VIP Deals! 🎉");
+                e.target.reset();
               }}
               className="w-full md:w-auto flex items-center gap-2 bg-white dark:bg-slate-900 rounded-full p-1.5 pl-4 max-w-md md:max-w-none shadow-sm"
             >

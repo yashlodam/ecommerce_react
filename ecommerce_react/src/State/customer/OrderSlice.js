@@ -49,12 +49,17 @@ export const createOrder = createAsyncThunk(
         params: { paymentMethod: paymentGateway },
       });
 
-      // For online payment — redirect to Razorpay immediately
-      if (response.data.payment_link_url) {
-        window.location.href = response.data.payment_link_url;
-      }
-
-      return response.data;
+      const data = response.data;
+      return {
+        ...data,
+        paymentLinkUrl: data.payment_link_url || data.paymentLinkUrl,
+        paymentLinkId: data.payment_link_id || data.paymentLinkId,
+        razorpayOrderId: data.razorpay_order_id || data.razorpayOrderId || data.payment_link_id,
+        keyId: data.key_id || data.keyId,
+        paymentOrderId: data.payment_order_id || data.paymentOrderId,
+        amount: data.amount,
+        currency: data.currency || "INR",
+      };
     } catch (error) {
       // Extract meaningful error message from backend
       const backendMessage =
@@ -133,9 +138,10 @@ export const cancelOrder = createAsyncThunk(
 // ================= Add Address =================
 export const addUserAddress = createAsyncThunk(
   "user/addUserAddress",
-  async (address, { rejectWithValue }) => {
+  async (arg, { rejectWithValue }) => {
     try {
-      const response = await api.post("/api/users/add-address", address);
+      const payload = arg?.address ? arg.address : arg;
+      const response = await api.post("/api/users/add-address", payload);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -145,11 +151,35 @@ export const addUserAddress = createAsyncThunk(
   }
 );
 
+// ================= Update Address =================
+export const updateUserAddress = createAsyncThunk(
+  "user/updateUserAddress",
+  async ({ addressId, address }, { rejectWithValue }) => {
+    try {
+      const id =
+        typeof addressId === "object" && addressId !== null
+          ? addressId.addressId || addressId.id
+          : addressId;
+      const payload = address?.address ? address.address : address;
+      const response = await api.put(`/api/users/address/${id}`, payload);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update address"
+      );
+    }
+  }
+);
+
 // ================= Delete Address =================
 export const deleteUserAddress = createAsyncThunk(
   "user/deleteUserAddress",
-  async (addressId, { rejectWithValue }) => {
+  async (arg, { rejectWithValue }) => {
     try {
+      const addressId =
+        typeof arg === "object" && arg !== null
+          ? arg.addressId || arg.id
+          : arg;
       const response = await api.delete(`/api/users/address/${addressId}`);
       return { addressId, user: response.data };
     } catch (error) {

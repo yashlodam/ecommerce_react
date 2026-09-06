@@ -14,10 +14,9 @@ import {
   Step,
   StepLabel,
   IconButton,
-  Snackbar,
-  Alert,
   Tooltip,
 } from "@mui/material";
+import { toast } from "../../common/toast";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import BlockRoundedIcon from "@mui/icons-material/BlockRounded";
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded";
@@ -42,18 +41,13 @@ function SuspendedAccount() {
   const [appealOpen, setAppealOpen] = useState(false);
   const [appealText, setAppealText] = useState("");
   const [appealSubmitted, setAppealSubmitted] = useState(false);
-  const [toast, setToast] = useState({ open: false, message: "", severity: "success" });
 
   const handleRefresh = () => {
     setChecking(true);
     // Simulated status check — swap for a real GET /seller/status call.
     setTimeout(() => {
       setChecking(false);
-      setToast({
-        open: true,
-        message: "Your account is still under review. We'll email you once it's resolved.",
-        severity: "info",
-      });
+      toast.info("Your account is still under review. We'll email you once it's resolved.");
     }, 1200);
   };
 
@@ -64,9 +58,9 @@ function SuspendedAccount() {
   const handleCopyEmail = async () => {
     try {
       await navigator.clipboard.writeText(SUPPORT_EMAIL);
-      setToast({ open: true, message: "Support email copied to clipboard.", severity: "success" });
+      toast.success("Support email copied to clipboard.");
     } catch {
-      setToast({ open: true, message: "Couldn't copy — please copy it manually.", severity: "error" });
+      toast.error("Couldn't copy — please copy it manually.");
     }
   };
 
@@ -329,22 +323,6 @@ function SuspendedAccount() {
           </>
         )}
       </Dialog>
-
-      {/* Toast feedback */}
-      <Snackbar
-        open={toast.open}
-        autoHideDuration={4000}
-        onClose={() => setToast((t) => ({ ...t, open: false }))}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          severity={toast.severity}
-          onClose={() => setToast((t) => ({ ...t, open: false }))}
-          sx={{ borderRadius: 2 }}
-        >
-          {toast.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

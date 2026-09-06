@@ -1,35 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import PhoneIcon from "@mui/icons-material/Phone";
 import { useAppDispatch } from "../../../State/Store";
 import { deleteUserAddress } from "../../../State/customer/OrderSlice";
 import { fetchUserProfile } from "../../../State/AuthSlice";
+import { toast } from "../../../common/toast";
+import ConfirmDialog from "../../../common/dialog/ConfirmDialog";
 
-function UserAddressCard({
-  address,
-  setOpenSuccess,
-  setOpenError,
-  setSuccessMessage,
-}) {
+function UserAddressCard({ address, onEdit }) {
   const dispatch = useAppDispatch();
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const removeAddress = async () => {
+    setDeleting(true);
     try {
-      await dispatch(
-        deleteUserAddress({
-          addressId: address.id,
-          jwt: localStorage.getItem("jwt"),
-        })
-      ).unwrap();
-
-      await dispatch(fetchUserProfile(localStorage.getItem("jwt")));
-      setSuccessMessage("Address deleted successfully.");
-      setOpenSuccess(true);
+      await dispatch(deleteUserAddress(address.id)).unwrap();
+      await dispatch(fetchUserProfile());
+      toast.success("Delivery address removed successfully.");
     } catch (error) {
       console.error("Delete Error:", error);
-      setOpenError(true);
+      toast.error(error || "Failed to remove delivery address.");
+    } finally {
+      setDeleting(false);
+      setConfirmDeleteOpen(false);
     }
   };
 
@@ -58,12 +55,26 @@ function UserAddressCard({
           </div>
         </div>
 
-        <div>
+        <div className="flex items-center gap-2 self-end sm:self-start">
+          {onEdit && (
+            <Button
+              onClick={() => onEdit(address)}
+              size="small"
+              variant="outlined"
+              color="primary"
+              startIcon={<EditOutlinedIcon fontSize="small" />}
+              sx={{ textTransform: "none", borderRadius: "10px", fontWeight: 600 }}
+            >
+              Edit
+            </Button>
+          )}
+
           <Button
-            onClick={removeAddress}
+            onClick={() => setConfirmDeleteOpen(true)}
             size="small"
             color="error"
             variant="outlined"
+            disabled={deleting}
             startIcon={<DeleteIcon fontSize="small" />}
             sx={{ textTransform: "none", borderRadius: "10px", fontWeight: 600 }}
           >
@@ -71,6 +82,16 @@ function UserAddressCard({
           </Button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        title="Delete Delivery Address"
+        message={`Are you sure you want to remove "${address.name}'s" address from your saved addresses?`}
+        confirmText="Delete Address"
+        confirmSeverity="danger"
+        onConfirm={removeAddress}
+        onCancel={() => setConfirmDeleteOpen(false)}
+      />
     </div>
   );
 }

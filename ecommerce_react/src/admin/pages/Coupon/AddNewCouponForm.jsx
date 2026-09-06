@@ -13,6 +13,7 @@ import Paper from "@mui/material/Paper";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch } from "../../../State/Store";
 import { createCoupon } from "../../../State/customer/CouponSlice";
+import { toast } from "../../../common/toast";
 
 function AddNewCouponForm({ handleClose, onSuccess }) {
   const dispatch = useAppDispatch();
@@ -57,6 +58,7 @@ function AddNewCouponForm({ handleClose, onSuccess }) {
 
       try {
         await dispatch(createCoupon(formattedValues)).unwrap();
+        toast.success(`Coupon "${formattedValues.code}" created successfully!`);
         if (onSuccess) onSuccess();
         if (handleClose) {
           handleClose();
@@ -65,6 +67,7 @@ function AddNewCouponForm({ handleClose, onSuccess }) {
         }
       } catch (error) {
         console.error("Failed to create coupon:", error);
+        toast.error(error || "Failed to create coupon.");
       } finally {
         setSubmitting(false);
       }

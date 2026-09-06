@@ -21,6 +21,8 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
+import NotificationBell from "../../../common/notifications/NotificationBell";
 import CircularProgress from "@mui/material/CircularProgress";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
@@ -578,6 +580,7 @@ function Navbar() {
           {/* Right Action Icons & Auth */}
           <div className="flex shrink-0 items-center gap-1 min-[360px]:gap-1.5 sm:gap-2 lg:gap-3">
             <ThemeToggle size="small" />
+            {isLoggedIn && <NotificationBell />}
 
             {!isLarge && (
               <>
@@ -783,6 +786,10 @@ function Navbar() {
                           <MenuItem onClick={() => { handleMenuClose(); navigate("/account/orders"); }}>
                             <ReceiptLongOutlinedIcon sx={{ fontSize: 17, mr: 1.5, color: "text.secondary" }} />
                             <span className="text-xs font-semibold">My Orders</span>
+                          </MenuItem>
+                          <MenuItem onClick={() => { handleMenuClose(); navigate("/notifications"); }}>
+                            <NotificationsNoneOutlinedIcon sx={{ fontSize: 17, mr: 1.5, color: "text.secondary" }} />
+                            <span className="text-xs font-semibold">Notifications</span>
                           </MenuItem>
                           <MenuItem onClick={() => { handleMenuClose(); navigate("/account"); }}>
                             <PersonOutlineOutlinedIcon sx={{ fontSize: 17, mr: 1.5, color: "text.secondary" }} />

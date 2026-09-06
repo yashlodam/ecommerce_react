@@ -4,7 +4,8 @@ import * as Yup from "yup";
 import { TextField, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAppDispatch } from "../../../State/Store";
-import { addUserAddress, createOrder } from "../../../State/customer/OrderSlice";
+import { addUserAddress, updateUserAddress, createOrder } from "../../../State/customer/OrderSlice";
+import { toast } from "../../../common/toast";
 
 const validationSchema = Yup.object({
   fullName: Yup.string().required("Full name is required"),
@@ -20,20 +21,21 @@ const validationSchema = Yup.object({
   state: Yup.string().required("State is required"),
 });
 
-const AddAddressForm = ({handleClose, onSuccess}) => {
+const AddAddressForm = ({ handleClose, onSuccess, addressToEdit = null }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const dispatch = useAppDispatch();
  
  const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      fullName: "",
-      mobile: "",
-      pincode: "",
-      house: "",
-      locality: "",
-      city: "",
-      state: "",
+      fullName: addressToEdit?.name || "",
+      mobile: addressToEdit?.mobile || "",
+      pincode: addressToEdit?.pinCode || addressToEdit?.pincode || "",
+      house: addressToEdit?.address || "",
+      locality: addressToEdit?.locality || "",
+      city: addressToEdit?.city || "",
+      state: addressToEdit?.state || "",
     },
     validationSchema,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
@@ -48,12 +50,20 @@ const AddAddressForm = ({handleClose, onSuccess}) => {
       pinCode: values.pincode,
     };
 
-    await dispatch(
-      addUserAddress({
-        address,
-        jwt: localStorage.getItem("jwt"),
-      })
-    ).unwrap();
+    if (addressToEdit) {
+      await dispatch(
+        updateUserAddress({
+          addressId: addressToEdit.id,
+          address,
+        })
+      ).unwrap();
+      toast.success("Delivery address updated successfully.");
+    } else {
+      await dispatch(
+        addUserAddress(address)
+      ).unwrap();
+      toast.success("Delivery address saved successfully.");
+    }
 
     resetForm();
 
@@ -62,9 +72,9 @@ const AddAddressForm = ({handleClose, onSuccess}) => {
     }
 
     handleClose();
-
   } catch (error) {
     console.error(error);
+    toast.error(error || `Failed to ${addressToEdit ? "update" : "save"} delivery address.`);
   } finally {
     setSubmitting(false);
   }
@@ -81,7 +91,7 @@ const AddAddressForm = ({handleClose, onSuccess}) => {
         {/* Header - sticky */}
         <div className="flex justify-between items-center px-4 sm:px-6 py-4 border-b border-gray-100 shrink-0">
           <h2 className="text-base sm:text-xl font-semibold text-gray-800">
-            Add New Address
+            {addressToEdit ? "Edit Delivery Address" : "Add New Address"}
           </h2>
           <IconButton
             onClick={handleClose}
@@ -226,7 +236,7 @@ const AddAddressForm = ({handleClose, onSuccess}) => {
             disabled={formik.isSubmitting}
             className="cursor-pointer w-full sm:w-auto px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 active:bg-gray-900 transition disabled:opacity-50"
           >
-            Save Address
+            {addressToEdit ? "Update Address" : "Save Address"}
           </button>
         </div>
       </form>

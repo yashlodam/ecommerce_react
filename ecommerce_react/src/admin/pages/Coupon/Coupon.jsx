@@ -21,6 +21,8 @@ import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { fetchAllCoupons, deleteCoupon } from "../../../State/customer/CouponSlice";
 import AddNewCouponForm from "./AddNewCouponForm";
 import EmptyState from "../../../common/EmptyState";
+import ConfirmDialog from "../../../common/dialog/ConfirmDialog";
+import { toast } from "../../../common/toast";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -34,6 +36,8 @@ function Coupon() {
   const dispatch = useAppDispatch();
   const coupon = useAppSelector((store) => store.coupon);
   const [openAddModal, setOpenAddModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAllCoupons());
@@ -42,9 +46,18 @@ function Coupon() {
   const coupons = coupon?.coupons || [];
   const isLoading = coupon?.loading;
 
-  const handleDeleteCoupon = (couponId) => {
-    if (window.confirm("Are you sure you want to delete this coupon?")) {
-      dispatch(deleteCoupon(couponId));
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await dispatch(deleteCoupon(deleteTarget.id)).unwrap();
+      toast.success(`Coupon "${deleteTarget.code}" deleted successfully.`);
+      dispatch(fetchAllCoupons());
+    } catch (err) {
+      toast.error(err || "Failed to delete coupon.");
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -223,7 +236,7 @@ function Coupon() {
                       <IconButton
                         size="small"
                         color="error"
-                        onClick={() => handleDeleteCoupon(c.id)}
+                        onClick={() => setDeleteTarget(c)}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -254,6 +267,18 @@ function Coupon() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title="Delete Coupon"
+        message={`Are you sure you want to permanently delete coupon code "${deleteTarget?.code}"? This action cannot be undone.`}
+        confirmText="Delete Coupon"
+        isDestructive={true}
+        loading={deleting}
+        onConfirm={handleConfirmDelete}
+        onClose={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

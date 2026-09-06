@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { addProductToWishlist } from "../../../State/customer/WishlistSlice";
 import DealBadge from "../../../common/deals/DealBadge";
 import DealPrice from "../../../common/deals/DealPrice";
+import { toast } from "../../../common/toast";
 
 function ProductCard({ item }) {
   const images = item.images || [];
@@ -52,6 +53,7 @@ function ProductCard({ item }) {
   const handleWishlist = (e) => {
     e.stopPropagation();
     if (!isLoggedIn) {
+      toast.info("Please sign in to save items to your wishlist.");
       navigate("/login");
       return;
     }
@@ -62,6 +64,11 @@ function ProductCard({ item }) {
           jwt: localStorage.getItem("jwt"),
         })
       );
+      if (isWishlisted) {
+        toast.info("Item removed from your wishlist.");
+      } else {
+        toast.success("Saved to your wishlist!");
+      }
     }
   };
 

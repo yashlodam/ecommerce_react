@@ -22,6 +22,7 @@ import OrderSuccess from "./customer/OrderSuccess";
 import SearchPage from "./customer/pages/SearchPage";
 import DealsPage from "./customer/pages/Deals/DealsPage";
 import CategoriesPage from "./customer/pages/Categories/CategoriesPage";
+import NotificationsPage from "./customer/pages/Notifications/NotificationsPage";
 import Auth from "./customer/pages/Auth/Auth";
 import AiChatWidget from "./customer/components/AiChat/AiChatWidget";
 import CartDrawer from "./customer/components/Cart/CartDrawer";
@@ -153,6 +154,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Account />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
               </ProtectedRoute>
             }
           />

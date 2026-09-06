@@ -18,6 +18,7 @@ import {
   fetchHomePageData,
 } from "../../../State/customer/CustomerSlice";
 import { fetchHomeCategories } from "../../../State/admin/adminSlice";
+import { toast } from "../../../common/toast";
 
 function CreateDealForm({ handleClose, onSuccess }) {
   const dispatch = useAppDispatch();
@@ -160,6 +161,7 @@ function CreateDealForm({ handleClose, onSuccess }) {
         }
 
         await dispatch(createDeal(payload)).unwrap();
+        toast.success("Promotional deal created successfully!");
         setSuccessMessage("Promotional deal created successfully!");
         dispatch(fetchDeals());
         dispatch(fetchHomePageData());
@@ -176,6 +178,7 @@ function CreateDealForm({ handleClose, onSuccess }) {
             : err?.message ||
               "Failed to create deal. Please verify parameters.";
         setErrorMessage(msg);
+        toast.error(msg);
       } finally {
         setSubmitting(false);
       }

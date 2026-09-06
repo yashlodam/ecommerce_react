@@ -20,7 +20,11 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const state = store.getState();
-    const token = state?.auth?.jwt;
+    let token = state?.auth?.jwt || state?.seller?.jwt;
+
+    if (!token) {
+      token = localStorage.getItem("jwt") || localStorage.getItem("seller_jwt");
+    }
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

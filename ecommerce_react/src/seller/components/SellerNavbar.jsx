@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from "../../State/Store";
 import { logout } from "../../State/AuthSlice";
 import SellerDrawerList from "./SellerDrawerList";
 import ThemeToggle from "../../common/ThemeToggle";
+import NotificationBell from "../../common/notifications/NotificationBell";
 
 function SellerNavbar() {
   const theme = useTheme();
@@ -94,6 +95,7 @@ function SellerNavbar() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle size="small" />
+            <NotificationBell role="ROLE_SELLER" allNotificationsUrl="/seller/notifications" />
 
             <Button
               variant="outlined"

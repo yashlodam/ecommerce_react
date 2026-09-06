@@ -9,6 +9,8 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 
 
@@ -60,6 +62,12 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
                 path:"/seller/transaction",
                 icon:<ReceiptIcon className="text-primary"/>,
                 activeIcon:<ReceiptIcon className="text-white"/>,
+            },
+            {
+                name:"Notifications",
+                path:"/seller/notifications",
+                icon:<NotificationsNoneIcon className="text-primary"/>,
+                activeIcon:<NotificationsIcon className="text-white"/>,
             },
             
     

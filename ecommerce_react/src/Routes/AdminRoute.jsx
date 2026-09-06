@@ -8,6 +8,7 @@ import GridTable from '../admin/pages/HomePage/GridTable'
 import ElectronicsTable from '../admin/pages/HomePage/ElectronicsTable'
 import ShopByCategoryTable from '../admin/pages/HomePage/ShopByCategoryTable'
 import Deal from '../admin/pages/HomePage/Deal'
+import NotificationsPage from '../customer/pages/Notifications/NotificationsPage'
 
 function AdminRoute() {
   return (
@@ -21,6 +22,7 @@ function AdminRoute() {
       <Route path="/home-grid" element={<GridTable />} />
       <Route path="/electronics-category" element={<ElectronicsTable />} />
       <Route path="/shop-by-category" element={<ShopByCategoryTable />} />
+      <Route path="/notifications" element={<NotificationsPage role="ROLE_ADMIN" />} />
     </Routes>
   );
 }

@@ -410,7 +410,7 @@ function OrderDetails() {
           <DialogContentText sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
             Are you sure you want to cancel this order?
             Any reserved product stock will immediately be restored.
-            If you paid online via Razorpay or Stripe, the refund will be processed to your original payment method.
+            If you paid online via Razorpay, the refund will be processed to your original payment method.
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>

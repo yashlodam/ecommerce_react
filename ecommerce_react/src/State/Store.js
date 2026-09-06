@@ -15,6 +15,7 @@ import homeCategorySlice from './admin/adminSlice'
 import adminFetchSlice from './admin/adminFetchSlice'
 import couponSlice from './customer/CouponSlice'
 import chatSlice from './customer/ChatSlice'
+import notificationSlice from './customer/notificationSlice'
 
 const rootReducer = combineReducers({
   seller: sellerSlice,
@@ -34,6 +35,7 @@ const rootReducer = combineReducers({
   homeCategory: homeCategorySlice,
   adminFetch: adminFetchSlice,
   chat: chatSlice,
+  notifications: notificationSlice,
 })
 
 export const store = configureStore({

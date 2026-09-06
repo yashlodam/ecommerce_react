@@ -1,18 +1,22 @@
 import React, { useState } from "react";
-import { Avatar, Button, TextField, Snackbar, Alert } from "@mui/material";
+import { Avatar, Button, TextField } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
-import { fetchUserProfile, updateUserProfile } from "../../../State/AuthSlice";
+import { fetchUserProfile, updateUserProfile, deleteCustomerAccount } from "../../../State/AuthSlice";
+import { toast } from "../../../common/toast";
+import ConfirmDialog from "../../../common/dialog/ConfirmDialog";
 
 function UserDetai() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { user } = useAppSelector((store) => store.auth);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [openSuccess, setOpenSuccess] = useState(false);
-  const [openError, setOpenError] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -32,46 +36,40 @@ function UserDetai() {
       try {
         await dispatch(
           updateUserProfile({
-            userData: values,
-            jwt: localStorage.getItem("jwt"),
+            fullName: values.fullName,
+            mobile: values.mobile,
           })
         ).unwrap();
 
-        await dispatch(fetchUserProfile(localStorage.getItem("jwt")));
-        setOpenSuccess(true);
+        await dispatch(fetchUserProfile());
+        toast.success("Profile updated successfully.");
         setIsEditing(false);
       } catch (error) {
         console.error(error);
-        setOpenError(true);
+        toast.error(error || "Failed to update profile. Please try again.");
       } finally {
         setSubmitting(false);
       }
     },
   });
 
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      await dispatch(deleteCustomerAccount()).unwrap();
+      toast.success("Your account has been deleted successfully.");
+      setConfirmDeleteOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      toast.error(error || "Failed to delete account. Please try again.");
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl">
-      <Snackbar
-        open={openSuccess}
-        autoHideDuration={3000}
-        onClose={() => setOpenSuccess(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="success" variant="filled">
-          Profile updated successfully.
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={openError}
-        autoHideDuration={3000}
-        onClose={() => setOpenError(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="error" variant="filled">
-          Failed to update profile. Please try again.
-        </Alert>
-      </Snackbar>
 
       <div className="mb-6">
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
@@ -183,6 +181,47 @@ function UserDetai() {
           />
         </div>
       </div>
+
+      {/* Danger Zone: Account Deletion */}
+      <div className="mt-8 bg-rose-50/50 dark:bg-rose-950/20 rounded-2xl border border-rose-200/80 dark:border-rose-900/40 p-6 sm:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <h3 className="text-base sm:text-lg font-bold text-rose-900 dark:text-rose-200">
+              Delete Customer Account
+            </h3>
+            <p className="text-xs sm:text-sm text-rose-700/80 dark:text-rose-400 mt-1 max-w-xl">
+              Permanently delete your ShopSphere customer account and remove all personal details, saved delivery addresses, and active shopping cart. This action cannot be reversed.
+            </p>
+          </div>
+
+          <Button
+            variant="outlined"
+            color="error"
+            disabled={deletingAccount}
+            onClick={() => setConfirmDeleteOpen(true)}
+            sx={{
+              textTransform: "none",
+              borderRadius: "10px",
+              fontWeight: 700,
+              px: 3,
+              py: 1,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {deletingAccount ? "Deleting..." : "Delete Account"}
+          </Button>
+        </div>
+      </div>
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        title="Delete Customer Account"
+        message="Are you sure you want to permanently delete your ShopSphere account? All your saved addresses, cart items, and wishlist will be permanently cleared. You will not be able to log back into this account."
+        confirmText="Yes, Delete My Account"
+        confirmSeverity="danger"
+        onConfirm={handleDeleteAccount}
+        onCancel={() => setConfirmDeleteOpen(false)}
+      />
     </div>
   );
 }

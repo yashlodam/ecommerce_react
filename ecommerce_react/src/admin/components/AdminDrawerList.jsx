@@ -11,6 +11,8 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import StoreIcon from '@mui/icons-material/Store';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 const menu = [
   {
@@ -60,6 +62,12 @@ const menu = [
     path: "/admin/shop-by-category",
     icon: <CategoryIcon className="text-primary" />,
     activeIcon: <CategoryIcon className="text-white" />,
+  },
+  {
+    name: "Notifications",
+    path: "/admin/notifications",
+    icon: <NotificationsNoneIcon className="text-primary" />,
+    activeIcon: <NotificationsIcon className="text-white" />,
   },
 ];
 

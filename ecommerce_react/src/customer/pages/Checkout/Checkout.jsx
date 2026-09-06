@@ -19,6 +19,7 @@ import { fetchUserProfile } from "../../../State/AuthSlice";
 import { createOrder } from "../../../State/customer/OrderSlice";
 import { fetchUserCart } from "../../../State/customer/CartSlice";
 import { useNavigate } from "react-router-dom";
+import { toast } from "../../../common/toast";
 
 const modalStyle = {
   position: "absolute",
@@ -34,6 +35,21 @@ const modalStyle = {
   p: 0,
 };
 
+const loadRazorpaySDK = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -46,17 +62,16 @@ function Checkout() {
   const [open, setOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentGateway, setPaymentGateway] = useState("RAZORPAY");
-  const [orderError, setOrderError] = useState("");
   const [placing, setPlacing] = useState(false);
+  const [orderError, setOrderError] = useState("");
 
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const auth = useAppSelector((store) => store.auth);
-  const cart = useAppSelector((store) => store.cart);
+  const dispatch = useAppDispatch();
+  const { auth, cart } = useAppSelector((store) => store);
 
   const cartItems = cart.cart?.cartItems || [];
   const hasOutOfStockItems = cartItems.some((item) => {
-    const stock = item?.productVariant?.quantity ?? item?.product?.quantity ?? 0;
+    const stock = item?.product?.quantity ?? item?.product?.stock ?? 0;
     return item?.product?.inStock === false || stock <= 0;
   });
 
@@ -80,6 +95,7 @@ function Checkout() {
       return;
     }
     if (!selectedAddress) {
+      toast.warning("Please select a delivery address before placing your order.");
       setOrderError("Please select a delivery address before placing order.");
       return;
     }
@@ -94,25 +110,96 @@ function Checkout() {
         })
       ).unwrap();
 
-      // If COD or payment order returned
+      // If COD
       if (paymentGateway === "COD") {
+        toast.success("Order placed successfully via Cash on Delivery! 🎉");
         dispatch(fetchUserCart());
         navigate("/order-success");
         return;
       }
 
-      // If Razorpay or Stripe returns paymentLinkUrl
-      if (paymentOrder?.paymentLinkUrl) {
-        window.location.href = paymentOrder.paymentLinkUrl;
+      // If Razorpay online payment (Standard Popup Checkout)
+      const razorpayOrderId =
+        paymentOrder?.razorpayOrderId ||
+        paymentOrder?.razorpay_order_id;
+      const keyId =
+        paymentOrder?.keyId ||
+        paymentOrder?.key_id ||
+        "rzp_test_TYnrwWwTwBEAv5";
+
+      const isLoaded = await loadRazorpaySDK();
+
+      if (razorpayOrderId && isLoaded && window.Razorpay) {
+        const orderRef =
+          paymentOrder?.paymentOrderId ||
+          paymentOrder?.payment_order_id ||
+          razorpayOrderId;
+
+        const options = {
+          key: keyId,
+          amount: paymentOrder.amount, // Exact cart amount in paise (e.g. 5,129,900 for Rs. 51,299.00)
+          currency: paymentOrder.currency || "INR",
+          name: "ShopSphere Marketplace",
+          description: `Order #${orderRef}`,
+          order_id: razorpayOrderId,
+          handler: function (response) {
+            // Payment succeeded in Razorpay popup
+            navigate(
+              `/payment-success/${orderRef}?razorpay_payment_id=${response.razorpay_payment_id}&razorpay_payment_link_id=${response.razorpay_order_id}&razorpay_signature=${response.razorpay_signature || ""}`
+            );
+          },
+          prefill: {
+            name: auth.user?.fullName || "",
+            email: auth.user?.email || "",
+            contact: auth.user?.mobile || "",
+          },
+          notes: {
+            address: `${selectedAddress.locality || ""}, ${selectedAddress.city || ""}, ${selectedAddress.state || ""}`,
+          },
+          theme: {
+            color: "#0f766e", // brand teal
+          },
+          modal: {
+            ondismiss: function () {
+              setPlacing(false);
+            },
+          },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.on("payment.failed", function (resp) {
+          const failMsg =
+            resp.error?.description ||
+            "Payment could not be completed. Please try again or select Cash on Delivery.";
+          setOrderError(failMsg);
+          toast.error(failMsg);
+          setPlacing(false);
+        });
+
+        rzp.open();
+        setPlacing(false);
         return;
       }
 
-      // Fallback
-      navigate(`/payment-success/${paymentOrder?.id || "ORD-SUCCESS"}`);
+      // Fallback: If hosted payment URL was returned
+      const paymentUrl =
+        paymentOrder?.paymentLinkUrl ||
+        paymentOrder?.payment_link_url;
+
+      if (paymentUrl) {
+        window.location.href = paymentUrl;
+        return;
+      }
+
+      const initError =
+        "Unable to initialize Razorpay checkout. Please try again or select Cash on Delivery.";
+      setOrderError(initError);
+      toast.error(initError);
     } catch (err) {
-      setOrderError(
-        typeof err === "string" ? err : "Failed to initiate payment. Please try again."
-      );
+      const errText =
+        typeof err === "string" ? err : "Failed to initiate payment. Please try again.";
+      setOrderError(errText);
+      toast.error(errText);
     } finally {
       setPlacing(false);
     }
@@ -219,28 +306,6 @@ function Checkout() {
                 <CreditCardIcon className="text-teal-700 dark:text-teal-400" />
               </div>
 
-              {/* Stripe */}
-              <div
-                className={`flex items-center justify-between border-2 rounded-xl p-4 cursor-pointer transition-all ${
-                  paymentGateway === "STRIPE"
-                    ? "border-teal-600 bg-teal-50/40 dark:bg-teal-950/30 shadow-sm"
-                    : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
-                }`}
-                onClick={() => setPaymentGateway("STRIPE")}
-              >
-                <div className="flex items-center gap-3">
-                  <Radio
-                    checked={paymentGateway === "STRIPE"}
-                    color="primary"
-                  />
-                  <div>
-                    <p className="font-bold text-sm text-slate-900 dark:text-slate-100">Stripe International</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Credit / Debit Cards (Global)</p>
-                  </div>
-                </div>
-                <CreditCardIcon className="text-indigo-600 dark:text-indigo-400" />
-              </div>
-
               {/* Cash on Delivery */}
               <div
                 className={`flex items-center justify-between border-2 rounded-xl p-4 cursor-pointer transition-all ${
@@ -318,10 +383,14 @@ function Checkout() {
             }}
           >
             {placing
-              ? "Processing Order..."
+              ? paymentGateway === "RAZORPAY"
+                ? "Redirecting to Razorpay..."
+                : "Placing Order..."
               : hasOutOfStockItems
               ? "Cart Contains Out-of-Stock Items"
-              : `Pay & Place Order`}
+              : paymentGateway === "RAZORPAY"
+              ? "Pay with Razorpay"
+              : "Place Order (COD)"}
           </Button>
         </div>
       </div>
@@ -350,7 +419,7 @@ function Checkout() {
               Payable:
             </span>
             <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 border border-teal-200/60 dark:border-teal-800/60">
-              {paymentGateway}
+              {paymentGateway === "RAZORPAY" ? "Razorpay" : "COD"}
             </span>
           </div>
           <p className="text-lg font-black text-teal-700 dark:text-teal-400">
@@ -386,12 +455,16 @@ function Checkout() {
           }}
         >
           {placing
-            ? "Processing..."
+            ? paymentGateway === "RAZORPAY"
+              ? "Redirecting..."
+              : "Placing..."
             : !selectedAddress
             ? "Select Address"
             : hasOutOfStockItems
             ? "Fix Cart"
-            : "Place Order"}
+            : paymentGateway === "RAZORPAY"
+            ? "Pay with Razorpay"
+            : "Place Order (COD)"}
         </Button>
       </div>
     </div>

@@ -21,6 +21,7 @@ import {
   removeCoupon,
   fetchActiveCoupons,
 } from "../../../State/customer/CouponSlice";
+import { toast } from "../../../common/toast";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -75,11 +76,13 @@ function Cart() {
           orderValue: baseOrderValue,
         })
       ).unwrap();
+      toast.success(`Coupon "${code}" applied successfully!`);
       setCouponCode("");
     } catch (err) {
       const msg =
         typeof err === "string" ? err : "Invalid coupon code. Please try again.";
       setCouponError(msg);
+      toast.error(msg);
       throw msg;
     } finally {
       setIsApplying(false);
@@ -92,11 +95,13 @@ function Cart() {
     setIsRemoving(true);
     try {
       await dispatch(removeCoupon(activeCouponCode)).unwrap();
+      toast.info(`Coupon "${activeCouponCode}" removed.`);
       setCouponCode("");
     } catch (err) {
-      setCouponError(
-        typeof err === "string" ? err : "Failed to remove coupon. Please try again."
-      );
+      const msg =
+        typeof err === "string" ? err : "Failed to remove coupon. Please try again.";
+      setCouponError(msg);
+      toast.error(msg);
     } finally {
       setIsRemoving(false);
     }

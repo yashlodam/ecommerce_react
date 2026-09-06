@@ -26,6 +26,7 @@ import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
 import { fetchUserCart } from "../../../State/customer/CartSlice";
 import { useAppDispatch } from "../../../State/Store";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "../../../common/toast";
 
 const OTP_EXPIRY_SECONDS = 600; // 10 minutes
 
@@ -96,6 +97,7 @@ function LoginForm() {
           signin({ email: values.email.trim(), otp: values.otp.trim() })
         ).unwrap();
 
+        toast.success("Welcome back to ShopSphere!");
         setSuccessMessage("Login successful! Redirecting...");
         const from = location.state?.from?.pathname;
 
@@ -112,9 +114,10 @@ function LoginForm() {
           navigate(from || "/", { replace: true });
         }
       } catch (error) {
-        setErrorMessage(
-          typeof error === "string" ? error : "Invalid OTP code. Please try again."
-        );
+        const errText =
+          typeof error === "string" ? error : "Invalid OTP code. Please try again.";
+        setErrorMessage(errText);
+        toast.error(errText);
       } finally {
         setLoginLoading(false);
       }
@@ -132,13 +135,15 @@ function LoginForm() {
     try {
       await dispatch(sendLoginSignupOtp(formik.values.email.trim())).unwrap();
       setOtpSent(true);
+      toast.info("Security code sent to your email!");
       setSuccessMessage("OTP code sent to your email! Valid for 10 minutes.");
       formik.setFieldValue("otp", "");
       setTimeout(() => setSuccessMessage(""), 5000);
     } catch (error) {
-      setErrorMessage(
-        typeof error === "string" ? error : "Failed to send OTP code. Please try again."
-      );
+      const errText =
+        typeof error === "string" ? error : "Failed to send OTP code. Please try again.";
+      setErrorMessage(errText);
+      toast.error(errText);
     } finally {
       setLoading(false);
     }

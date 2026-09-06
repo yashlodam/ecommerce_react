@@ -4,8 +4,6 @@ import Divider from "@mui/material/Divider";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import ShieldIcon from "@mui/icons-material/Shield";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
@@ -41,6 +39,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { fetchActiveCoupons } from "../../../State/customer/CouponSlice";
+import { toast } from "../../../common/toast";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -52,9 +51,6 @@ function formatINR(val) {
 
 function ProductDetails() {
   const [quantity, setQuantity] = useState(1);
-  const [openAlert, setOpenAlert] = useState(false);
-  const [alertMsg, setAlertMsg] = useState("");
-  const [alertSeverity, setAlertSeverity] = useState("success");
   const [activeImage, setActiveImage] = useState(0);
   const [addingToCart, setAddingToCart] = useState(false);
 
@@ -96,6 +92,7 @@ function ProductDetails() {
   const handleCopyCoupon = (code) => {
     navigator.clipboard.writeText(code);
     setCopiedCoupon(code);
+    toast.success(`Coupon code "${code}" copied to clipboard!`, { duration: 2500 });
     setTimeout(() => setCopiedCoupon(""), 2500);
   };
 
@@ -177,9 +174,7 @@ function ProductDetails() {
   const handleAddToCart = () => {
     if (!requireAuth()) return;
     if (!isInStock || displayStock <= 0) {
-      setAlertMsg("Sorry, this item is currently out of stock and cannot be added to your cart.");
-      setAlertSeverity("warning");
-      setOpenAlert(true);
+      toast.warning("Sorry, this item is currently out of stock and cannot be added to your cart.");
       return;
     }
 
@@ -196,14 +191,11 @@ function ProductDetails() {
     dispatch(addItemToCart(data))
       .unwrap()
       .then(() => {
-        setAlertMsg("Item added to cart successfully!");
-        setAlertSeverity("success");
-        setOpenAlert(true);
+        const itemTitle = currentProduct?.title ? `"${currentProduct.title}"` : "Item";
+        toast.success(`${itemTitle} added to your cart.`);
       })
       .catch((err) => {
-        setAlertMsg(err || "Failed to add item to cart.");
-        setAlertSeverity("error");
-        setOpenAlert(true);
+        toast.error(err, { fallback: "Unable to add product to cart." });
       })
       .finally(() => {
         setAddingToCart(false);
@@ -221,14 +213,10 @@ function ProductDetails() {
       )
         .unwrap()
         .then(() => {
-          setAlertMsg("Wishlist updated!");
-          setAlertSeverity("success");
-          setOpenAlert(true);
+          toast.success(isWishlisted ? "Removed from your wishlist." : "Added to your wishlist.");
         })
-        .catch(() => {
-          setAlertMsg("Could not update wishlist.");
-          setAlertSeverity("error");
-          setOpenAlert(true);
+        .catch((err) => {
+          toast.error(err, { fallback: "Could not update wishlist." });
         });
     }
   };
@@ -838,22 +826,6 @@ function ProductDetails() {
             : "Add to Bag"}
         </Button>
       </div>
-
-      <Snackbar
-        open={openAlert}
-        autoHideDuration={3000}
-        onClose={() => setOpenAlert(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={() => setOpenAlert(false)}
-          severity={alertSeverity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {alertMsg}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

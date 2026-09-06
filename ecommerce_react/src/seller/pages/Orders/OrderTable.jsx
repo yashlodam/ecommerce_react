@@ -29,6 +29,7 @@ import {
 } from "../../../State/seller/sellerOrderSlice";
 import StatusBadge from "../../../common/StatusBadge";
 import EmptyState from "../../../common/EmptyState";
+import { toast } from "../../../common/toast";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -68,13 +69,18 @@ export default function OrderTable() {
     }));
   };
 
-  const handleStatusChange = (orderId, status) => {
-    dispatch(
-      updateOrderStatus({
-        orderId,
-        orderStatus: status,
-      })
-    );
+  const handleStatusChange = async (orderId, status) => {
+    try {
+      await dispatch(
+        updateOrderStatus({
+          orderId,
+          orderStatus: status,
+        })
+      ).unwrap();
+      toast.success(`Order #${orderId} status updated to ${status}.`);
+    } catch (error) {
+      toast.error(error || "Failed to update order status.");
+    }
     handleClose(orderId);
   };
 

@@ -9,9 +9,7 @@ import Transaction from '../seller/pages/Payment/Transaction'
 import Payment from '../seller/pages/Payment/Payment'
 import Orders from '../seller/pages/Orders/Orders'
 import SellerDeals from '../seller/pages/Deals/SellerDeals'
-
-
-
+import NotificationsPage from '../customer/pages/Notifications/NotificationsPage'
 
 function SellerRoute() {
   return (
@@ -29,6 +27,7 @@ function SellerRoute() {
         <Route path='/account' element= {<Profile/>} />
         <Route path='/payment' element= {<Payment/>} />
         <Route path='/transaction' element= {<Transaction/>} />
+        <Route path='/notifications' element= {<NotificationsPage role="ROLE_SELLER" />} />
 
 
 

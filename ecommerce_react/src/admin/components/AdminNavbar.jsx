@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from "../../State/Store";
 import { logout } from "../../State/AuthSlice";
 import AdminDrawerList from "./AdminDrawerList";
 import ThemeToggle from "../../common/ThemeToggle";
+import NotificationBell from "../../common/notifications/NotificationBell";
 
 function AdminNavbar() {
   const theme = useTheme();
@@ -96,6 +97,7 @@ function AdminNavbar() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle size="small" />
+            <NotificationBell role="ROLE_ADMIN" allNotificationsUrl="/admin/notifications" />
 
             <Button
               variant="outlined"

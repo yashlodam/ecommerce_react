@@ -16,6 +16,7 @@ import BecomeSellerFormStep4 from "./BecomeSellerFormStep4";
 import { validationSchemas } from "./validationSchemas";
 import { useAppDispatch } from "../../../State/Store";
 import { createSellers } from "../../../State/seller/sellerSlice";
+import { toast } from "../../../common/toast";
 
 const steps = [
   "Tax & Mobile",
@@ -137,10 +138,10 @@ function SellerAccountForm({ onRegisterSuccess }) {
               ? resultAction.payload
               : resultAction.payload?.message ||
                 "Unable to complete seller registration. Please verify details.";
-          alert(errMsg);
+          toast.error(errMsg);
         }
       } catch {
-        alert("Something went wrong during registration. Please try again.");
+        toast.error("Something went wrong during registration. Please try again.");
       } finally {
         setSubmitting(false);
       }

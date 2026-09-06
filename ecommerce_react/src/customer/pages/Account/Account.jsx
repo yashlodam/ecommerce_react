@@ -10,6 +10,7 @@ import { logout } from "../../../State/AuthSlice";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 
 function Account() {
@@ -28,6 +29,11 @@ function Account() {
       name: "Addresses",
       path: "/account/addresses",
       icon: <LocationOnOutlinedIcon sx={{ fontSize: 20 }} />,
+    },
+    {
+      name: "Notifications",
+      path: "/notifications",
+      icon: <NotificationsNoneOutlinedIcon sx={{ fontSize: 20 }} />,
     },
     {
       name: "Logout",

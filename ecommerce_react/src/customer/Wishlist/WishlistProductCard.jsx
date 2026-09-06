@@ -5,6 +5,8 @@ import { useAppDispatch } from "../../State/Store";
 import { addProductToWishlist, removeProductFromWishlist } from "../../State/customer/WishlistSlice";
 import { useNavigate } from "react-router-dom";
 
+import { toast } from "../../common/toast";
+
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -13,7 +15,7 @@ function formatINR(val) {
   }).format(val || 0);
 }
 
-function WishlistProductCard({ item, setOpenSuccess, setSuccessMessage }) {
+function WishlistProductCard({ item }) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -27,12 +29,10 @@ function WishlistProductCard({ item, setOpenSuccess, setSuccessMessage }) {
         })
       ).unwrap();
 
-      if (setSuccessMessage && setOpenSuccess) {
-        setSuccessMessage("Item removed from your wishlist.");
-        setOpenSuccess(true);
-      }
+      toast.info("Item removed from your wishlist.");
     } catch (error) {
       console.error("Failed to remove from wishlist:", error);
+      toast.error(error || "Failed to remove item from wishlist.");
     }
   };
 

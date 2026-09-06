@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
-import { Alert, Button, CircularProgress, Snackbar } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import WishlistProductCard from "./WishlistProductCard";
 import { useAppDispatch, useAppSelector } from "../../State/Store";
@@ -15,8 +15,6 @@ function Wishlist() {
   const navigate = useNavigate();
 
   const wishlist = useAppSelector((store) => store.wishlist);
-  const [openSuccess, setOpenSuccess] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     dispatch(getWishlistByUserId());
@@ -56,22 +54,6 @@ function Wishlist() {
           </div>
         </div>
 
-        <Snackbar
-          open={openSuccess}
-          autoHideDuration={3000}
-          onClose={() => setOpenSuccess(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        >
-          <Alert
-            severity="success"
-            variant="filled"
-            sx={{ width: "100%" }}
-            onClose={() => setOpenSuccess(false)}
-          >
-            {successMessage}
-          </Alert>
-        </Snackbar>
-
         {/* Loading Skeletons */}
         {wishlist.loading && <SkeletonGrid count={4} />}
 
@@ -102,8 +84,6 @@ function Wishlist() {
                 <WishlistProductCard
                   key={item.id}
                   item={item}
-                  setOpenSuccess={setOpenSuccess}
-                  setSuccessMessage={setSuccessMessage}
                 />
               ))}
             </div>

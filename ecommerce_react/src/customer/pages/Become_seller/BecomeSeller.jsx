@@ -2,14 +2,10 @@ import React, { useState } from "react";
 import SellerAccountForm from "./SellerAccountForm";
 import SellerLoginForm from "./SellerLoginForm";
 import Button from "@mui/material/Button";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import { toast } from "../../../common/toast";
 
 function BecomeSeller() {
   const [isLogin, setIsLogin] = useState(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const handleShowPage = () => {
     setIsLogin(!isLogin);
@@ -25,14 +21,12 @@ function BecomeSeller() {
               {!isLogin ? (
                 <SellerAccountForm
                   onRegisterSuccess={() => {
-                    setSnackbarSeverity("success");
-                    setSnackbarMessage(
+                    toast.success(
                       "Seller account created successfully! Please sign in with your email OTP."
                     );
-                    setOpenSnackbar(true);
                     setTimeout(() => {
                       setIsLogin(true);
-                    }, 2000);
+                    }, 1500);
                   }}
                 />
               ) : (
@@ -120,22 +114,6 @@ function BecomeSeller() {
           </section>
         </div>
       </div>
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={4000}
-        onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          severity={snackbarSeverity}
-          variant="filled"
-          sx={{ width: "100%" }}
-          onClose={() => setOpenSnackbar(false)}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

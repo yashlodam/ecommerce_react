@@ -33,6 +33,8 @@ import {
   addOptimisticUserMessage,
 } from '../../../State/customer/ChatSlice';
 import ProductCardChat from './ProductCardChat';
+import ConfirmDialog from '../../../common/dialog/ConfirmDialog';
+import { toast } from '../../../common/toast';
 
 const QUICK_PROMPT_CARDS = [
   {
@@ -88,6 +90,7 @@ export default function AiChatWidget() {
 
   const [input, setInput] = useState('');
   const [copiedId, setCopiedId] = useState(null);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -167,9 +170,13 @@ export default function AiChatWidget() {
   };
 
   const handleClear = () => {
-    if (window.confirm('Clear your conversation with ShopSphere AI?')) {
-      dispatch(clearChatSession(sessionId));
-    }
+    setClearConfirmOpen(true);
+  };
+
+  const handleConfirmClear = () => {
+    dispatch(clearChatSession(sessionId));
+    toast.info("Conversation cleared.");
+    setClearConfirmOpen(false);
   };
 
   const handleActionClick = (action) => {
@@ -594,6 +601,16 @@ export default function AiChatWidget() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={clearConfirmOpen}
+        title="Clear Conversation"
+        message="Are you sure you want to clear your conversation history with ShopSphere AI? This cannot be undone."
+        confirmText="Clear Chat"
+        isDestructive={true}
+        onConfirm={handleConfirmClear}
+        onClose={() => setClearConfirmOpen(false)}
+      />
     </>
   );
 }

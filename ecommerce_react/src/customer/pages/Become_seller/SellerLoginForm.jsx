@@ -11,6 +11,7 @@ import { useFormik } from "formik";
 import { sendLoginSignupOtp, signin } from "../../../State/AuthSlice";
 import { useAppDispatch } from "../../../State/Store";
 import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
+import { toast } from "../../../common/toast";
 
 const RESEND_COOLDOWN_SECONDS = 30;
 const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -65,6 +66,7 @@ function SellerLoginForm() {
         ).unwrap();
 
         setSuccess(result?.message || "Login successful.");
+        toast.success("Welcome to your Seller Dashboard!");
         if (result?.jwt) {
           await dispatch(fetchSellerProfile(result.jwt));
         }
@@ -75,6 +77,7 @@ function SellerLoginForm() {
             ? err
             : err?.message || "Invalid or expired OTP. Please try again.";
         setError(message);
+        toast.error(message);
       } finally {
         setVerifying(false);
       }
@@ -107,12 +110,14 @@ function SellerLoginForm() {
       setOtpSent(true);
       setCooldown(RESEND_COOLDOWN_SECONDS);
       setSuccess(result?.message || "OTP sent successfully to your email.");
+      toast.info("Verification code sent to your email.");
     } catch (err) {
       const message =
         typeof err === "string"
           ? err
           : err?.message || "Failed to send OTP. Please try again.";
       setError(message);
+      toast.error(message);
     } finally {
       setSendingOtp(false);
     }

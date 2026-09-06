@@ -7,12 +7,11 @@ import {
   Divider,
   Grid,
   IconButton,
-  Snackbar,
-  Alert,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
+import { toast } from "../../../common/toast";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -69,9 +68,14 @@ export default function EditProduct() {
   const [newVariantRow, setNewVariantRow] = useState(emptyVariantRow());
 
   const [saving, setSaving] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, msg: "", severity: "success" });
-  const showSnackbar = (msg, severity = "success") =>
-    setSnackbar({ open: true, msg, severity });
+  // Centralized Toast
+  const showSnackbar = (msg, severity = "success") => {
+    if (toast[severity]) {
+      toast[severity](msg);
+    } else {
+      toast.info(msg);
+    }
+  };
 
   // Load on mount
   useEffect(() => {
@@ -433,16 +437,6 @@ export default function EditProduct() {
           </div>
         )}
       </div>
-
-      <Snackbar
-        open={snackbar.open} autoHideDuration={4000}
-        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert severity={snackbar.severity} variant="filled" onClose={() => setSnackbar((s) => ({ ...s, open: false }))}>
-          {snackbar.msg}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

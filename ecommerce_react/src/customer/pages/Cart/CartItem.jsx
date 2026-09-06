@@ -11,9 +11,8 @@ import {
   deleteCartItem,
   updateCartItem,
 } from "../../../State/customer/CartSlice";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 import DealBadge from "../../../common/deals/DealBadge";
+import { toast } from "../../../common/toast";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -27,12 +26,6 @@ function CartItem({ item }) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
   const product = item?.product;
   const availableStock = item?.productVariant?.quantity ?? product?.quantity ?? 0;
   const isOutOfStock = (product?.inStock === false) || availableStock <= 0;
@@ -44,50 +37,38 @@ function CartItem({ item }) {
   const totalItemDiscount = Math.max(0, (item?.mrpPrice || 0) - (item?.sellingPrice || 0));
   const discountPercent = item?.mrpPrice > 0 ? Math.round((totalItemDiscount / item.mrpPrice) * 100) : 0;
 
-  const handleUpdateQuantity = (value) => {
+  const handleUpdateQuantity = async (value) => {
     if (value > item.quantity && (isOutOfStock || isMaxStockReached)) {
-      setSnackbar({
-        open: true,
-        message: isOutOfStock
+      toast.warning(
+        isOutOfStock
           ? "This item is currently out of stock."
-          : `Cannot add more. Only ${availableStock} available in stock.`,
-        severity: "warning",
-      });
+          : `Only ${availableStock} units available in stock.`
+      );
       return;
     }
-    dispatch(
-      updateCartItem({
-        jwt: localStorage.getItem("jwt"),
-        cartItemId: item.id,
-        cartItem: {
-          quantity: value,
-        },
-      })
-    );
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({
-      ...prev,
-      open: false,
-    }));
+    try {
+      await dispatch(
+        updateCartItem({
+          jwt: localStorage.getItem("jwt"),
+          cartItemId: item.id,
+          cartItem: {
+            quantity: value,
+          },
+        })
+      ).unwrap();
+      toast.success("Cart quantity updated.");
+    } catch (err) {
+      toast.error(err, { fallback: "Unable to update quantity." });
+    }
   };
 
   const handleRemoveItem = async () => {
     try {
       await dispatch(deleteCartItem(item.id)).unwrap();
-
-      setSnackbar({
-        open: true,
-        message: "Item removed from your cart.",
-        severity: "success",
-      });
+      const title = product?.title ? `"${product.title}"` : "Item";
+      toast.info(`${title} removed from your cart.`);
     } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Unable to remove the item. Please try again.",
-        severity: "error",
-      });
+      toast.error(error, { fallback: "Unable to remove item from cart." });
     }
   };
 
@@ -97,21 +78,6 @@ function CartItem({ item }) {
         ? "border-red-300 dark:border-red-900/80 shadow-xs bg-red-50/10"
         : "border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md"
     }`}>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
 
       {/* Remove Item Button */}
       <IconButton
