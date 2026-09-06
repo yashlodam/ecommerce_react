@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { sumCartItemMrpPrice } from "../../Util/sumCartItemMrpPrice";
 import { sumCartItemSellingPrice } from "../../Util/sumCartItemSellingPrice";
-import { applyCoupon } from "./CouponSlice";
+import { applyCoupon, removeCoupon } from "./CouponSlice";
 import { api } from "../../config/Api";
 
 const API_URL = "/api/cart";
@@ -186,6 +186,10 @@ const cartSlice = createSlice({
       })
 
       .addCase(applyCoupon.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cart = action.payload;
+      })
+      .addCase(removeCoupon.fulfilled, (state, action) => {
         state.loading = false;
         state.cart = action.payload;
       });

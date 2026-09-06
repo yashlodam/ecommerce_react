@@ -20,6 +20,38 @@ export const applyCoupon = createAsyncThunk(
   }
 );
 
+// ================= Remove Coupon (Customer) =================
+export const removeCoupon = createAsyncThunk(
+  "coupon/removeCoupon",
+  async (code, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`${API_URL}/apply`, null, {
+        params: { apply: "false", code, orderValue: 0 },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to remove coupon"
+      );
+    }
+  }
+);
+
+// ================= Fetch Active Coupons (Public / Customer) =================
+export const fetchActiveCoupons = createAsyncThunk(
+  "coupon/fetchActiveCoupons",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_URL}/active`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch active coupons"
+      );
+    }
+  }
+);
+
 // ================= Fetch All Coupons (Admin) =================
 export const fetchAllCoupons = createAsyncThunk(
   "coupon/fetchAllCoupons",
@@ -67,8 +99,10 @@ export const deleteCoupon = createAsyncThunk(
 
 const initialState = {
   coupons: [],
+  activeCoupons: [],
   cart: null,
   loading: false,
+  loadingActiveCoupons: false,
   error: null,
   couponApplied: false,
 };
@@ -84,6 +118,9 @@ const couponSlice = createSlice({
     },
     clearCouponError: (state) => {
       state.error = null;
+    },
+    setCouponAppliedState: (state, action) => {
+      state.couponApplied = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -105,7 +142,36 @@ const couponSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Fetch All Coupons
+      // Remove Coupon
+      .addCase(removeCoupon.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeCoupon.fulfilled, (state, action) => {
+        state.loading = false;
+        state.couponApplied = false;
+        state.cart = action.payload;
+      })
+      .addCase(removeCoupon.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Fetch Active Coupons
+      .addCase(fetchActiveCoupons.pending, (state) => {
+        state.loadingActiveCoupons = true;
+        state.error = null;
+      })
+      .addCase(fetchActiveCoupons.fulfilled, (state, action) => {
+        state.loadingActiveCoupons = false;
+        state.activeCoupons = action.payload || [];
+      })
+      .addCase(fetchActiveCoupons.rejected, (state, action) => {
+        state.loadingActiveCoupons = false;
+        state.error = action.payload;
+      })
+
+      // Fetch All Coupons (Admin)
       .addCase(fetchAllCoupons.pending, (state) => {
         state.loading = true;
       })
@@ -130,5 +196,5 @@ const couponSlice = createSlice({
   },
 });
 
-export const { resetCouponState, clearCouponError } = couponSlice.actions;
+export const { resetCouponState, clearCouponError, setCouponAppliedState } = couponSlice.actions;
 export default couponSlice.reducer;
