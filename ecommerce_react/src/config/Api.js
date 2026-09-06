@@ -2,16 +2,24 @@ import axios from "axios";
 import { store } from "../State/Store";
 import { setAccessToken } from "../State/AuthSlice";
 
-// In development, Vite proxy handles routing → baseURL is just "/"
-// In production, set VITE_API_URL to your deployed backend URL
-const API_URL = import.meta.env.VITE_API_URL || "";
+// Resolve API base URL:
+// 1. Primary: VITE_API_BASE_URL
+// 2. Backwards-compatible alias: VITE_API_URL
+// 3. Fallback: "" (uses Vite dev server proxy to http://localhost:5454)
+const rawBaseUrl =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  "";
+
+export const API_BASE_URL = rawBaseUrl ? rawBaseUrl.replace(/\/+$/, "") : "";
+export const API_URL = API_BASE_URL;
 
 export const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
-  // Ensure cookies (e.g. HttpOnly refreshToken) are sent and received with requests
+  // Ensure cookies (e.g. HttpOnly refreshToken) are sent and received with cross-origin requests
   withCredentials: true,
 });
 
@@ -108,6 +116,15 @@ api.interceptors.response.use(
         store.dispatch(setAccessToken(null));
         return Promise.reject(refreshError);
       }
+    }
+
+    // Render Cold Start / Network failure enhancement
+    if (!error.response) {
+      error.userMessage =
+        "Unable to connect to server. The service may be starting up. Please wait a moment and retry.";
+    } else if (error.response.status === 502 || error.response.status === 503) {
+      error.userMessage =
+        "Server is currently warming up. Please retry in a few seconds.";
     }
 
     return Promise.reject(error);

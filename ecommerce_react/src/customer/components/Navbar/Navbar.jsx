@@ -38,7 +38,7 @@ import { fetchUserProfile, logout } from "../../../State/AuthSlice";
 import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
 import { fetchUserCart, openCartDrawer } from "../../../State/customer/CartSlice";
 import { searchProduct } from "../../../State/customer/ProductSlice";
-import { openChat } from "../../../State/customer/chatSlice";
+import { openChat } from "../../../State/customer/ChatSlice";
 
 const ACCENT = "#00927c";
 
