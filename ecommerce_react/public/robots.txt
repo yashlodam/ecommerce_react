@@ -1,0 +1,13 @@
+# ShopSphere Multi-Vendor Marketplace robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /seller/
+Disallow: /account/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /payment-success
+Disallow: /order-success
+Disallow: /api/
+
+Sitemap: /sitemap.xml

@@ -1,16 +1,159 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
+    <!-- Document Charset and Compatibility -->
     <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+
+    <!-- Primary Brand and SEO Metadata -->
+    <title>ShopSphere | Multi-Vendor Online Shopping</title>
+    <meta name="title" content="ShopSphere | Multi-Vendor Online Shopping" />
+    <meta
+      name="description"
+      content="ShopSphere is a premier multi-vendor online marketplace. Discover top deals on electronics, fashion, home essentials, and beauty from verified independent sellers."
+    />
+    <meta
+      name="keywords"
+      content="ShopSphere, multi-vendor marketplace, online shopping, electronics, fashion, home essentials, deals, top offers, buy online, verified sellers"
+    />
+    <meta name="author" content="ShopSphere Inc." />
+    <meta name="application-name" content="ShopSphere" />
+
+    <!-- Search Engine Indexing Directives -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="bingbot" content="index, follow" />
+
+    <!-- Browser and Platform Theming -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#00927c" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0f19" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- Mobile Web App Directives -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="ShopSphere" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Security & Referrer Policy -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Favicon & Touch Icon Ecosystem -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <title>ecommerce_react</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph / Facebook / LinkedIn Metadata -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ShopSphere" />
+    <meta property="og:title" content="ShopSphere | Multi-Vendor Online Shopping" />
+    <meta
+      property="og:description"
+      content="Discover top deals on electronics, fashion, home essentials, and beauty from verified independent sellers on ShopSphere."
+    />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="ShopSphere - Multi-Vendor Online Shopping Marketplace" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Metadata -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ShopSphere | Multi-Vendor Online Shopping" />
+    <meta
+      name="twitter:description"
+      content="Discover top deals on electronics, fashion, home essentials, and beauty from verified independent sellers on ShopSphere."
+    />
+    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="twitter:image:alt" content="ShopSphere Marketplace Preview" />
+
+    <!-- Performance Preconnect & DNS-Prefetch Optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="preconnect" href="https://ecommerce-multivendor-ywdy.onrender.com" />
+    <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+    <link rel="dns-prefetch" href="https://api.razorpay.com" />
+
+    <!-- Brand Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+
+    <!-- Payment SDKs -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Structured Data (JSON-LD Organization & WebSite) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "/#organization",
+            "name": "ShopSphere",
+            "url": "/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "/android-chrome-512x512.png",
+              "width": 512,
+              "height": 512
+            },
+            "description": "Multi-Vendor E-Commerce Platform connecting discerning shoppers with verified sellers."
+          },
+          {
+            "@type": "WebSite",
+            "@id": "/#website",
+            "url": "/",
+            "name": "ShopSphere",
+            "description": "Premier multi-vendor online shopping marketplace.",
+            "publisher": {
+              "@id": "/#organization"
+            },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "/search?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
+    <!-- Accessible Noscript Graceful Degradation -->
+    <noscript>
+      <div
+        style="
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          padding: 2.5rem 1.5rem;
+          text-align: center;
+          background-color: #0b0f19;
+          color: #f9fafb;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          box-sizing: border-box;
+        "
+      >
+        <div style="width: 56px; height: 56px; margin-bottom: 1.25rem; border-radius: 50%; background: linear-gradient(135deg, #00927c, #007965); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: bold; color: #ffffff;">
+          S
+        </div>
+        <h1 style="font-size: 1.75rem; margin: 0 0 0.75rem; color: #ffffff; letter-spacing: -0.025em;">
+          JavaScript is Required
+        </h1>
+        <p style="font-size: 1.05rem; max-width: 520px; line-height: 1.6; color: #9ca3af; margin: 0 0 1.5rem;">
+          ShopSphere uses modern web technologies to deliver an interactive shopping experience, real-time inventory, and secure multi-vendor checkout. Please enable JavaScript in your browser settings to continue.
+        </p>
+      </div>
+    </noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
