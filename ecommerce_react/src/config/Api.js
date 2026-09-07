@@ -80,11 +80,15 @@ export const executeSilentRefresh = async () => {
       }
       return data;
     } catch (error) {
-      store.dispatch(setAccessToken(null));
-      localStorage.removeItem("jwt");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("role");
-      localStorage.removeItem("user");
+      // Only clear credentials if the server explicitly confirmed the session is expired (401 or 403)
+      // Never log out on temporary network glitches, 502/503/504 Render cold-start timeouts
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        store.dispatch(setAccessToken(null));
+        localStorage.removeItem("jwt");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("role");
+        localStorage.removeItem("user");
+      }
       throw error;
     } finally {
       // Clear after a short tick to allow future separate refresh cycles
@@ -130,7 +134,9 @@ api.interceptors.response.use(
           throw new Error("Missing access token in refresh response");
         }
       } catch (refreshError) {
-        store.dispatch(setAccessToken(null));
+        if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
+          store.dispatch(setAccessToken(null));
+        }
         return Promise.reject(refreshError);
       }
     }
