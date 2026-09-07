@@ -3,30 +3,51 @@ import { useNavigate } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 
 const CATEGORY_HIGHLIGHTS = {
+  // Men's Fashion
   men_topwear: { offer: "Min. 40% Off", badge: "Trending" },
   men_bottomwear: { offer: "From ₹499", badge: "Popular" },
   men_hoodies: { offer: "Winter Style", badge: "Hot" },
   men_jackets: { offer: "Flat 45% Off", badge: "Bestseller" },
   men_footwear: { offer: "Top Brands", badge: "New" },
+  men_formal_shirts: { offer: "Under ₹899", badge: "Workwear" },
+  men_suits_blazers: { offer: "Up to 50% Off", badge: "Premium" },
+  men_festive_wear: { offer: "Festive Edit", badge: "Ethnic" },
+  men_watches_accessories: { offer: "Up to 60% Off", badge: "Luxury" },
+  men_grooming_essentials: { offer: "From ₹299", badge: "Daily Care" },
+
+  // Women's Fashion
   women_western_wear: { offer: "Chic Styles", badge: "Trending" },
   women_dresses: { offer: "Up to 60% Off", badge: "Special" },
-  women_jewellery: { offer: "Artisan Picks", badge: "Festive" },
-  women_kurtas: { offer: "Ethnic Edit", badge: "Hot" },
   women_sarees: { offer: "Designer Weaves", badge: "Premium" },
+  women_kurtas: { offer: "Ethnic Edit", badge: "Hot" },
+  women_jewellery: { offer: "Artisan Picks", badge: "Festive" },
+  women_handbags: { offer: "Top Brands", badge: "Bestseller" },
   women_footwear: { offer: "Under ₹999", badge: "Popular" },
+  women_activewear: { offer: "Up to 50% Off", badge: "Active" },
+
+  // Beauty, Fragrance & Grooming
+  women_beauty_personal_care: { offer: "Glow Essentials", badge: "Top Rated" },
+  luxury_fragrances: { offer: "From ₹1,299", badge: "Luxury" },
+  haircare_styling: { offer: "Salon Quality", badge: "Trending" },
+  makeup_cosmetics: { offer: "Min. 30% Off", badge: "Glam" },
+
+  // Home & Living
   home_beds: { offer: "Best Comfort", badge: "Home" },
   home_furniture: { offer: "Solid Wood", badge: "Crafted" },
   home_lighting: { offer: "From ₹199", badge: "Decor" },
   home_garden_outdoor: { offer: "Green Living", badge: "Outdoor" },
   home_kitchen_dining: { offer: "Cookware Sets", badge: "Kitchen" },
-  women_beauty_personal_care: { offer: "Self Care", badge: "Glow" },
+  home_decor_accents: { offer: "Artisan Crafts", badge: "Handmade" },
+
+  // Electronics & Gadgets
   laptops: { offer: "High Speed", badge: "Tech" },
   smartphones: { offer: "5G Flagships", badge: "Mobiles" },
   headphones: { offer: "Up to 80% Off", badge: "Audio" },
-  smart_watches: { offer: "AMOLED", badge: "Fitness" },
-  speakers: { offer: "Deep Bass", badge: "Sound" },
-  cameras: { offer: "4K Capture", badge: "Optics" },
-  televisions: { offer: "Ultra HD", badge: "Visual" },
+  smart_watches: { offer: "AMOLED Displays", badge: "Fitness" },
+  speakers: { offer: "Deep Bass Hi-Fi", badge: "Sound" },
+  cameras: { offer: "4K Cinema Capture", badge: "Optics" },
+  televisions: { offer: "Ultra HD 4K", badge: "Visual" },
+  gaming_consoles: { offer: "Next-Gen Gear", badge: "Gaming" },
 };
 
 function formatDisplayName(name, categoryId) {

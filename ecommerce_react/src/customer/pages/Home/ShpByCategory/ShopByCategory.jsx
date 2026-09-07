@@ -14,32 +14,57 @@ const DEPARTMENT_TABS = [
   { id: "BEAUTY", label: "Beauty & Care", icon: "💄" },
 ];
 
-function getDepartment(categoryId = "") {
+export function matchesDepartment(categoryId = "", deptId = "ALL") {
+  if (deptId === "ALL") return true;
   const cid = (categoryId || "").toLowerCase();
-  if (cid.startsWith("men_")) return "MEN";
-  if (cid.startsWith("women_beauty") || cid === "beauty") return "BEAUTY";
-  if (cid.startsWith("women_")) return "WOMEN";
-  if (
-    cid.startsWith("home_") ||
-    cid.includes("furniture") ||
-    cid.includes("bed") ||
-    cid.includes("kitchen") ||
-    cid.includes("lighting") ||
-    cid.includes("garden")
-  )
-    return "HOME";
-  if (
-    cid.startsWith("electronics") ||
-    cid === "laptops" ||
-    cid === "smartphones" ||
-    cid === "headphones" ||
-    cid === "smart_watches" ||
-    cid === "speakers" ||
-    cid === "cameras" ||
-    cid === "televisions"
-  )
-    return "ELECTRONICS";
-  return "OTHER";
+
+  if (deptId === "MEN") {
+    return cid.startsWith("men_");
+  }
+  if (deptId === "WOMEN") {
+    return cid.startsWith("women_") && !cid.startsWith("women_beauty");
+  }
+  if (deptId === "BEAUTY") {
+    return (
+      cid.startsWith("women_beauty") ||
+      cid === "beauty" ||
+      cid.includes("fragrance") ||
+      cid.includes("perfume") ||
+      cid.includes("skincare") ||
+      cid.includes("haircare") ||
+      cid.includes("makeup") ||
+      cid.includes("cosmetic") ||
+      cid.includes("grooming")
+    );
+  }
+  if (deptId === "ELECTRONICS") {
+    return (
+      cid.startsWith("electronics") ||
+      cid === "laptops" ||
+      cid === "smartphones" ||
+      cid === "headphones" ||
+      cid === "smart_watches" ||
+      cid === "speakers" ||
+      cid === "cameras" ||
+      cid === "televisions" ||
+      cid.includes("gaming") ||
+      cid.includes("tablet") ||
+      cid.includes("audio")
+    );
+  }
+  if (deptId === "HOME") {
+    return (
+      cid.startsWith("home_") ||
+      cid.includes("furniture") ||
+      cid.includes("bed") ||
+      cid.includes("kitchen") ||
+      cid.includes("lighting") ||
+      cid.includes("garden") ||
+      cid.includes("decor") ||
+      cid.includes("living")
+    );
+  }
+  return false;
 }
 
 function ShopByCategory() {
@@ -86,15 +111,19 @@ function ShopByCategory() {
   // Filter based on selected department tab
   const filteredCategories = useMemo(() => {
     if (selectedDept === "ALL") return allCategories;
-    return allCategories.filter((item) => getDepartment(item.categoryId) === selectedDept);
+    return allCategories.filter((item) => matchesDepartment(item.categoryId, selectedDept));
   }, [allCategories, selectedDept]);
 
   // Count items per department
   const deptCounts = useMemo(() => {
     const counts = { ALL: allCategories.length, MEN: 0, WOMEN: 0, ELECTRONICS: 0, HOME: 0, BEAUTY: 0 };
     allCategories.forEach((cat) => {
-      const d = getDepartment(cat.categoryId);
-      if (counts[d] !== undefined) counts[d]++;
+      const cid = cat.categoryId;
+      if (matchesDepartment(cid, "MEN")) counts.MEN++;
+      if (matchesDepartment(cid, "WOMEN")) counts.WOMEN++;
+      if (matchesDepartment(cid, "ELECTRONICS")) counts.ELECTRONICS++;
+      if (matchesDepartment(cid, "HOME")) counts.HOME++;
+      if (matchesDepartment(cid, "BEAUTY")) counts.BEAUTY++;
     });
     return counts;
   }, [allCategories]);

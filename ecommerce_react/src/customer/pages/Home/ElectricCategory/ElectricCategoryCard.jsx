@@ -10,6 +10,7 @@ const ELECTRIC_HIGHLIGHTS = {
   speakers: { offer: "Extra 20% Off", badge: "Top Sound" },
   cameras: { offer: "Pro 4K Gear", badge: "Creator" },
   televisions: { offer: "Cinematic 4K", badge: "Big Screen" },
+  gaming_consoles: { offer: "Next-Gen Gear", badge: "Gaming" },
 };
 
 function ElectricCategoryCard({ item }) {
