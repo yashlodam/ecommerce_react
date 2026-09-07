@@ -403,33 +403,11 @@ export default function AiChatWidget() {
                     </div>
 
                     {/* Execution Engine Indicator */}
-                    {!isUser && msg.executionMode && (
+                    {!isUser && (
                       <div className="flex items-center gap-1 mt-1 px-1">
-                        {msg.executionMode === 'GROQ_LLM' && (
-                          <span className="text-[9px] font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/40 px-1.5 py-0.5 rounded-md border border-orange-200 dark:border-orange-800">
-                            ⚡ Groq AI
-                          </span>
-                        )}
-                        {msg.executionMode === 'GEMINI_LLM' && (
-                          <span className="text-[9px] font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40 px-1.5 py-0.5 rounded-md border border-purple-200 dark:border-purple-800">
-                            ✨ Gemini 2.0
-                          </span>
-                        )}
-                        {msg.executionMode === 'DETERMINISTIC_ENGINE' && (
-                          <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
-                            ⚡ ShopSphere Engine
-                          </span>
-                        )}
-                        {msg.executionMode === 'CONVERSATIONAL_SHORT_CIRCUIT' && (
-                          <span className="text-[9px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-1.5 py-0.5 rounded-md border border-blue-200 dark:border-blue-800">
-                            💬 Quick Dialog
-                          </span>
-                        )}
-                        {msg.executionMode === 'SECURITY_INJECTION_BLOCKED' && (
-                          <span className="text-[9px] font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 px-1.5 py-0.5 rounded-md border border-red-200 dark:border-red-800">
-                            🛡️ Security Guard
-                          </span>
-                        )}
+                        <span className="text-[9px] font-bold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/40 px-1.5 py-0.5 rounded-md border border-teal-200 dark:border-teal-800">
+                          ✨ ShopSphere AI
+                        </span>
                       </div>
                     )}
 
