@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { fetchAllProducts, clearProductError, resetProductCatalog } from "../../../State/customer/ProductSlice";
