@@ -26,7 +26,7 @@ export default function Transaction() {
   const loading = transactionState?.loading || false;
 
   useEffect(() => {
-    dispatch(fetchTransactionsBySeller(localStorage.getItem("jwt") || ""));
+    dispatch(fetchTransactionsBySeller());
   }, [dispatch]);
 
   const transactionList = Array.isArray(transactions) ? transactions : [];

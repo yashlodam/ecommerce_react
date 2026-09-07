@@ -88,24 +88,19 @@ export const logout = createAsyncThunk(
   "auth/logout",
   async (navigate) => {
     try {
-      const storedRefreshToken = localStorage.getItem("refreshToken");
-      // Revoke refresh token on the server
-      await api.post(
-        "/auth/logout",
-        { refreshToken: storedRefreshToken || undefined },
-        {
-          headers: storedRefreshToken ? { "X-Refresh-Token": storedRefreshToken } : {},
-        }
-      );
+      // Revoke refresh token on the server and clear HttpOnly cookie
+      await api.post("/auth/logout");
     } catch {
       // Ignore network errors during logout
     }
-    // Clean up all auth credentials from localStorage
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("role");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
-    localStorage.removeItem("seller_jwt");
+    // Clean up any legacy tokens from localStorage
+    try {
+      localStorage.removeItem("jwt");
+      localStorage.removeItem("role");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      localStorage.removeItem("seller_jwt");
+    } catch {}
     if (navigate) navigate("/");
     return null;
   }
@@ -134,7 +129,9 @@ export const deleteCustomerAccount = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.delete("/api/users/profile");
-      localStorage.removeItem("jwt");
+      try {
+        localStorage.removeItem("jwt");
+      } catch {}
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -159,25 +156,16 @@ export const fetchCurrentRole = createAsyncThunk(
 );
 
 // ─── INITIAL STATE ───────────────────────────────────────────────────────────
-
-const storedJwt = localStorage.getItem("jwt");
-const storedRole = localStorage.getItem("role");
-let storedUser = null;
-try {
-  const userJson = localStorage.getItem("user");
-  if (userJson) storedUser = JSON.parse(userJson);
-} catch {
-  storedUser = null;
-}
-
+// In-Memory Token Architecture: Access Token is NEVER stored in localStorage.
+// authChecking defaults to true so ProtectedRoute waits for silent refresh on boot.
 const initialState = {
-  jwt: storedJwt || null,
-  role: storedRole || null,
+  jwt: null,
+  role: null,
   otpSend: false,
-  isLoggedIn: !!storedJwt,
-  user: storedUser,
+  isLoggedIn: false,
+  user: null,
   loading: false,
-  authChecking: false, // Session restored immediately from local credentials
+  authChecking: true,
   error: null,
 };
 
@@ -197,14 +185,6 @@ const authSlice = createSlice({
       state.jwt = action.payload;
       state.isLoggedIn = !!action.payload;
       state.authChecking = false;
-      if (action.payload) {
-        localStorage.setItem("jwt", action.payload);
-      } else {
-        localStorage.removeItem("jwt");
-        localStorage.removeItem("role");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
-      }
     },
     setAuthChecking: (state, action) => {
       state.authChecking = action.payload;
@@ -229,9 +209,6 @@ const authSlice = createSlice({
       // Fetch Current Role
       .addCase(fetchCurrentRole.fulfilled, (state, action) => {
         state.role = action.payload;
-        if (action.payload) {
-          localStorage.setItem("role", action.payload);
-        }
       })
 
       // Sign In
@@ -246,15 +223,6 @@ const authSlice = createSlice({
         state.isLoggedIn = true;
         state.authChecking = false;
         state.error = null;
-        if (action.payload.jwt) {
-          localStorage.setItem("jwt", action.payload.jwt);
-        }
-        if (action.payload.role) {
-          localStorage.setItem("role", action.payload.role);
-        }
-        if (action.payload.refreshToken) {
-          localStorage.setItem("refreshToken", action.payload.refreshToken);
-        }
       })
       .addCase(signin.rejected, (state, action) => {
         state.loading = false;
@@ -275,15 +243,6 @@ const authSlice = createSlice({
         state.isLoggedIn = true;
         state.authChecking = false;
         state.error = null;
-        if (action.payload.jwt) {
-          localStorage.setItem("jwt", action.payload.jwt);
-        }
-        if (action.payload.role) {
-          localStorage.setItem("role", action.payload.role);
-        }
-        if (action.payload.refreshToken) {
-          localStorage.setItem("refreshToken", action.payload.refreshToken);
-        }
       })
       .addCase(signup.rejected, (state, action) => {
         state.loading = false;
@@ -302,15 +261,6 @@ const authSlice = createSlice({
         state.isLoggedIn = true;
         state.authChecking = false;
         state.error = null;
-        if (action.payload.jwt) {
-          localStorage.setItem("jwt", action.payload.jwt);
-        }
-        if (action.payload.role) {
-          localStorage.setItem("role", action.payload.role);
-        }
-        if (action.payload.refreshToken) {
-          localStorage.setItem("refreshToken", action.payload.refreshToken);
-        }
       })
       .addCase(refreshToken.rejected, (state) => {
         state.loading = false;
@@ -319,10 +269,6 @@ const authSlice = createSlice({
         state.user = null;
         state.isLoggedIn = false;
         state.authChecking = false;
-        localStorage.removeItem("jwt");
-        localStorage.removeItem("role");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
       })
 
       // Fetch User Profile
@@ -335,14 +281,6 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.role = action.payload.role || state.role;
         state.isLoggedIn = true;
-        if (action.payload) {
-          try {
-            localStorage.setItem("user", JSON.stringify(action.payload));
-          } catch {}
-        }
-        if (action.payload?.role) {
-          localStorage.setItem("role", action.payload.role);
-        }
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;

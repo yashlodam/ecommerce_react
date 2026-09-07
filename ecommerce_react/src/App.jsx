@@ -58,39 +58,22 @@ function App() {
       // Load live homepage categories and promotional deals
       dispatch(fetchHomePageData());
 
-      const token = localStorage.getItem("jwt");
-      const refreshTokenVal = localStorage.getItem("refreshToken");
-      const role = localStorage.getItem("role");
-
-      // Only verify auth session if user has existing credentials
-      // Prevents unnecessary 401 calls to /auth/refresh for guest users
-      if (token || refreshTokenVal) {
-        try {
-          if (role === "ROLE_SELLER") {
-            await dispatch(fetchSellerProfile()).unwrap();
+      try {
+        // Attempt silent session restoration via HttpOnly refresh cookie
+        const authData = await dispatch(refreshToken()).unwrap();
+        if (authData?.jwt) {
+          if (authData.role === "ROLE_SELLER") {
+            await dispatch(fetchSellerProfile());
           } else {
-            await dispatch(fetchUserProfile()).unwrap();
-          }
-        } catch {
-          // If access token expired, try silent refresh with refreshToken
-          if (refreshTokenVal) {
-            try {
-              const authData = await dispatch(refreshToken()).unwrap();
-              if (authData?.jwt) {
-                if (authData.role === "ROLE_SELLER") {
-                  await dispatch(fetchSellerProfile());
-                } else {
-                  await dispatch(fetchUserProfile());
-                }
-              }
-            } catch {
-              // Session genuinely expired — credentials cleaned up by reducer
-            }
+            await dispatch(fetchUserProfile());
           }
         }
+      } catch {
+        // Normal guest flow: no valid cookie present or session expired
+      } finally {
+        // Silent refresh attempt finished: unlock protected route evaluation
+        dispatch(setAuthChecking(false));
       }
-
-      dispatch(setAuthChecking(false));
     };
 
     initialize();

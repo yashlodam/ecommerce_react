@@ -50,7 +50,7 @@ function SellersTable() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllSellers(localStorage.getItem("jwt") || ""));
+    dispatch(fetchAllSellers());
   }, [dispatch]);
 
   const [anchorEl, setAnchorEl] = useState({});
@@ -73,7 +73,6 @@ function SellersTable() {
     try {
       await dispatch(
         updateSellerAccountStatus({
-          jwt: localStorage.getItem("jwt"),
           id,
           status,
         })

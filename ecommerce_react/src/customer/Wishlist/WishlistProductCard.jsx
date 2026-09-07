@@ -25,7 +25,6 @@ function WishlistProductCard({ item }) {
       await dispatch(
         removeProductFromWishlist({
           productId: item.id,
-          jwt: localStorage.getItem("jwt"),
         })
       ).unwrap();
 

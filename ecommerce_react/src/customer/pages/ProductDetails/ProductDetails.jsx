@@ -208,7 +208,6 @@ function ProductDetails() {
       dispatch(
         addProductToWishlist({
           productId: Number(productId),
-          jwt: localStorage.getItem("jwt"),
         })
       )
         .unwrap()

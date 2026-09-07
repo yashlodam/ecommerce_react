@@ -49,7 +49,6 @@ function CartItem({ item }) {
     try {
       await dispatch(
         updateCartItem({
-          jwt: localStorage.getItem("jwt"),
           cartItemId: item.id,
           cartItem: {
             quantity: value,

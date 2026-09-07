@@ -12,7 +12,6 @@ function DrawerList({ menu, menu2, toggleDrawer }) {
   const dispatch = useAppDispatch();
 
   const handleLogout = () => {
-    localStorage.removeItem("jwt");
     dispatch(logoutSeller());
     dispatch(logout());
     navigate("/login");

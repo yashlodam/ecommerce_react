@@ -61,7 +61,6 @@ function ProductCard({ item }) {
       dispatch(
         addProductToWishlist({
           productId: item.id,
-          jwt: localStorage.getItem("jwt"),
         })
       );
       if (isWishlisted) {

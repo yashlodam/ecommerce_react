@@ -19,21 +19,18 @@ export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
+    "Accept": "application/json",
   },
   // Ensure cookies (e.g. HttpOnly refreshToken) are sent and received with cross-origin requests
   withCredentials: true,
 });
 
 // ─── REQUEST INTERCEPTOR ──────────────────────────────────────────────────────
-// Attach short-lived Access Token strictly from Redux memory (XSS-safe)
+// Attach short-lived Access Token strictly from Redux memory (100% XSS-safe)
 api.interceptors.request.use(
   (config) => {
     const state = store.getState();
-    let token = state?.auth?.jwt || state?.seller?.jwt;
-
-    if (!token) {
-      token = localStorage.getItem("jwt") || localStorage.getItem("seller_jwt");
-    }
+    const token = state?.auth?.jwt || state?.seller?.jwt;
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -46,8 +43,7 @@ api.interceptors.request.use(
 
 // ─── SINGLE-FLIGHT SILENT REFRESH PROMISE ──────────────────────────────────────
 // Guarantees that only ONE /auth/refresh HTTP request is sent over the wire at a time.
-// All concurrent callers (React StrictMode, multiple components, parallel 401 interceptors)
-// share the exact same promise and receive the same refreshed token.
+// Browser automatically transmits the HttpOnly refresh token cookie with credentials.
 let refreshPromise = null;
 
 export const executeSilentRefresh = async () => {
@@ -55,39 +51,27 @@ export const executeSilentRefresh = async () => {
     return refreshPromise;
   }
 
-  const storedRefreshToken = localStorage.getItem("refreshToken");
-
   refreshPromise = (async () => {
     try {
       const response = await axios.post(
         `${API_URL}/auth/refresh`,
-        { refreshToken: storedRefreshToken || undefined },
+        {},
         {
           withCredentials: true,
-          headers: storedRefreshToken ? { "X-Refresh-Token": storedRefreshToken } : {},
+          headers: {
+            "Accept": "application/json",
+          },
         }
       );
       const data = response.data;
       if (data?.jwt) {
         store.dispatch(setAccessToken(data.jwt));
-        localStorage.setItem("jwt", data.jwt);
-      }
-      if (data?.refreshToken) {
-        localStorage.setItem("refreshToken", data.refreshToken);
-      }
-      if (data?.role) {
-        localStorage.setItem("role", data.role);
       }
       return data;
     } catch (error) {
-      // Only clear credentials if the server explicitly confirmed the session is expired (401 or 403)
-      // Never log out on temporary network glitches, 502/503/504 Render cold-start timeouts
+      // Only clear auth state if the server explicitly confirmed the session is expired (401 or 403)
       if (error.response?.status === 401 || error.response?.status === 403) {
         store.dispatch(setAccessToken(null));
-        localStorage.removeItem("jwt");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("role");
-        localStorage.removeItem("user");
       }
       throw error;
     } finally {

@@ -16,7 +16,7 @@ function Address() {
   const [editingAddress, setEditingAddress] = useState(null);
 
   useEffect(() => {
-    dispatch(fetchUserProfile(localStorage.getItem("jwt")));
+    dispatch(fetchUserProfile());
   }, [dispatch]);
 
   const auth = useAppSelector((store) => store.auth);
@@ -103,7 +103,7 @@ function Address() {
             onSuccess={() => {
               setOpenDialog(false);
               setEditingAddress(null);
-              dispatch(fetchUserProfile(localStorage.getItem("jwt")));
+              dispatch(fetchUserProfile());
             }}
           />
         </DialogContent>

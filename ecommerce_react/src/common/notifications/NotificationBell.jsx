@@ -34,7 +34,7 @@ export default function NotificationBell({ role = null, allNotificationsUrl }) {
 
   // Poll unread count on mount and periodically
   useEffect(() => {
-    if (!auth?.isLoggedIn && !localStorage.getItem("jwt") && !localStorage.getItem("seller_jwt")) {
+    if (!auth?.isLoggedIn) {
       return;
     }
 
