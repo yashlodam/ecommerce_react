@@ -21,6 +21,7 @@ import {
 } from "../../../State/customer/notificationSlice";
 import NotificationItem, { normalizeActionUrl } from "../../../common/notifications/NotificationItem";
 import NotificationSkeleton from "../../../common/notifications/NotificationSkeleton";
+import ConfirmDialog from "../../../common/dialog/ConfirmDialog";
 
 export default function NotificationsPage({ role = null }) {
   const dispatch = useAppDispatch();
@@ -32,6 +33,7 @@ export default function NotificationsPage({ role = null }) {
 
   const [activeTab, setActiveTab] = useState("ALL"); // "ALL" | "UNREAD"
   const [currentPage, setCurrentPage] = useState(0);
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false);
 
   const targetRole = role || auth?.role;
 
@@ -65,9 +67,12 @@ export default function NotificationsPage({ role = null }) {
   };
 
   const handleDeleteAllRead = () => {
-    if (window.confirm("Are you sure you want to clear all read notifications?")) {
-      dispatch(deleteAllReadNotifications({ role: targetRole }));
-    }
+    setConfirmClearOpen(true);
+  };
+
+  const handleConfirmClearAll = () => {
+    dispatch(deleteAllReadNotifications({ role: targetRole }));
+    setConfirmClearOpen(false);
   };
 
   const handleNavigate = (url) => {
@@ -227,6 +232,17 @@ export default function NotificationsPage({ role = null }) {
             </button>
           </div>
         )}
+
+        {/* Clear Read Confirmation Dialog */}
+        <ConfirmDialog
+          open={confirmClearOpen}
+          onClose={() => setConfirmClearOpen(false)}
+          onConfirm={handleConfirmClearAll}
+          title="Clear Read Notifications"
+          message="Are you sure you want to delete all read notifications? This action cannot be undone."
+          confirmText="Clear All"
+          isDestructive={true}
+        />
       </div>
     </div>
   );

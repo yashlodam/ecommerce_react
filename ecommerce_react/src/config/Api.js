@@ -1,6 +1,7 @@
 import axios from "axios";
 import { store } from "../State/Store";
 import { setAccessToken } from "../State/AuthSlice";
+import { toast } from "../common/toast";
 
 // Resolve API base URL:
 // 1. Primary: VITE_API_BASE_URL
@@ -80,7 +81,7 @@ export const executeSilentRefresh = async () => {
   return refreshPromise;
 };
 
-// ─── RESPONSE INTERCEPTOR (SILENT REFRESH ON 401) ─────────────────────────────
+// ─── RESPONSE INTERCEPTOR (SILENT REFRESH ON 401 & RENDER COLD-START RECOVERY) ─
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -118,7 +119,44 @@ api.interceptors.response.use(
       }
     }
 
-    // Render Cold Start / Network failure enhancement
+    // ─── RENDER FREE TIER COLD-START RESILIENCY ──────────────────────────────
+    // Render spins down free instances after 15m inactivity. First request takes 30-50s
+    // and may fail with network timeout, 502 Bad Gateway, 503, or 504.
+    const isColdStart =
+      !error.response ||
+      error.response.status === 502 ||
+      error.response.status === 503 ||
+      error.response.status === 504;
+
+    if (isColdStart && originalRequest) {
+      const method = (originalRequest.method || "get").toLowerCase();
+      const isIdempotent = method === "get" || method === "head";
+
+      // Safe automatic retry only for read-only / idempotent queries
+      // NEVER auto-retry POST, PUT, DELETE, PATCH (prevents duplicate orders/payments)
+      if (isIdempotent) {
+        originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
+
+        if (originalRequest._retryCount <= 3) {
+          if (originalRequest._retryCount === 1) {
+            toast.info(
+              "Connecting to ShopSphere cloud servers. Service is warming up...",
+              { id: "render-cold-start-toast", duration: 5000 }
+            );
+          }
+
+          // Exponential backoff: 2s, 4s, 6s
+          const delay = Math.min(
+            2000 * Math.pow(2, originalRequest._retryCount - 1),
+            6000
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          return api(originalRequest);
+        }
+      }
+    }
+
+    // Attach human-readable error explanation for UI consumers
     if (!error.response) {
       error.userMessage =
         "Unable to connect to server. The service may be starting up. Please wait a moment and retry.";
@@ -130,3 +168,13 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// ─── HEALTH CHECK UTILITY ─────────────────────────────────────────────────────
+export const checkServerHealth = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/health`, { timeout: 10000 });
+    return res.data?.status === "UP";
+  } catch {
+    return false;
+  }
+};

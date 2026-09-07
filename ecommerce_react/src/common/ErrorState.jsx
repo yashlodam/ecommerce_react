@@ -10,13 +10,13 @@ export default function ErrorState({
 }) {
   return (
     <Box className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center text-red-500 mb-3 shadow-inner">
+      <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/60 flex items-center justify-center text-red-500 dark:text-red-400 mb-3 shadow-inner">
         <ErrorOutlineIcon sx={{ fontSize: 34 }} />
       </div>
-      <Typography variant="h6" className="font-bold text-slate-800 mb-1">
+      <Typography variant="h6" className="font-bold text-slate-800 dark:text-slate-100 mb-1">
         {title}
       </Typography>
-      <Typography variant="body2" className="text-slate-500 max-w-sm mb-5">
+      <Typography variant="body2" className="text-slate-500 dark:text-slate-400 max-w-sm mb-5">
         {message}
       </Typography>
       {onRetry && (
@@ -25,7 +25,8 @@ export default function ErrorState({
           color="primary"
           startIcon={<RefreshIcon />}
           onClick={onRetry}
-          className="font-semibold text-xs rounded-lg"
+          className="font-semibold text-xs rounded-xl"
+          sx={{ borderRadius: "12px", textTransform: "none", fontWeight: 700 }}
         >
           Try Again
         </Button>

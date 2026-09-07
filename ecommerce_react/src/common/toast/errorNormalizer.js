@@ -42,7 +42,12 @@ function isTechnicalString(str) {
 export function normalizeApiError(error, fallback = "Something went wrong. Please try again.") {
   if (!error) return fallback;
 
-  // 1. If error is a clean string already
+  // 1. Explicit user-facing message attached by network interceptors
+  if (error.userMessage && typeof error.userMessage === "string" && !isTechnicalString(error.userMessage)) {
+    return error.userMessage.trim();
+  }
+
+  // 2. If error is a clean string already
   if (typeof error === "string") {
     const trimmed = error.trim();
     if (trimmed.length > 0 && !isTechnicalString(trimmed)) {
@@ -52,17 +57,17 @@ export function normalizeApiError(error, fallback = "Something went wrong. Pleas
     return fallback;
   }
 
-  // 2. Network connectivity error (no response received)
+  // 3. Network connectivity error (no response received)
   if (error.code === "ERR_NETWORK" || error.message === "Network Error" || (!error.response && error.request)) {
-    return "Unable to reach ShopSphere servers. Please check your internet connection.";
+    return "Unable to reach ShopSphere servers. The service may be starting up. Please try again shortly.";
   }
 
-  // 3. Timeout error
+  // 4. Timeout error
   if (error.code === "ECONNABORTED" || error.message?.toLowerCase().includes("timeout")) {
     return "The server took too long to respond. Please try again.";
   }
 
-  // 4. HTTP Response Error from Backend
+  // 5. HTTP Response Error from Backend
   if (error.response) {
     const status = error.response.status;
     const data = error.response.data;
@@ -75,9 +80,12 @@ export function normalizeApiError(error, fallback = "Something went wrong. Pleas
       backendMsg = data.message || data.error || data.detail || "";
     }
 
-    // If backend message is safe and non-technical, use it for 4xx errors
-    if (backendMsg && !isTechnicalString(backendMsg) && status < 500) {
-      return backendMsg.trim();
+    // If backend message is safe and non-technical, use it for 4xx or safe 5xx messages
+    if (backendMsg && !isTechnicalString(backendMsg)) {
+      // Do not return raw HTML (e.g. standard Render / Cloudflare 502 HTML error pages)
+      if (!backendMsg.trim().startsWith("<") && !backendMsg.includes("<!DOCTYPE")) {
+        return backendMsg.trim();
+      }
     }
 
     // Otherwise use standard semantic HTTP status messages
@@ -96,17 +104,18 @@ export function normalizeApiError(error, fallback = "Something went wrong. Pleas
         return "Some fields were incomplete or invalid. Please check the highlighted inputs.";
       case 429:
         return "Too many requests. Please wait a moment before trying again.";
-      case 500:
       case 502:
       case 503:
       case 504:
+        return "ShopSphere cloud server is warming up. Please try again in a few moments.";
+      case 500:
         return "Our servers encountered a temporary issue. Please try again in a few moments.";
       default:
         return fallback;
     }
   }
 
-  // 5. Standard JavaScript Error object
+  // 6. Standard JavaScript Error object
   if (error instanceof Error && error.message && !isTechnicalString(error.message)) {
     return error.message.replace(/^error:\s*/i, "");
   }

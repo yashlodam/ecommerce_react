@@ -13,6 +13,34 @@ const htmlBypass = (req) => {
 export default defineConfig({
   plugins: [react(), tailwindcss()],
 
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('@mui') || id.includes('@emotion')) {
+              return 'vendor-mui';
+            }
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@reduxjs') || id.includes('react-redux')) {
+              return 'vendor-redux';
+            }
+            if (id.includes('lucide-react')) {
+              return 'vendor-lucide';
+            }
+            if (id.includes('formik') || id.includes('yup')) {
+              return 'vendor-forms';
+            }
+            return 'vendor-libs';
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
+
   server: {
     port: 5173,
     proxy: {

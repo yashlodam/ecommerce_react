@@ -67,7 +67,8 @@ function Checkout() {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { auth, cart } = useAppSelector((store) => store);
+  const auth = useAppSelector((state) => state.auth);
+  const cart = useAppSelector((state) => state.cart);
 
   const cartItems = cart.cart?.cartItems || [];
   const hasOutOfStockItems = cartItems.some((item) => {
