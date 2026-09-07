@@ -88,13 +88,24 @@ export const logout = createAsyncThunk(
   "auth/logout",
   async (navigate) => {
     try {
-      // Revoke refresh token and clear cookie on the server
-      await api.post("/auth/logout");
+      const storedRefreshToken = localStorage.getItem("refreshToken");
+      // Revoke refresh token on the server
+      await api.post(
+        "/auth/logout",
+        { refreshToken: storedRefreshToken || undefined },
+        {
+          headers: storedRefreshToken ? { "X-Refresh-Token": storedRefreshToken } : {},
+        }
+      );
     } catch {
       // Ignore network errors during logout
     }
-    // Clean up any remaining legacy localStorage tokens
+    // Clean up all auth credentials from localStorage
     localStorage.removeItem("jwt");
+    localStorage.removeItem("role");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("seller_jwt");
     if (navigate) navigate("/");
     return null;
   }
@@ -149,14 +160,24 @@ export const fetchCurrentRole = createAsyncThunk(
 
 // ─── INITIAL STATE ───────────────────────────────────────────────────────────
 
+const storedJwt = localStorage.getItem("jwt");
+const storedRole = localStorage.getItem("role");
+let storedUser = null;
+try {
+  const userJson = localStorage.getItem("user");
+  if (userJson) storedUser = JSON.parse(userJson);
+} catch {
+  storedUser = null;
+}
+
 const initialState = {
-  jwt: null, // Short-lived access token kept strictly in frontend memory
-  role: null,
+  jwt: storedJwt || null,
+  role: storedRole || null,
   otpSend: false,
-  isLoggedIn: false,
-  user: null,
+  isLoggedIn: !!storedJwt,
+  user: storedUser,
   loading: false,
-  authChecking: true, // true while checking silent refresh on initial app load
+  authChecking: false, // Session restored immediately from local credentials
   error: null,
 };
 
@@ -176,6 +197,14 @@ const authSlice = createSlice({
       state.jwt = action.payload;
       state.isLoggedIn = !!action.payload;
       state.authChecking = false;
+      if (action.payload) {
+        localStorage.setItem("jwt", action.payload);
+      } else {
+        localStorage.removeItem("jwt");
+        localStorage.removeItem("role");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+      }
     },
     setAuthChecking: (state, action) => {
       state.authChecking = action.payload;
@@ -200,6 +229,9 @@ const authSlice = createSlice({
       // Fetch Current Role
       .addCase(fetchCurrentRole.fulfilled, (state, action) => {
         state.role = action.payload;
+        if (action.payload) {
+          localStorage.setItem("role", action.payload);
+        }
       })
 
       // Sign In
@@ -214,6 +246,15 @@ const authSlice = createSlice({
         state.isLoggedIn = true;
         state.authChecking = false;
         state.error = null;
+        if (action.payload.jwt) {
+          localStorage.setItem("jwt", action.payload.jwt);
+        }
+        if (action.payload.role) {
+          localStorage.setItem("role", action.payload.role);
+        }
+        if (action.payload.refreshToken) {
+          localStorage.setItem("refreshToken", action.payload.refreshToken);
+        }
       })
       .addCase(signin.rejected, (state, action) => {
         state.loading = false;
@@ -234,6 +275,15 @@ const authSlice = createSlice({
         state.isLoggedIn = true;
         state.authChecking = false;
         state.error = null;
+        if (action.payload.jwt) {
+          localStorage.setItem("jwt", action.payload.jwt);
+        }
+        if (action.payload.role) {
+          localStorage.setItem("role", action.payload.role);
+        }
+        if (action.payload.refreshToken) {
+          localStorage.setItem("refreshToken", action.payload.refreshToken);
+        }
       })
       .addCase(signup.rejected, (state, action) => {
         state.loading = false;
@@ -248,17 +298,31 @@ const authSlice = createSlice({
       .addCase(refreshToken.fulfilled, (state, action) => {
         state.loading = false;
         state.jwt = action.payload.jwt;
-        state.role = action.payload.role;
+        state.role = action.payload.role || state.role;
         state.isLoggedIn = true;
         state.authChecking = false;
         state.error = null;
+        if (action.payload.jwt) {
+          localStorage.setItem("jwt", action.payload.jwt);
+        }
+        if (action.payload.role) {
+          localStorage.setItem("role", action.payload.role);
+        }
+        if (action.payload.refreshToken) {
+          localStorage.setItem("refreshToken", action.payload.refreshToken);
+        }
       })
       .addCase(refreshToken.rejected, (state) => {
         state.loading = false;
         state.jwt = null;
         state.role = null;
+        state.user = null;
         state.isLoggedIn = false;
         state.authChecking = false;
+        localStorage.removeItem("jwt");
+        localStorage.removeItem("role");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
       })
 
       // Fetch User Profile
@@ -269,8 +333,16 @@ const authSlice = createSlice({
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
-        state.role = action.payload.role;
+        state.role = action.payload.role || state.role;
         state.isLoggedIn = true;
+        if (action.payload) {
+          try {
+            localStorage.setItem("user", JSON.stringify(action.payload));
+          } catch {}
+        }
+        if (action.payload?.role) {
+          localStorage.setItem("role", action.payload.role);
+        }
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;

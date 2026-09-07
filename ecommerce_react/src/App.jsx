@@ -52,29 +52,45 @@ function App() {
   const isProductDetails = location.pathname.startsWith("/product-details");
   const isCart = location.pathname.startsWith("/cart");
 
-  // ─── Bootstrap on mount (Silent Refresh via HttpOnly cookie) ─────────────────
+  // ─── Bootstrap on mount ──────────────────────────────────────────────────
   useEffect(() => {
     const initialize = async () => {
       // Load live homepage categories and promotional deals
       dispatch(fetchHomePageData());
 
-      try {
-        // Attempt silent refresh using the HttpOnly refresh token cookie
-        const authData = await dispatch(refreshToken()).unwrap();
+      const token = localStorage.getItem("jwt");
+      const refreshTokenVal = localStorage.getItem("refreshToken");
+      const role = localStorage.getItem("role");
 
-        if (authData?.jwt) {
-          const role = authData?.role;
+      // Only verify auth session if user has existing credentials
+      // Prevents unnecessary 401 calls to /auth/refresh for guest users
+      if (token || refreshTokenVal) {
+        try {
           if (role === "ROLE_SELLER") {
-            await dispatch(fetchSellerProfile());
+            await dispatch(fetchSellerProfile()).unwrap();
           } else {
-            await dispatch(fetchUserProfile());
+            await dispatch(fetchUserProfile()).unwrap();
+          }
+        } catch {
+          // If access token expired, try silent refresh with refreshToken
+          if (refreshTokenVal) {
+            try {
+              const authData = await dispatch(refreshToken()).unwrap();
+              if (authData?.jwt) {
+                if (authData.role === "ROLE_SELLER") {
+                  await dispatch(fetchSellerProfile());
+                } else {
+                  await dispatch(fetchUserProfile());
+                }
+              }
+            } catch {
+              // Session genuinely expired — credentials cleaned up by reducer
+            }
           }
         }
-      } catch {
-        // No active session or refresh token expired — user continues as guest
-      } finally {
-        dispatch(setAuthChecking(false));
       }
+
+      dispatch(setAuthChecking(false));
     };
 
     initialize();

@@ -55,20 +55,36 @@ export const executeSilentRefresh = async () => {
     return refreshPromise;
   }
 
+  const storedRefreshToken = localStorage.getItem("refreshToken");
+
   refreshPromise = (async () => {
     try {
       const response = await axios.post(
         `${API_URL}/auth/refresh`,
-        {},
-        { withCredentials: true }
+        { refreshToken: storedRefreshToken || undefined },
+        {
+          withCredentials: true,
+          headers: storedRefreshToken ? { "X-Refresh-Token": storedRefreshToken } : {},
+        }
       );
       const data = response.data;
       if (data?.jwt) {
         store.dispatch(setAccessToken(data.jwt));
+        localStorage.setItem("jwt", data.jwt);
+      }
+      if (data?.refreshToken) {
+        localStorage.setItem("refreshToken", data.refreshToken);
+      }
+      if (data?.role) {
+        localStorage.setItem("role", data.role);
       }
       return data;
     } catch (error) {
       store.dispatch(setAccessToken(null));
+      localStorage.removeItem("jwt");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("role");
+      localStorage.removeItem("user");
       throw error;
     } finally {
       // Clear after a short tick to allow future separate refresh cycles
