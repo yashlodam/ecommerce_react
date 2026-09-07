@@ -317,6 +317,20 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
+      // Delete User Address (Optimistic)
+      .addCase("user/deleteUserAddress/pending", (state, action) => {
+        if (state.user?.addresses && Array.isArray(state.user.addresses) && action.meta?.arg !== undefined) {
+          const arg = action.meta.arg;
+          const addressId = typeof arg === "object" && arg !== null ? (arg.addressId || arg.id) : arg;
+          state.user.addresses = state.user.addresses.filter((a) => a.id !== addressId);
+        }
+      })
+      .addCase("user/deleteUserAddress/fulfilled", (state, action) => {
+        if (action.payload?.user?.addresses) {
+          state.user.addresses = action.payload.user.addresses;
+        }
+      })
+
       // Delete Customer Account
       .addCase(deleteCustomerAccount.pending, (state) => {
         state.loading = true;

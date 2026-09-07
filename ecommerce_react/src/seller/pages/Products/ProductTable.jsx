@@ -179,7 +179,7 @@ export default function ProductTable() {
         />
       </div>
 
-      {loading ? (
+      {loading && productList.length === 0 ? (
         <div className="flex justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
           <CircularProgress color="primary" />
         </div>

@@ -123,7 +123,14 @@ function Cart() {
         </p>
       </div>
 
-      {cartItems.length === 0 ? (
+      {cart.loading && !cart.cart ? (
+        <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <CircularProgress color="primary" />
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-3">
+            Loading your cart...
+          </p>
+        </div>
+      ) : cartItems.length === 0 ? (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8">
           <EmptyState
             icon={ShoppingBagOutlinedIcon}

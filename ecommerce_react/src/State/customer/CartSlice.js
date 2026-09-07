@@ -50,6 +50,7 @@ export const deleteCartItem = createAsyncThunk(
       dispatch(fetchUserCart());
       return cartItemId;
     } catch (error) {
+      dispatch(fetchUserCart());
       return rejectWithValue(
         error.response?.data?.message || "Failed to remove item"
       );
@@ -68,6 +69,7 @@ export const updateCartItem = createAsyncThunk(
       dispatch(fetchUserCart());
       return response.data;
     } catch (error) {
+      dispatch(fetchUserCart());
       return rejectWithValue(
         error.response?.data?.message || "Failed to update item"
       );
@@ -134,19 +136,31 @@ const cartSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(deleteCartItem.pending, (state) => {
-        state.loading = true;
+      .addCase(deleteCartItem.pending, (state, action) => {
         state.error = null;
+        if (state.cart && Array.isArray(state.cart.cartItems) && action.meta?.arg !== undefined) {
+          const arg = action.meta.arg;
+          const itemId = typeof arg === "object" && arg !== null ? (arg.cartItemId || arg.id) : arg;
+          state.cart.cartItems = state.cart.cartItems.filter(
+            (item) => item.id !== itemId
+          );
+          state.cart.totalMrpPrice = sumCartItemMrpPrice(state.cart.cartItems);
+          state.cart.totalSellingPrice = sumCartItemSellingPrice(state.cart.cartItems);
+          state.cart.totalItem = state.cart.cartItems.reduce(
+            (total, item) => total + (item.quantity || 1),
+            0
+          );
+        }
       })
       .addCase(deleteCartItem.fulfilled, (state, action) => {
-        if (state.cart) {
+        if (state.cart && Array.isArray(state.cart.cartItems)) {
           state.cart.cartItems = state.cart.cartItems.filter(
             (item) => item.id !== action.payload
           );
           state.cart.totalMrpPrice = sumCartItemMrpPrice(state.cart.cartItems);
           state.cart.totalSellingPrice = sumCartItemSellingPrice(state.cart.cartItems);
           state.cart.totalItem = state.cart.cartItems.reduce(
-            (total, item) => total + item.quantity,
+            (total, item) => total + (item.quantity || 1),
             0
           );
         }
@@ -157,16 +171,38 @@ const cartSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(updateCartItem.pending, (state) => {
-        state.loading = true;
+      .addCase(updateCartItem.pending, (state, action) => {
         state.error = null;
+        if (state.cart && Array.isArray(state.cart.cartItems) && action.meta?.arg) {
+          const { cartItemId, cartItem } = action.meta.arg;
+          const index = state.cart.cartItems.findIndex((item) => item.id === cartItemId);
+          if (index !== -1 && cartItem?.quantity != null) {
+            const currentItem = state.cart.cartItems[index];
+            const oldQty = currentItem.quantity || 1;
+            const newQty = cartItem.quantity;
+            const unitSelling = (currentItem.sellingPrice || 0) / oldQty;
+            const unitMrp = (currentItem.mrpPrice || currentItem.sellingPrice || 0) / oldQty;
+            state.cart.cartItems[index] = {
+              ...currentItem,
+              quantity: newQty,
+              sellingPrice: Math.round(unitSelling * newQty),
+              mrpPrice: Math.round(unitMrp * newQty),
+            };
+            state.cart.totalMrpPrice = sumCartItemMrpPrice(state.cart.cartItems);
+            state.cart.totalSellingPrice = sumCartItemSellingPrice(state.cart.cartItems);
+            state.cart.totalItem = state.cart.cartItems.reduce(
+              (total, item) => total + (item.quantity || 1),
+              0
+            );
+          }
+        }
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
-        if (state.cart) {
+        if (state.cart && Array.isArray(state.cart.cartItems)) {
           const index = state.cart.cartItems.findIndex(
             (item) => item.id === action.meta.arg.cartItemId
           );
-          if (index !== -1) {
+          if (index !== -1 && action.payload) {
             state.cart.cartItems[index] = {
               ...state.cart.cartItems[index],
               ...action.payload,
@@ -175,7 +211,7 @@ const cartSlice = createSlice({
           state.cart.totalMrpPrice = sumCartItemMrpPrice(state.cart.cartItems);
           state.cart.totalSellingPrice = sumCartItemSellingPrice(state.cart.cartItems);
           state.cart.totalItem = state.cart.cartItems.reduce(
-            (total, item) => total + item.quantity,
+            (total, item) => total + (item.quantity || 1),
             0
           );
         }

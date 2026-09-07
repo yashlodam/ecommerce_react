@@ -137,15 +137,21 @@ const homeCategorySlice = createSlice({
       })
 
       // Delete Home Category
-      .addCase(deleteHomeCategory.pending, (state) => {
-        state.loading = true;
+      .addCase(deleteHomeCategory.pending, (state, action) => {
         state.error = null;
+        if (Array.isArray(state.categories) && action.meta?.arg !== undefined) {
+          state.categories = state.categories.filter(
+            (item) => item.id !== action.meta.arg
+          );
+        }
       })
       .addCase(deleteHomeCategory.fulfilled, (state, action) => {
         state.loading = false;
-        state.categories = state.categories.filter(
-          (item) => item.id !== action.payload
-        );
+        if (Array.isArray(state.categories)) {
+          state.categories = state.categories.filter(
+            (item) => item.id !== action.payload
+          );
+        }
       })
       .addCase(deleteHomeCategory.rejected, (state, action) => {
         state.loading = false;

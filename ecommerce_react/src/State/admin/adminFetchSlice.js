@@ -173,8 +173,17 @@ const adminFetchSlice = createSlice({
       })
 
       // Delete user
+      .addCase(deleteUser.pending, (state, action) => {
+        state.error = null;
+        if (Array.isArray(state.users) && action.meta?.arg !== undefined) {
+          state.users = state.users.filter((u) => u.id !== action.meta.arg);
+        }
+      })
       .addCase(deleteUser.fulfilled, (state, action) => {
-        state.users = state.users.filter((u) => u.id !== action.payload);
+        state.loading = false;
+        if (Array.isArray(state.users)) {
+          state.users = state.users.filter((u) => u.id !== action.payload);
+        }
       });
   },
 });

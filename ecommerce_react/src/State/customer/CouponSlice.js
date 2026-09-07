@@ -190,8 +190,17 @@ const couponSlice = createSlice({
       })
 
       // Delete Coupon
+      .addCase(deleteCoupon.pending, (state, action) => {
+        state.error = null;
+        if (Array.isArray(state.coupons) && action.meta?.arg !== undefined) {
+          state.coupons = state.coupons.filter((c) => c.id !== action.meta.arg);
+        }
+      })
       .addCase(deleteCoupon.fulfilled, (state, action) => {
-        state.coupons = state.coupons.filter((c) => c.id !== action.payload);
+        state.loading = false;
+        if (Array.isArray(state.coupons)) {
+          state.coupons = state.coupons.filter((c) => c.id !== action.payload);
+        }
       })
 
       // Immediate reset on logout

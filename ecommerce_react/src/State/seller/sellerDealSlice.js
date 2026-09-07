@@ -157,15 +157,19 @@ const sellerDealSlice = createSlice({
       })
 
       // Delete Deal
-      .addCase(deleteSellerDeal.pending, (state) => {
-        state.loading = true;
+      .addCase(deleteSellerDeal.pending, (state, action) => {
         state.dealDeleted = false;
         state.error = null;
+        if (Array.isArray(state.deals) && action.meta?.arg !== undefined) {
+          state.deals = state.deals.filter((d) => d.id !== action.meta.arg);
+        }
       })
       .addCase(deleteSellerDeal.fulfilled, (state, action) => {
         state.loading = false;
         state.dealDeleted = true;
-        state.deals = state.deals.filter((d) => d.id !== action.payload);
+        if (Array.isArray(state.deals)) {
+          state.deals = state.deals.filter((d) => d.id !== action.payload);
+        }
       })
       .addCase(deleteSellerDeal.rejected, (state, action) => {
         state.loading = false;

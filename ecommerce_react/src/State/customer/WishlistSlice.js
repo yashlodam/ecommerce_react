@@ -19,7 +19,7 @@ export const getWishlistByUserId = createAsyncThunk(
 
 export const addProductToWishlist = createAsyncThunk(
   "wishlist/addProductToWishlist",
-  async (arg, { rejectWithValue }) => {
+  async (arg, { dispatch, rejectWithValue }) => {
     try {
       const id = typeof arg === "object" && arg !== null ? arg.productId : arg;
       const response = await api.post(
@@ -28,6 +28,7 @@ export const addProductToWishlist = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
+      dispatch(getWishlistByUserId());
       return rejectWithValue(
         error.response?.data?.message || "Failed to add product to wishlist"
       );
@@ -37,12 +38,13 @@ export const addProductToWishlist = createAsyncThunk(
 
 export const removeProductFromWishlist = createAsyncThunk(
   "wishlist/removeProductFromWishlist",
-  async (arg, { rejectWithValue }) => {
+  async (arg, { dispatch, rejectWithValue }) => {
     try {
       const id = typeof arg === "object" && arg !== null ? arg.productId : arg;
       const response = await api.delete(`/api/wishlist/product/${id}`);
       return response.data;
     } catch (error) {
+      dispatch(getWishlistByUserId());
       return rejectWithValue(
         error.response?.data?.message || "Failed to remove product from wishlist"
       );
@@ -82,9 +84,18 @@ const wishlistSlice = createSlice({
         state.wishlist = null;
       })
 
-      .addCase(addProductToWishlist.pending, (state) => {
-        state.loading = true;
+      .addCase(addProductToWishlist.pending, (state, action) => {
         state.error = null;
+        if (state.wishlist && Array.isArray(state.wishlist.products) && action.meta?.arg !== undefined) {
+          const arg = action.meta.arg;
+          const prodId = typeof arg === "object" && arg !== null ? (arg.productId ?? arg.id) : arg;
+          const exists = state.wishlist.products.some((p) => p.id === prodId);
+          if (exists) {
+            state.wishlist.products = state.wishlist.products.filter((p) => p.id !== prodId);
+          } else {
+            state.wishlist.products.push({ id: prodId });
+          }
+        }
       })
       .addCase(addProductToWishlist.fulfilled, (state, action) => {
         state.wishlist = action.payload;
@@ -95,9 +106,13 @@ const wishlistSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(removeProductFromWishlist.pending, (state) => {
-        state.loading = true;
+      .addCase(removeProductFromWishlist.pending, (state, action) => {
         state.error = null;
+        if (state.wishlist && Array.isArray(state.wishlist.products) && action.meta?.arg !== undefined) {
+          const arg = action.meta.arg;
+          const prodId = typeof arg === "object" && arg !== null ? (arg.productId ?? arg.id) : arg;
+          state.wishlist.products = state.wishlist.products.filter((p) => p.id !== prodId);
+        }
       })
       .addCase(removeProductFromWishlist.fulfilled, (state, action) => {
         state.wishlist = action.payload;

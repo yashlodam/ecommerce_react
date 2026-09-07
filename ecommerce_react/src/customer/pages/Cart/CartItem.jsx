@@ -61,18 +61,24 @@ function CartItem({ item }) {
     }
   };
 
+  const [isRemoving, setIsRemoving] = useState(false);
+
   const handleRemoveItem = async () => {
+    setIsRemoving(true);
     try {
       await dispatch(deleteCartItem(item.id)).unwrap();
       const title = product?.title ? `"${product.title}"` : "Item";
       toast.info(`${title} removed from your cart.`);
     } catch (error) {
+      setIsRemoving(false);
       toast.error(error, { fallback: "Unable to remove item from cart." });
     }
   };
 
   return (
     <div className={`bg-white dark:bg-slate-900 rounded-2xl border transition-all duration-300 overflow-hidden relative ${
+      isRemoving ? "opacity-30 scale-95 pointer-events-none" : ""
+    } ${
       isOutOfStock
         ? "border-red-300 dark:border-red-900/80 shadow-xs bg-red-50/10"
         : "border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md"
@@ -81,6 +87,7 @@ function CartItem({ item }) {
       {/* Remove Item Button */}
       <IconButton
         onClick={handleRemoveItem}
+        disabled={isRemoving}
         className="!absolute top-3 right-3 z-10 text-slate-400 hover:text-red-500"
         size="small"
       >

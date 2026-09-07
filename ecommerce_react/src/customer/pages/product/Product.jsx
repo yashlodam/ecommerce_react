@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useCallback } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
-import { fetchAllProducts, clearProductError } from "../../../State/customer/ProductSlice";
+import { fetchAllProducts, clearProductError, resetProductCatalog } from "../../../State/customer/ProductSlice";
 import ProductListingLayout from "../Listing/ProductListingLayout";
 
 const categoryMetaMap = {
@@ -297,6 +297,12 @@ function Product() {
     }),
     [priceParam, colorParam, brandParam, discountParam, stockParam]
   );
+
+  // Reset catalog immediately when category changes to prevent stale product flash
+  useEffect(() => {
+    dispatch(resetProductCatalog());
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [category, dispatch]);
 
   // Fetch products whenever category, filters, sort or page changes
   const loadProducts = useCallback(() => {

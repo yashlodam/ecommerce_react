@@ -49,11 +49,12 @@ export const updateSellerProduct = createAsyncThunk(
 
 export const deleteSellerProduct = createAsyncThunk(
   "sellerProduct/deleteSellerProduct",
-  async (productId, { rejectWithValue }) => {
+  async (productId, { dispatch, rejectWithValue }) => {
     try {
       await api.delete(`/sellers/products/${productId}`);
       return productId;
     } catch (error) {
+      dispatch(fetchSellerProduct());
       return rejectWithValue(
         error.response?.data?.message || "Failed to delete product"
       );
@@ -202,13 +203,17 @@ const sellerProductSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(deleteSellerProduct.pending, (state) => {
-        state.loading = true;
+      .addCase(deleteSellerProduct.pending, (state, action) => {
         state.error = null;
+        if (Array.isArray(state.products) && action.meta?.arg !== undefined) {
+          state.products = state.products.filter((p) => p.id !== action.meta.arg);
+        }
       })
       .addCase(deleteSellerProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = state.products.filter((p) => p.id !== action.payload);
+        if (Array.isArray(state.products)) {
+          state.products = state.products.filter((p) => p.id !== action.payload);
+        }
       })
       .addCase(deleteSellerProduct.rejected, (state, action) => {
         state.loading = false;
@@ -255,12 +260,17 @@ const sellerProductSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(deleteVariant.pending, (state) => {
-        state.variantLoading = true;
+      .addCase(deleteVariant.pending, (state, action) => {
+        state.error = null;
+        if (Array.isArray(state.variants) && action.meta?.arg !== undefined) {
+          state.variants = state.variants.filter((v) => v.id !== action.meta.arg);
+        }
       })
       .addCase(deleteVariant.fulfilled, (state, action) => {
         state.variantLoading = false;
-        state.variants = state.variants.filter((v) => v.id !== action.payload);
+        if (Array.isArray(state.variants)) {
+          state.variants = state.variants.filter((v) => v.id !== action.payload);
+        }
       })
       .addCase(deleteVariant.rejected, (state, action) => {
         state.variantLoading = false;

@@ -54,11 +54,11 @@ function Wishlist() {
           </div>
         </div>
 
-        {/* Loading Skeletons */}
-        {wishlist.loading && <SkeletonGrid count={4} />}
+        {/* Loading Skeletons on initial load */}
+        {wishlist.loading && !wishlist.wishlist && <SkeletonGrid count={4} />}
 
         {/* Empty State */}
-        {!wishlist.loading && products.length === 0 && (
+        {(!wishlist.loading || wishlist.wishlist) && products.length === 0 && (
           <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-8 transition-colors">
             <EmptyState
               icon={FavoriteBorderIcon}
@@ -71,7 +71,7 @@ function Wishlist() {
         )}
 
         {/* Wishlist Products Grid */}
-        {!wishlist.loading && products.length > 0 && (
+        {products.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-200">

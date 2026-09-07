@@ -126,6 +126,13 @@ const productSlice = createSlice({
     clearProductError: (state) => {
       state.error = null;
     },
+    resetProductCatalog: (state) => {
+      state.products = [];
+      state.totalPages = 1;
+      state.totalElements = 0;
+      state.loading = true;
+      state.error = null;
+    },
   },
 
   extraReducers: (builder) => {
@@ -150,6 +157,7 @@ const productSlice = createSlice({
       .addCase(fetchAllProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.products = [];
       })
       .addCase(fetchAllProducts.fulfilled, (state, action) => {
         state.loading = false;
@@ -207,5 +215,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { clearProductError } = productSlice.actions;
+export const { clearProductError, resetProductCatalog } = productSlice.actions;
 export default productSlice.reducer;

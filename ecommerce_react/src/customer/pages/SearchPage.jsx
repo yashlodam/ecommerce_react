@@ -8,7 +8,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
 import { useAppDispatch, useAppSelector } from "../../State/Store";
-import { fetchAllProducts, clearProductError } from "../../State/customer/ProductSlice";
+import { fetchAllProducts, clearProductError, resetProductCatalog } from "../../State/customer/ProductSlice";
 import ProductListingLayout from "./Listing/ProductListingLayout";
 
 const TRENDING_SEARCHES = [
@@ -56,6 +56,12 @@ function SearchPage() {
     }),
     [categoryParam, priceParam, colorParam, brandParam, discountParam, stockParam]
   );
+
+  // Reset catalog immediately when search query or category changes to prevent stale product flash
+  useEffect(() => {
+    dispatch(resetProductCatalog());
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [queryParam, categoryParam, dispatch]);
 
   // Load products based on query & filters
   const loadSearchProducts = useCallback(() => {

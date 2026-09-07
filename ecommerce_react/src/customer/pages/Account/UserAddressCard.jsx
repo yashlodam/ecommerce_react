@@ -17,16 +17,16 @@ function UserAddressCard({ address, onEdit }) {
 
   const removeAddress = async () => {
     setDeleting(true);
+    setConfirmDeleteOpen(false);
     try {
       await dispatch(deleteUserAddress(address.id)).unwrap();
-      await dispatch(fetchUserProfile());
       toast.success("Delivery address removed successfully.");
     } catch (error) {
       console.error("Delete Error:", error);
+      dispatch(fetchUserProfile());
       toast.error(error || "Failed to remove delivery address.");
     } finally {
       setDeleting(false);
-      setConfirmDeleteOpen(false);
     }
   };
 
