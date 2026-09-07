@@ -77,8 +77,12 @@ export default function ProductTable() {
     return matchesTab && matchesQuery;
   });
 
+  const [hasFetched, setHasFetched] = useState(false);
+
   useEffect(() => {
-    dispatch(fetchSellerProduct());
+    dispatch(fetchSellerProduct()).finally(() => {
+      setHasFetched(true);
+    });
   }, [dispatch]);
 
   const handleDelete = (prod) => {
@@ -179,7 +183,7 @@ export default function ProductTable() {
         />
       </div>
 
-      {loading && productList.length === 0 ? (
+      {(loading || !hasFetched) && productList.length === 0 ? (
         <div className="flex justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
           <CircularProgress color="primary" />
         </div>

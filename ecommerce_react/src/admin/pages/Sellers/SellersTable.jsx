@@ -48,10 +48,15 @@ function SellersTable() {
   const sellers = adminFetch?.sellers || [];
   const loading = adminFetch?.loading || false;
   const dispatch = useAppDispatch();
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchAllSellers());
+    dispatch(fetchAllSellers()).finally(() => {
+      setHasFetched(true);
+    });
   }, [dispatch]);
+
+  const isLoading = loading || !hasFetched;
 
   const [anchorEl, setAnchorEl] = useState({});
 
@@ -146,7 +151,7 @@ function SellersTable() {
         />
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
           <CircularProgress color="primary" />
         </div>

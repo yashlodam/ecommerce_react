@@ -27,6 +27,7 @@ export default function ProductListingLayout({
   totalPages = 1,
   currentPage = 1,
   loading = false,
+  hasFetched = true,
   error = null,
   filters = {},
   sort = "",
@@ -174,7 +175,7 @@ export default function ProductListingLayout({
 
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-              {countDisplay} items
+              {loading || hasFetched === false ? "Loading..." : `${countDisplay} items`}
             </span>
             <SortControl value={sort} onChange={onSortChange} />
           </div>
@@ -211,7 +212,7 @@ export default function ProductListingLayout({
           <main className="flex-1 min-w-0 w-full transition-all duration-300">
             {error ? (
               <ErrorListingState error={error} onRetry={onRetry} />
-            ) : loading ? (
+            ) : loading || hasFetched === false ? (
               <SkeletonGrid count={8} />
             ) : products.length === 0 ? (
               <EmptyListingState

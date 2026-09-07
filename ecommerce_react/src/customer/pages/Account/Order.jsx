@@ -12,13 +12,16 @@ function Order() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const order = useAppSelector((store) => store.order);
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchUserOrderHistory());
+    dispatch(fetchUserOrderHistory()).finally(() => {
+      setHasFetched(true);
+    });
   }, [dispatch]);
 
   const orders = order?.orders || [];
-  const isLoading = order?.loading;
+  const isLoading = order?.loading || !hasFetched;
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -42,7 +45,7 @@ function Order() {
         <div className="bg-teal-50 dark:bg-teal-950/40 px-4 py-2 rounded-xl border border-teal-100 dark:border-teal-900/40 shrink-0 self-start sm:self-auto">
           <p className="text-[11px] font-bold uppercase text-teal-700 dark:text-teal-400">Total Orders</p>
           <h3 className="text-xl font-extrabold text-teal-800 dark:text-teal-300">
-            {orders.length}
+            {!hasFetched ? "..." : orders.length}
           </h3>
         </div>
       </div>

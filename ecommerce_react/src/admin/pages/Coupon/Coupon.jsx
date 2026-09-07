@@ -39,12 +39,16 @@ function Coupon() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [hasFetched, setHasFetched] = useState(false);
+
   useEffect(() => {
-    dispatch(fetchAllCoupons());
+    dispatch(fetchAllCoupons()).finally(() => {
+      setHasFetched(true);
+    });
   }, [dispatch]);
 
   const coupons = coupon?.coupons || [];
-  const isLoading = coupon?.loading;
+  const isLoading = coupon?.loading || !hasFetched;
 
   const handleConfirmDelete = async () => {
     if (!deleteTarget) return;

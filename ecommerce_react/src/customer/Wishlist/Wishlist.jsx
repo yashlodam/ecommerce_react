@@ -15,12 +15,16 @@ function Wishlist() {
   const navigate = useNavigate();
 
   const wishlist = useAppSelector((store) => store.wishlist);
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
-    dispatch(getWishlistByUserId());
+    dispatch(getWishlistByUserId()).finally(() => {
+      setHasFetched(true);
+    });
   }, [dispatch]);
 
   const products = wishlist.wishlist?.products || [];
+  const isLoading = wishlist.loading || !hasFetched;
 
   return (
     <div className="min-h-[85vh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
@@ -48,17 +52,17 @@ function Wishlist() {
                 Saved Items
               </p>
               <h2 className="text-xl font-extrabold text-rose-700 dark:text-rose-300">
-                {products.length}
+                {!hasFetched ? "..." : products.length}
               </h2>
             </div>
           </div>
         </div>
 
         {/* Loading Skeletons on initial load */}
-        {wishlist.loading && !wishlist.wishlist && <SkeletonGrid count={4} />}
+        {isLoading && <SkeletonGrid count={4} />}
 
         {/* Empty State */}
-        {(!wishlist.loading || wishlist.wishlist) && products.length === 0 && (
+        {!isLoading && products.length === 0 && (
           <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-8 transition-colors">
             <EmptyState
               icon={FavoriteBorderIcon}
@@ -71,7 +75,7 @@ function Wishlist() {
         )}
 
         {/* Wishlist Products Grid */}
-        {products.length > 0 && (
+        {!isLoading && products.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-200">

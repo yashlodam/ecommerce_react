@@ -41,9 +41,15 @@ function UsersTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
+  const [hasFetched, setHasFetched] = useState(false);
+
   useEffect(() => {
-    dispatch(getAllUsers());
+    dispatch(getAllUsers()).finally(() => {
+      setHasFetched(true);
+    });
   }, [dispatch]);
+
+  const isLoading = loading || !hasFetched;
 
   const handleToggleBan = (user) => {
     if (user.enabled) {
@@ -101,7 +107,7 @@ function UsersTable() {
         />
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
           <CircularProgress color="primary" />
         </div>

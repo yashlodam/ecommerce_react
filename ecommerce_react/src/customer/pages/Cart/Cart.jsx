@@ -55,12 +55,19 @@ function Cart() {
   });
   const hasOutOfStockItems = outOfStockItems.length > 0;
 
+  const [hasFetched, setHasFetched] = useState(false);
+
   useEffect(() => {
     if (isLoggedIn) {
-      dispatch(fetchUserCart());
-      dispatch(fetchActiveCoupons());
+      Promise.all([
+        dispatch(fetchUserCart()),
+        dispatch(fetchActiveCoupons()),
+      ]).finally(() => {
+        setHasFetched(true);
+      });
     } else {
       dispatch(resetCartState());
+      setHasFetched(true);
     }
   }, [dispatch, isLoggedIn]);
 
@@ -123,7 +130,7 @@ function Cart() {
         </p>
       </div>
 
-      {cart.loading && !cart.cart ? (
+      {isLoggedIn && (cart.loading || !hasFetched) ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
           <CircularProgress color="primary" />
           <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-3">

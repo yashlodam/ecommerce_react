@@ -58,10 +58,15 @@ export default function DealTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [dealToDelete, setDealToDelete] = useState(null);
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchDeals());
+    dispatch(fetchDeals()).finally(() => {
+      setHasFetched(true);
+    });
   }, [dispatch]);
+
+  const isLoading = loading || !hasFetched;
 
   const handleOpenDelete = (deal) => {
     setDealToDelete(deal);
@@ -180,7 +185,7 @@ export default function DealTable() {
         />
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex justify-center items-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
           <CircularProgress color="primary" size={28} />
         </div>

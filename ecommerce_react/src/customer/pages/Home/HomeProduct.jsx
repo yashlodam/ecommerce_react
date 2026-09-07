@@ -9,6 +9,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 import ProductCard from "../product/ProductCard";
+import { SkeletonCard } from "../../../common/SkeletonCard";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { fetchHomeProducts } from "../../../State/customer/ProductSlice";
 
@@ -85,25 +86,33 @@ function HomeProducts() {
             </Button>
           </div>
 
-          <Swiper
-            modules={[Navigation]}
-            navigation
-            spaceBetween={16}
-            breakpoints={{
-              0: { slidesPerView: 1, spaceBetween: 16 },
-              640: { slidesPerView: 2.2, spaceBetween: 16 },
-              900: { slidesPerView: 3, spaceBetween: 16 },
-              1100: { slidesPerView: 4, spaceBetween: 18 },
-              1400: { slidesPerView: 5, spaceBetween: 20 },
-            }}
-            className="home-product-swiper"
-          >
-            {(homeProducts[section.category] || []).map((item) => (
-              <SwiperSlide key={item.id || item._id || item.productId}>
-                <ProductCard item={item} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          {(homeProducts[section.category] || []).length === 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 py-2">
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <SkeletonCard key={idx} />
+              ))}
+            </div>
+          ) : (
+            <Swiper
+              modules={[Navigation]}
+              navigation
+              spaceBetween={16}
+              breakpoints={{
+                0: { slidesPerView: 1, spaceBetween: 16 },
+                640: { slidesPerView: 2.2, spaceBetween: 16 },
+                900: { slidesPerView: 3, spaceBetween: 16 },
+                1100: { slidesPerView: 4, spaceBetween: 18 },
+                1400: { slidesPerView: 5, spaceBetween: 20 },
+              }}
+              className="home-product-swiper"
+            >
+              {homeProducts[section.category].map((item) => (
+                <SwiperSlide key={item.id || item._id || item.productId}>
+                  <ProductCard item={item} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
         </section>
       ))}
 

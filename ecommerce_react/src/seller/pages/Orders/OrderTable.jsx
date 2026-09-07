@@ -43,15 +43,18 @@ export default function OrderTable() {
   const dispatch = useAppDispatch();
   const sellerOrder = useAppSelector((store) => store.sellerOrder);
   const orders = sellerOrder?.orders || [];
-  const isLoading = sellerOrder?.loading || false;
-
   const [selectedTab, setSelectedTab] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [anchorEl, setAnchorEl] = useState({});
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchSellerOrders());
+    dispatch(fetchSellerOrders()).finally(() => {
+      setHasFetched(true);
+    });
   }, [dispatch]);
+
+  const isLoading = sellerOrder?.loading || !hasFetched;
 
   const orderList = Array.isArray(orders) ? orders : [];
 

@@ -57,11 +57,14 @@ function SearchPage() {
     [categoryParam, priceParam, colorParam, brandParam, discountParam, stockParam]
   );
 
-  // Reset catalog immediately when search query or category changes to prevent stale product flash
+  // Composite key identifying the exact search query
+  const currentKey = `${queryParam}|${categoryParam}|${priceParam}|${colorParam}|${brandParam}|${discountParam}|${stockParam}|${sortParam}|${pageParam}`;
+  const [loadedKey, setLoadedKey] = useState(null);
+
+  // Scroll to top when search query or category changes
   useEffect(() => {
-    dispatch(resetProductCatalog());
     window.scrollTo({ top: 0, behavior: "instant" });
-  }, [queryParam, categoryParam, dispatch]);
+  }, [queryParam, categoryParam]);
 
   // Load products based on query & filters
   const loadSearchProducts = useCallback(() => {
@@ -93,8 +96,11 @@ function SearchPage() {
       pageNumber: Math.max(0, pageParam - 1),
     };
 
-    dispatch(fetchAllProducts(filterRequest));
-  }, [dispatch, queryParam, categoryParam, priceParam, colorParam, brandParam, discountParam, stockParam, sortParam, pageParam]);
+    const targetKey = currentKey;
+    dispatch(fetchAllProducts(filterRequest)).finally(() => {
+      setLoadedKey((prev) => (targetKey === currentKey ? targetKey : prev));
+    });
+  }, [dispatch, queryParam, categoryParam, priceParam, colorParam, brandParam, discountParam, stockParam, sortParam, pageParam, currentKey]);
 
   useEffect(() => {
     loadSearchProducts();
@@ -262,6 +268,11 @@ function SearchPage() {
     </div>
   );
 
+  const isSearchLoading = product.loading || loadedKey !== currentKey;
+  const displayProducts = loadedKey === currentKey ? (product.products || []) : [];
+  const displayTotal = loadedKey === currentKey ? (product.totalElements || displayProducts.length || 0) : 0;
+  const displayPages = loadedKey === currentKey ? (product.totalPages || 1) : 1;
+
   return (
     <ProductListingLayout
       title={
@@ -281,11 +292,12 @@ function SearchPage() {
       badge="Search Results"
       breadcrumbs={breadcrumbs}
       searchQuery={queryParam}
-      products={product.products || []}
-      totalElements={product.totalElements || product.products?.length || 0}
-      totalPages={product.totalPages || 1}
+      products={displayProducts}
+      totalElements={displayTotal}
+      totalPages={displayPages}
       currentPage={pageParam}
-      loading={product.loading}
+      loading={isSearchLoading}
+      hasFetched={loadedKey === currentKey}
       error={product.error}
       filters={activeFilters}
       sort={sortParam}

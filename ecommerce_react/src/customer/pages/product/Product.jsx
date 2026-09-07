@@ -298,11 +298,14 @@ function Product() {
     [priceParam, colorParam, brandParam, discountParam, stockParam]
   );
 
-  // Reset catalog immediately when category changes to prevent stale product flash
+  // Composite key identifying the exact catalog query
+  const currentKey = `${category}|${priceParam}|${colorParam}|${brandParam}|${discountParam}|${stockParam}|${sortParam}|${pageParam}`;
+  const [loadedKey, setLoadedKey] = useState(null);
+
+  // Scroll to top when category changes
   useEffect(() => {
-    dispatch(resetProductCatalog());
     window.scrollTo({ top: 0, behavior: "instant" });
-  }, [category, dispatch]);
+  }, [category]);
 
   // Fetch products whenever category, filters, sort or page changes
   const loadProducts = useCallback(() => {
@@ -337,8 +340,11 @@ function Product() {
       pageNumber: Math.max(0, pageParam - 1),
     };
 
-    dispatch(fetchAllProducts(filterRequest));
-  }, [dispatch, category, priceParam, colorParam, brandParam, discountParam, stockParam, sortParam, pageParam]);
+    const targetKey = currentKey;
+    dispatch(fetchAllProducts(filterRequest)).finally(() => {
+      setLoadedKey((prev) => (targetKey === currentKey ? targetKey : prev));
+    });
+  }, [dispatch, category, priceParam, colorParam, brandParam, discountParam, stockParam, sortParam, pageParam, currentKey]);
 
   useEffect(() => {
     loadProducts();
@@ -407,17 +413,23 @@ function Product() {
     { label: formattedCategoryName, path: `/products/${category}` },
   ];
 
+  const isCatalogLoading = product.loading || loadedKey !== currentKey;
+  const displayProducts = loadedKey === currentKey ? (product.products || []) : [];
+  const displayTotal = loadedKey === currentKey ? (product.totalElements || displayProducts.length || 0) : 0;
+  const displayPages = loadedKey === currentKey ? (product.totalPages || 1) : 1;
+
   return (
     <ProductListingLayout
       title={meta.title}
       subtitle={meta.subtitle}
       badge={meta.badge}
       breadcrumbs={breadcrumbs}
-      products={product.products || []}
-      totalElements={product.totalElements || product.products?.length || 0}
-      totalPages={product.totalPages || 1}
+      products={displayProducts}
+      totalElements={displayTotal}
+      totalPages={displayPages}
       currentPage={pageParam}
-      loading={product.loading}
+      loading={isCatalogLoading}
+      hasFetched={loadedKey === currentKey}
       error={product.error}
       filters={activeFilters}
       sort={sortParam}

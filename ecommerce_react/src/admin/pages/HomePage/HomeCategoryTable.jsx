@@ -96,8 +96,12 @@ export default function HomeCategoryTable({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
+  const [hasFetched, setHasFetched] = useState(false);
+
   useEffect(() => {
-    dispatch(fetchHomeCategories());
+    dispatch(fetchHomeCategories()).finally(() => {
+      setHasFetched(true);
+    });
   }, [dispatch]);
 
   // Filtered categories based on section and search query
@@ -337,7 +341,7 @@ export default function HomeCategoryTable({
       </div>
 
       {/* Content Area */}
-      {loading && categories.length === 0 ? (
+      {(loading || !hasFetched) && categories.length === 0 ? (
         <div className="flex justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800">
           <CircularProgress color="primary" size={32} />
         </div>
