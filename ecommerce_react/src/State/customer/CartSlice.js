@@ -118,6 +118,7 @@ const cartSlice = createSlice({
       .addCase(fetchUserCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.cart = null;
       })
 
       .addCase(addItemToCart.pending, (state) => {
@@ -192,6 +193,20 @@ const cartSlice = createSlice({
       .addCase(removeCoupon.fulfilled, (state, action) => {
         state.loading = false;
         state.cart = action.payload;
+      })
+
+      // Immediate reset on logout
+      .addCase("auth/logout/fulfilled", (state) => {
+        state.cart = null;
+        state.loading = false;
+        state.error = null;
+        state.isCartDrawerOpen = false;
+      })
+      .addCase("auth/logout/pending", (state) => {
+        state.cart = null;
+        state.loading = false;
+        state.error = null;
+        state.isCartDrawerOpen = false;
       });
   },
 });

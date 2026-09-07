@@ -192,6 +192,20 @@ const couponSlice = createSlice({
       // Delete Coupon
       .addCase(deleteCoupon.fulfilled, (state, action) => {
         state.coupons = state.coupons.filter((c) => c.id !== action.payload);
+      })
+
+      // Immediate reset on logout
+      .addCase("auth/logout/fulfilled", (state) => {
+        state.cart = null;
+        state.couponApplied = false;
+        state.error = null;
+        state.loading = false;
+      })
+      .addCase("auth/logout/pending", (state) => {
+        state.cart = null;
+        state.couponApplied = false;
+        state.error = null;
+        state.loading = false;
       });
   },
 });

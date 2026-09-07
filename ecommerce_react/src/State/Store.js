@@ -17,7 +17,7 @@ import couponSlice from './customer/CouponSlice'
 import chatSlice from './customer/ChatSlice'
 import notificationSlice from './customer/notificationSlice'
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   seller: sellerSlice,
   sellerProduct: sellerProductSlice,
   sellerDeal: sellerDealSlice,
@@ -37,6 +37,31 @@ const rootReducer = combineReducers({
   chat: chatSlice,
   notifications: notificationSlice,
 })
+
+const rootReducer = (state, action) => {
+  if (action.type === 'auth/logout/fulfilled' || action.type === 'auth/logout/pending') {
+    // Preserve public catalog data while purging all user session data immediately
+    state = {
+      product: state?.product,
+      customer: state?.customer,
+      home: state?.home,
+      admin: state?.admin,
+      homeCategory: state?.homeCategory,
+      adminFetch: state?.adminFetch,
+      auth: {
+        jwt: null,
+        role: null,
+        otpSend: false,
+        isLoggedIn: false,
+        user: null,
+        loading: false,
+        authChecking: false,
+        error: null,
+      },
+    };
+  }
+  return appReducer(state, action);
+};
 
 export const store = configureStore({
   reducer: rootReducer,

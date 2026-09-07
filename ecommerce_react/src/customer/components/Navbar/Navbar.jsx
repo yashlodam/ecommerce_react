@@ -36,7 +36,7 @@ import Collapse from "@mui/material/Collapse";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import { fetchUserProfile, logout } from "../../../State/AuthSlice";
 import { fetchSellerProfile } from "../../../State/seller/sellerSlice";
-import { fetchUserCart, openCartDrawer } from "../../../State/customer/CartSlice";
+import { fetchUserCart, openCartDrawer, resetCartState } from "../../../State/customer/CartSlice";
 import { searchProduct } from "../../../State/customer/ProductSlice";
 import { openChat } from "../../../State/customer/ChatSlice";
 
@@ -93,6 +93,8 @@ function Navbar() {
           dispatch(fetchUserCart());
         }
       }
+    } else {
+      dispatch(resetCartState());
     }
   }, [dispatch, isLoggedIn, role]);
 

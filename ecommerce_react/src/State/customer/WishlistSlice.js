@@ -79,6 +79,7 @@ const wishlistSlice = createSlice({
       .addCase(getWishlistByUserId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.wishlist = null;
       })
 
       .addCase(addProductToWishlist.pending, (state) => {
@@ -105,6 +106,18 @@ const wishlistSlice = createSlice({
       .addCase(removeProductFromWishlist.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Immediate reset on logout
+      .addCase("auth/logout/fulfilled", (state) => {
+        state.wishlist = null;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase("auth/logout/pending", (state) => {
+        state.wishlist = null;
+        state.loading = false;
+        state.error = null;
       });
   },
 });

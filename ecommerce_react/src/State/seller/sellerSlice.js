@@ -143,6 +143,26 @@ const sellerSlice = createSlice({
       .addCase(updateSellerProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Immediate reset on logout
+      .addCase("auth/logout/fulfilled", (state) => {
+        state.profile = null;
+        state.selectedSeller = null;
+        state.report = null;
+        state.error = null;
+        state.loading = false;
+        state.profileLoading = false;
+        state.reportLoading = false;
+      })
+      .addCase("auth/logout/pending", (state) => {
+        state.profile = null;
+        state.selectedSeller = null;
+        state.report = null;
+        state.error = null;
+        state.loading = false;
+        state.profileLoading = false;
+        state.reportLoading = false;
       });
   },
 });

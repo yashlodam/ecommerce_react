@@ -218,6 +218,15 @@ const orderSlice = createSlice({
     resetOrderCanceled: (state) => {
       state.orderCanceled = false;
     },
+    resetOrderState: (state) => {
+      state.orders = [];
+      state.currentOrder = null;
+      state.orderItem = null;
+      state.paymentOrder = null;
+      state.orderCanceled = false;
+      state.loading = false;
+      state.error = null;
+    },
   },
 
   extraReducers: (builder) => {
@@ -235,6 +244,7 @@ const orderSlice = createSlice({
       .addCase(fetchUserOrderHistory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.orders = [];
       })
 
       // Fetch Order By Id
@@ -311,9 +321,29 @@ const orderSlice = createSlice({
       .addCase(cancelOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Immediate reset on logout
+      .addCase("auth/logout/fulfilled", (state) => {
+        state.orders = [];
+        state.currentOrder = null;
+        state.orderItem = null;
+        state.paymentOrder = null;
+        state.orderCanceled = false;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase("auth/logout/pending", (state) => {
+        state.orders = [];
+        state.currentOrder = null;
+        state.orderItem = null;
+        state.paymentOrder = null;
+        state.orderCanceled = false;
+        state.loading = false;
+        state.error = null;
       });
   },
 });
 
-export const { clearOrderError, resetOrderCanceled } = orderSlice.actions;
+export const { clearOrderError, resetOrderCanceled, resetOrderState } = orderSlice.actions;
 export default orderSlice.reducer;

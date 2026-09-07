@@ -198,6 +198,26 @@ const notificationSlice = createSlice({
       // deleteAllReadNotifications
       .addCase(deleteAllReadNotifications.fulfilled, (state) => {
         state.notifications = state.notifications.filter((n) => !n.read);
+      })
+
+      // Immediate reset on logout
+      .addCase("auth/logout/fulfilled", (state) => {
+        state.notifications = [];
+        state.unreadCount = 0;
+        state.loading = false;
+        state.error = null;
+        state.page = 0;
+        state.totalPages = 0;
+        state.totalElements = 0;
+      })
+      .addCase("auth/logout/pending", (state) => {
+        state.notifications = [];
+        state.unreadCount = 0;
+        state.loading = false;
+        state.error = null;
+        state.page = 0;
+        state.totalPages = 0;
+        state.totalElements = 0;
       });
   },
 });

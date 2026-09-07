@@ -15,7 +15,7 @@ import PricingCrd from "./PricingCrd";
 import EmptyState from "../../../common/EmptyState";
 import CouponModal from "../../../common/coupons/CouponModal";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
-import { fetchUserCart } from "../../../State/customer/CartSlice";
+import { fetchUserCart, resetCartState } from "../../../State/customer/CartSlice";
 import {
   applyCoupon,
   removeCoupon,
@@ -42,6 +42,7 @@ function Cart() {
   const dispatch = useAppDispatch();
   const cart = useAppSelector((store) => store.cart);
   const couponState = useAppSelector((store) => store.coupon);
+  const { isLoggedIn } = useAppSelector((store) => store.auth);
 
   const cartItems = cart.cart?.cartItems || [];
   const activeCoupons = couponState?.activeCoupons || [];
@@ -55,9 +56,13 @@ function Cart() {
   const hasOutOfStockItems = outOfStockItems.length > 0;
 
   useEffect(() => {
-    dispatch(fetchUserCart());
-    dispatch(fetchActiveCoupons());
-  }, [dispatch]);
+    if (isLoggedIn) {
+      dispatch(fetchUserCart());
+      dispatch(fetchActiveCoupons());
+    } else {
+      dispatch(resetCartState());
+    }
+  }, [dispatch, isLoggedIn]);
 
   // Base cart order value before coupon discount
   const baseOrderValue =
@@ -123,9 +128,13 @@ function Cart() {
           <EmptyState
             icon={ShoppingBagOutlinedIcon}
             title="Your Cart is Empty"
-            description="Looks like you haven't added anything to your cart yet. Explore our top categories and discover trending collections!"
-            actionText="Start Shopping"
-            onAction={() => navigate("/")}
+            description={
+              isLoggedIn
+                ? "Looks like you haven't added anything to your cart yet. Explore our top categories and discover trending collections!"
+                : "Log in to view your saved cart items and complete your purchase."
+            }
+            actionText={isLoggedIn ? "Start Shopping" : "Sign In to Continue"}
+            onAction={() => navigate(isLoggedIn ? "/" : "/login")}
           />
         </div>
       ) : (

@@ -145,6 +145,26 @@ const chatSlice = createSlice({
         state.sessionId = null;
         state.messages = [];
         localStorage.removeItem(SESSION_KEY);
+      })
+
+      // Immediate reset on logout
+      .addCase("auth/logout/fulfilled", (state) => {
+        state.sessionId = null;
+        state.messages = [];
+        state.isOpen = false;
+        state.error = null;
+        try {
+          localStorage.removeItem(SESSION_KEY);
+        } catch {}
+      })
+      .addCase("auth/logout/pending", (state) => {
+        state.sessionId = null;
+        state.messages = [];
+        state.isOpen = false;
+        state.error = null;
+        try {
+          localStorage.removeItem(SESSION_KEY);
+        } catch {}
       });
   },
 });

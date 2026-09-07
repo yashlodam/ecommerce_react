@@ -1,5 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api, executeSilentRefresh } from "../config/Api";
+import { resetCartState } from "./customer/CartSlice";
+import { resetWishlistState } from "./customer/WishlistSlice";
+import { resetOrderState } from "./customer/OrderSlice";
+import { resetNotifications } from "./customer/notificationSlice";
 
 // ─── ASYNC THUNKS ────────────────────────────────────────────────────────────
 
@@ -86,7 +90,7 @@ export const fetchUserProfile = createAsyncThunk(
 
 export const logout = createAsyncThunk(
   "auth/logout",
-  async (navigate) => {
+  async (navigate, { dispatch }) => {
     try {
       // Revoke refresh token on the server and clear HttpOnly cookie
       await api.post("/auth/logout");
@@ -100,7 +104,17 @@ export const logout = createAsyncThunk(
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
       localStorage.removeItem("seller_jwt");
+      localStorage.removeItem("shopsphere_chat_session_id");
     } catch {}
+
+    // Synchronously dispatch reset actions for all customer state
+    try {
+      dispatch(resetCartState());
+      dispatch(resetWishlistState());
+      dispatch(resetOrderState());
+      dispatch(resetNotifications());
+    } catch {}
+
     if (navigate) navigate("/");
     return null;
   }
