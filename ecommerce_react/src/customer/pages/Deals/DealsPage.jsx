@@ -13,6 +13,7 @@ import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 
 import { getActiveDeals } from "../../../services/dealService";
+import { useAppSelector } from "../../../State/Store";
 import DealBadge from "../../../common/deals/DealBadge";
 import DealCountdown from "../../../common/deals/DealCountdown";
 import EmptyState from "../../../common/EmptyState";
@@ -27,6 +28,7 @@ function formatINR(val) {
 
 export default function DealsPage() {
   const navigate = useNavigate();
+  const reduxHome = useAppSelector((state) => state.home || state.customer);
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,11 +40,27 @@ export default function DealsPage() {
     setError(null);
     try {
       const data = await getActiveDeals();
-      setDeals(Array.isArray(data) ? data : []);
+      const serverDeals = Array.isArray(data) ? data : [];
+      // Merge with Redux deals if available to guarantee parity with homepage deals
+      const combined = [...serverDeals];
+      const fallbackList = reduxHome?.deals || reduxHome?.homePageData?.deals || [];
+      if (Array.isArray(fallbackList)) {
+        for (const d of fallbackList) {
+          if (d?.id && !combined.some((item) => item.id === d.id)) {
+            combined.push(d);
+          }
+        }
+      }
+      setDeals(combined);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Unable to load active promotional deals right now. Please try again."
-      );
+      const fallbackList = reduxHome?.deals || reduxHome?.homePageData?.deals || [];
+      if (Array.isArray(fallbackList) && fallbackList.length > 0) {
+        setDeals(fallbackList);
+      } else {
+        setError(
+          err.response?.data?.message || "Unable to load active promotional deals right now. Please try again."
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -52,6 +70,24 @@ export default function DealsPage() {
     loadDeals();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+
+  // Ensure deals sync dynamically if Redux home/admin deals update
+  useEffect(() => {
+    const fallbackList = reduxHome?.deals || reduxHome?.homePageData?.deals;
+    if (Array.isArray(fallbackList) && fallbackList.length > 0) {
+      setDeals((prev) => {
+        const combined = [...prev];
+        let changed = false;
+        for (const d of fallbackList) {
+          if (d?.id && !combined.some((item) => item.id === d.id)) {
+            combined.push(d);
+            changed = true;
+          }
+        }
+        return changed ? combined : prev;
+      });
+    }
+  }, [reduxHome?.deals, reduxHome?.homePageData?.deals]);
 
   const filteredDeals = deals.filter((deal) => {
     const matchesTab =
