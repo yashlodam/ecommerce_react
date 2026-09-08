@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
+import DealBadge from "../../../common/deals/DealBadge";
+import DealPrice from "../../../common/deals/DealPrice";
 
 function formatINR(val) {
   return new Intl.NumberFormat("en-IN", {
@@ -33,11 +35,22 @@ function SimilarProductCard({ item }) {
           loading="lazy"
         />
 
-        {item.discountPercent > 0 && (
+        {/* Deal Badge or Standard Discount Pill */}
+        {item.dealActive ? (
+          <div className="absolute top-3 left-3 z-10">
+            <DealBadge
+              discountValue={item.discountPercentage}
+              discountType="PERCENTAGE"
+              dealType={item.dealType}
+              size="xs"
+              urgent={true}
+            />
+          </div>
+        ) : item.discountPercent > 0 ? (
           <span className="absolute top-3 left-3 bg-teal-600 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow z-10">
             {item.discountPercent}% OFF
           </span>
-        )}
+        ) : null}
 
         {/* Out of Stock Overlay */}
         {((item.quantity != null && item.quantity <= 0) || item.inStock === false) && (
@@ -66,15 +79,23 @@ function SimilarProductCard({ item }) {
           </span>
         </div>
 
-        <div className="flex items-baseline gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <span className="text-base font-extrabold text-slate-900 dark:text-slate-100">
-            {formatINR(item.sellingPrice)}
-          </span>
+        {/* Price & Deal Line */}
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+          <DealPrice
+            effectivePrice={item.dealActive && item.effectivePrice != null ? item.effectivePrice : item.sellingPrice}
+            basePrice={item.dealActive ? (item.basePrice || item.sellingPrice) : null}
+            mrpPrice={item.mrpPrice}
+            discountPercentage={item.dealActive ? item.discountPercentage : item.discountPercent}
+            discountAmount={item.discountAmount}
+            dealActive={Boolean(item.dealActive)}
+            size="sm"
+          />
 
-          {item.mrpPrice > item.sellingPrice && (
-            <span className="line-through text-slate-400 text-xs">
-              {formatINR(item.mrpPrice)}
-            </span>
+          {item.dealActive && item.appliedDealTitle && (
+            <p className="text-[10px] font-bold text-teal-600 dark:text-teal-400 truncate mt-1 flex items-center gap-1">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+              {item.appliedDealTitle}
+            </p>
           )}
         </div>
       </div>

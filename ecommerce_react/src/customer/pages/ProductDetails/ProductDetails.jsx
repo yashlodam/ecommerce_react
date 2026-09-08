@@ -171,6 +171,26 @@ function ProductDetails() {
   const displayDiscount = selectedVariant?.discountPercent ?? currentProduct?.discountPercent ?? 0;
   const displayStock = Math.max(0, currentStock);
 
+  // Single authoritative pricing source of truth (syncing variant + active promotional deals)
+  const isDealActive = Boolean(dealPricing?.dealActive);
+  const effectivePrice = isDealActive && dealPricing?.effectivePrice != null
+    ? dealPricing.effectivePrice
+    : displaySellingPrice;
+  const basePrice = isDealActive
+    ? (dealPricing?.basePrice ?? displaySellingPrice)
+    : null;
+  const mrpPrice = displayMrpPrice;
+  const originalPrice = isDealActive
+    ? (basePrice || mrpPrice)
+    : (mrpPrice > effectivePrice ? mrpPrice : null);
+  const hasDiscount = originalPrice != null && originalPrice > effectivePrice;
+  const effectiveDiscount = isDealActive
+    ? (dealPricing?.discountPercentage ?? displayDiscount)
+    : displayDiscount;
+  const discountSavingsAmount = isDealActive
+    ? (dealPricing?.discountAmount ?? (hasDiscount ? originalPrice - effectivePrice : 0))
+    : (hasDiscount ? originalPrice - effectivePrice : 0);
+
   const handleAddToCart = () => {
     if (!requireAuth()) return;
     if (!isInStock || displayStock <= 0) {
@@ -444,12 +464,12 @@ function ProductDetails() {
               {/* Price Line — uses authoritative DealPrice component */}
               <div className="mt-4">
                 <DealPrice
-                  effectivePrice={dealPricing?.dealActive ? dealPricing.effectivePrice : displaySellingPrice}
-                  basePrice={dealPricing?.dealActive ? dealPricing.basePrice : null}
-                  mrpPrice={displayMrpPrice}
-                  discountPercentage={dealPricing?.dealActive ? dealPricing.discountPercentage : displayDiscount}
-                  discountAmount={dealPricing?.discountAmount}
-                  dealActive={Boolean(dealPricing?.dealActive)}
+                  effectivePrice={effectivePrice}
+                  basePrice={basePrice}
+                  mrpPrice={mrpPrice}
+                  discountPercentage={effectiveDiscount}
+                  discountAmount={discountSavingsAmount}
+                  dealActive={isDealActive}
                   size="xl"
                 />
               </div>
@@ -782,19 +802,22 @@ function ProductDetails() {
           )}
         </button>
 
-        <div className="flex flex-col min-w-0 pr-1">
-          <span className="text-[10px] text-slate-400 font-medium line-through leading-none">
-            {dealPricing?.hasActiveDeal
-              ? formatINR(dealPricing.originalPrice)
-              : displayMrpPrice > displaySellingPrice
-              ? formatINR(displayMrpPrice)
-              : null}
-          </span>
-          <span className="text-base font-black text-slate-900 dark:text-slate-100 leading-tight">
-            {dealPricing?.hasActiveDeal
-              ? formatINR(dealPricing.dealPrice)
-              : formatINR(displaySellingPrice)}
-          </span>
+        <div className="flex flex-col min-w-0 pr-1 shrink-0">
+          {hasDiscount && (
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold line-through leading-none">
+              {formatINR(originalPrice)}
+            </span>
+          )}
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-base font-black text-slate-900 dark:text-slate-100 leading-tight">
+              {formatINR(effectivePrice)}
+            </span>
+            {hasDiscount && effectiveDiscount > 0 && (
+              <span className="text-[10px] font-bold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800/80 px-1.5 py-0.5 rounded-full leading-none">
+                {effectiveDiscount}% OFF
+              </span>
+            )}
+          </div>
         </div>
 
         <Button
