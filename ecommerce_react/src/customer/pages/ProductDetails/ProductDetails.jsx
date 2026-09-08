@@ -59,6 +59,7 @@ function ProductDetails() {
   const [variantsLoading, setVariantsLoading] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [dealPricing, setDealPricing] = useState(null);
+  const [priceLoading, setPriceLoading] = useState(false);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -120,23 +121,45 @@ function ProductDetails() {
       .finally(() => setVariantsLoading(false));
   }, [productId]);
 
-  // Fetch real-time deal pricing
+  // Fetch real-time deal pricing with race-condition prevention and loading state
   useEffect(() => {
     if (!productId) return;
+    const controller = new AbortController();
     const variantQuery = selectedVariant?.id ? `&variantId=${selectedVariant.id}` : "";
+    setPriceLoading(true);
+
     api
-      .get(`/api/deals/pricing?productId=${productId}${variantQuery}`)
-      .then((res) => setDealPricing(res.data))
-      .catch(() => setDealPricing(null));
+      .get(`/api/deals/pricing?productId=${productId}${variantQuery}`, {
+        signal: controller.signal,
+      })
+      .then((res) => {
+        setDealPricing(res.data);
+      })
+      .catch((err) => {
+        if (err?.code !== "ERR_CANCELED" && err?.name !== "CanceledError" && err?.name !== "AbortError") {
+          setDealPricing(null);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setPriceLoading(false);
+        }
+      });
+
+    return () => {
+      controller.abort();
+    };
   }, [productId, selectedVariant?.id]);
 
   const handleDealExpire = () => {
     if (!productId) return;
     const variantQuery = selectedVariant?.id ? `&variantId=${selectedVariant.id}` : "";
+    setPriceLoading(true);
     api
       .get(`/api/deals/pricing?productId=${productId}${variantQuery}`)
       .then((res) => setDealPricing(res.data))
-      .catch(() => setDealPricing(null));
+      .catch(() => setDealPricing(null))
+      .finally(() => setPriceLoading(false));
   };
 
   const images = currentProduct?.images || [];
@@ -171,24 +194,53 @@ function ProductDetails() {
   const displayDiscount = selectedVariant?.discountPercent ?? currentProduct?.discountPercent ?? 0;
   const displayStock = Math.max(0, currentStock);
 
-  // Single authoritative pricing source of truth (syncing variant + active promotional deals)
+  // Validate whether dealPricing in state matches the currently selected variant
+  const isDealPricingMatching = Boolean(
+    dealPricing &&
+    (selectedVariant?.id
+      ? Number(dealPricing.variantId) === Number(selectedVariant.id)
+      : (!dealPricing.variantId || Number(dealPricing.productId) === Number(productId)))
+  );
+
+  // Promotional deal calculations (real-time responsive fallback prevents stale variant price display)
   const isDealActive = Boolean(dealPricing?.dealActive);
-  const effectivePrice = isDealActive && dealPricing?.effectivePrice != null
-    ? dealPricing.effectivePrice
+  const activeDealDiscountPercent = isDealActive ? (dealPricing?.discountPercentage || 0) : 0;
+
+  // Single authoritative pricing source of truth (syncing variant + active promotional deals)
+  // If deal is active:
+  // - If dealPricing matches this variant, use exact backend deal pricing.
+  // - If dealPricing is currently fetching for this newly selected variant, instantly calculate
+  //   the deal price for this variant using the active deal percentage (0ms visual delay)!
+  const effectivePrice = isDealActive
+    ? (isDealPricingMatching && dealPricing?.effectivePrice != null
+        ? dealPricing.effectivePrice
+        : (activeDealDiscountPercent > 0
+            ? Math.round(displaySellingPrice * (1 - activeDealDiscountPercent / 100))
+            : displaySellingPrice))
     : displaySellingPrice;
+
   const basePrice = isDealActive
-    ? (dealPricing?.basePrice ?? displaySellingPrice)
+    ? (isDealPricingMatching && dealPricing?.basePrice != null
+        ? dealPricing.basePrice
+        : displaySellingPrice)
     : null;
+
   const mrpPrice = displayMrpPrice;
   const originalPrice = isDealActive
     ? (basePrice || mrpPrice)
     : (mrpPrice > effectivePrice ? mrpPrice : null);
+
   const hasDiscount = originalPrice != null && originalPrice > effectivePrice;
   const effectiveDiscount = isDealActive
-    ? (dealPricing?.discountPercentage ?? displayDiscount)
+    ? (isDealPricingMatching && dealPricing?.discountPercentage != null
+        ? dealPricing.discountPercentage
+        : activeDealDiscountPercent || displayDiscount)
     : displayDiscount;
+
   const discountSavingsAmount = isDealActive
-    ? (dealPricing?.discountAmount ?? (hasDiscount ? originalPrice - effectivePrice : 0))
+    ? (isDealPricingMatching && dealPricing?.discountAmount != null
+        ? dealPricing.discountAmount
+        : (hasDiscount ? originalPrice - effectivePrice : 0))
     : (hasDiscount ? originalPrice - effectivePrice : 0);
 
   const handleAddToCart = () => {
@@ -240,14 +292,66 @@ function ProductDetails() {
     }
   };
 
-  // Loading State
+  const handleSelectVariant = (v) => {
+    if (selectedVariant?.id === v.id) return;
+    setSelectedVariant(v);
+    setQuantity(1);
+    setPriceLoading(true);
+  };
+
+  // Loading State — Full-Page Shimmer Skeleton (Flipkart / Amazon style)
   if (isLoading) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-[60vh] space-y-3">
-        <CircularProgress color="primary" />
-        <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
-          Loading product specifications...
-        </p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 animate-pulse">
+        {/* Breadcrumb Skeleton */}
+        <div className="flex items-center gap-2 mb-6">
+          <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
+          <div className="h-3 w-3 bg-slate-200 dark:bg-slate-800 rounded" />
+          <div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+          <div className="h-3 w-3 bg-slate-200 dark:bg-slate-800 rounded" />
+          <div className="h-3 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Left: Gallery Skeleton */}
+          <div className="lg:col-span-6 space-y-4">
+            <div className="w-full aspect-square max-h-[480px] bg-slate-200 dark:bg-slate-800 rounded-3xl" />
+            <div className="flex gap-3 overflow-hidden">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="w-18 h-18 bg-slate-200 dark:bg-slate-800 rounded-2xl shrink-0" />
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Info Skeleton */}
+          <div className="lg:col-span-6 space-y-5">
+            <div className="h-6 w-36 bg-slate-200 dark:bg-slate-800 rounded-full" />
+            <div className="h-8 w-4/5 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+            <div className="h-4 w-48 bg-slate-200 dark:bg-slate-800 rounded" />
+
+            {/* Price Box Skeleton */}
+            <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-850 space-y-2.5">
+              <div className="h-10 w-48 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+              <div className="h-3 w-64 bg-slate-200 dark:bg-slate-800 rounded" />
+            </div>
+
+            {/* Options Skeleton */}
+            <div className="space-y-2 pt-2">
+              <div className="h-3.5 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="flex gap-2.5">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-9 w-20 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+                ))}
+              </div>
+            </div>
+
+            {/* CTA Buttons Skeleton */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-4">
+              <div className="h-12 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+              <div className="h-12 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -471,6 +575,7 @@ function ProductDetails() {
                   discountAmount={discountSavingsAmount}
                   dealActive={isDealActive}
                   size="xl"
+                  loading={priceLoading}
                 />
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
@@ -587,19 +692,19 @@ function ProductDetails() {
                           key={v.id}
                           type="button"
                           disabled={outOfStock}
-                          onClick={() => {
-                            setSelectedVariant(v);
-                            setQuantity(1);
-                          }}
-                          className={`px-4 py-1.5 rounded-xl text-xs font-bold border transition-all relative ${
+                          onClick={() => handleSelectVariant(v)}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all relative flex items-center gap-1.5 ${
                             outOfStock
                               ? "opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 line-through"
                               : isSelected
-                              ? "bg-teal-600 text-white border-teal-600 shadow-sm"
-                              : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-teal-500 cursor-pointer"
+                              ? "bg-teal-600 text-white border-teal-600 shadow-md ring-2 ring-teal-500/40"
+                              : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-teal-500 cursor-pointer active:scale-95"
                           }`}
                         >
-                          {v.variantName}
+                          {isSelected && priceLoading && (
+                            <CircularProgress size={11} color="inherit" />
+                          )}
+                          <span>{v.variantName}</span>
                           {outOfStock && (
                             <span className="block text-[9px] font-normal not-italic leading-none mt-0.5">
                               Out of stock
@@ -610,12 +715,19 @@ function ProductDetails() {
                     })}
                   </div>
                   {selectedVariant && (
-                    <p className="text-[11px] text-teal-600 dark:text-teal-400 font-semibold mt-2">
-                      Selected: <strong>{selectedVariant.variantName}</strong>
-                      {selectedVariant.quantity > 0
-                        ? ` — ${selectedVariant.quantity} in stock`
-                        : " — Out of stock"}
-                    </p>
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                      <p className="text-[11px] text-teal-700 dark:text-teal-400 font-semibold">
+                        Selected: <strong>{selectedVariant.variantName}</strong>
+                        {selectedVariant.quantity > 0
+                          ? ` — ${selectedVariant.quantity} in stock`
+                          : " — Out of stock"}
+                      </p>
+                      {priceLoading && (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-teal-600 dark:text-teal-400 font-bold animate-pulse">
+                          • Updating real-time price...
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
               ) : null}
@@ -803,21 +915,37 @@ function ProductDetails() {
         </button>
 
         <div className="flex flex-col min-w-0 pr-1 shrink-0">
-          {hasDiscount && (
-            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold line-through leading-none">
-              {formatINR(originalPrice)}
-            </span>
+          {priceLoading ? (
+            <div className="flex items-center gap-1.5 py-0.5 animate-pulse">
+              <CircularProgress size={12} sx={{ color: "#0d9488" }} />
+              <div className="flex flex-col">
+                <span className="text-[9px] text-teal-600 dark:text-teal-400 font-bold uppercase tracking-wider leading-none">
+                  Live Price
+                </span>
+                <span className="text-sm font-black text-slate-900 dark:text-slate-100 leading-tight">
+                  {formatINR(effectivePrice)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <>
+              {hasDiscount && (
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold line-through leading-none">
+                  {formatINR(originalPrice)}
+                </span>
+              )}
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-base font-black text-slate-900 dark:text-slate-100 leading-tight">
+                  {formatINR(effectivePrice)}
+                </span>
+                {hasDiscount && effectiveDiscount > 0 && (
+                  <span className="text-[10px] font-bold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800/80 px-1.5 py-0.5 rounded-full leading-none">
+                    {effectiveDiscount}% OFF
+                  </span>
+                )}
+              </div>
+            </>
           )}
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-base font-black text-slate-900 dark:text-slate-100 leading-tight">
-              {formatINR(effectivePrice)}
-            </span>
-            {hasDiscount && effectiveDiscount > 0 && (
-              <span className="text-[10px] font-bold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800/80 px-1.5 py-0.5 rounded-full leading-none">
-                {effectiveDiscount}% OFF
-              </span>
-            )}
-          </div>
         </div>
 
         <Button

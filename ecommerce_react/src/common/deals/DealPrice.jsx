@@ -21,6 +21,7 @@ function formatINR(val) {
  * @param {boolean} dealActive - Whether a promotional deal is actively applied
  * @param {"sm"|"md"|"lg"|"xl"} size - Sizing tier
  * @param {string} className - Additional CSS classes
+ * @param {boolean} loading - Whether price is actively recalculating in real-time
  */
 export default function DealPrice({
   effectivePrice,
@@ -31,6 +32,7 @@ export default function DealPrice({
   dealActive = false,
   size = "md",
   className = "",
+  loading = false,
 }) {
   const currentPrice = effectivePrice != null ? effectivePrice : basePrice || mrpPrice || 0;
   const originalPrice = dealActive
@@ -68,14 +70,18 @@ export default function DealPrice({
 
   return (
     <div
-      className={`flex items-baseline gap-2 sm:gap-2.5 flex-wrap ${className}`}
+      className={`flex items-baseline gap-2 sm:gap-2.5 flex-wrap transition-opacity duration-200 ${
+        loading ? "opacity-80" : "opacity-100"
+      } ${className}`}
       aria-label={`Price: ${formatINR(currentPrice)}${
         hasDiscount ? `, original price ${formatINR(originalPrice)}` : ""
       }`}
     >
       {/* Effective Dominant Price */}
       <span
-        className={`${currentSize.price} text-slate-900 dark:text-slate-100 tracking-tight`}
+        className={`${currentSize.price} text-slate-900 dark:text-slate-100 tracking-tight transition-all duration-200 ${
+          loading ? "animate-pulse" : ""
+        }`}
       >
         {formatINR(currentPrice)}
       </span>
@@ -95,6 +101,22 @@ export default function DealPrice({
           className={`${currentSize.badge} font-bold rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-400 border border-teal-200/80 dark:border-teal-800/80`}
         >
           {discountPercentage ? `${discountPercentage}% OFF` : `Save ${formatINR(discountAmount)}`}
+        </span>
+      )}
+
+      {/* Real-time updating micro-indicator */}
+      {loading && (
+        <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-bold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/80 border border-teal-200 dark:border-teal-800/80 px-2 py-0.5 rounded-full animate-pulse">
+          <svg
+            className="animate-spin h-2.5 w-2.5 sm:h-3 sm:w-3 text-teal-600 dark:text-teal-400"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          Updating...
         </span>
       )}
     </div>
