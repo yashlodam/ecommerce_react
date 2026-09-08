@@ -46,6 +46,8 @@ function App() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  // Determine the current section of the app based on the URL path
+
   const isSeller = location.pathname.startsWith("/seller");
   const isAdmin = location.pathname.startsWith("/admin");
   const isCheckout = location.pathname.startsWith("/checkout") || location.pathname.startsWith("/order-success");
